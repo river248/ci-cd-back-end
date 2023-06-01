@@ -4,6 +4,7 @@ import { HttpStatusCode } from '~/utils/constants'
 const handleDataFromGithubAction = (req, res) => {
     const result = PipeLineService.handleDataFromGithubActions(req.body)
 
+    console.log(result)
     res.status(HttpStatusCode.OK).json(result)
 }
 

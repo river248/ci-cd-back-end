@@ -1,16 +1,12 @@
 const handleDataFromGithubActions = (payload) => {
-    const { repository } = payload
-    const checkSuite = payload.check_suite
-
-    const { conclusion, head_branch, created_at, updated_at, head_commit } = checkSuite
+    const { workflow_job } = payload
+    const { status, conclusion, head_branch, created_at, completed_at } = workflow_job
 
     const pipelineData = {
-        status: conclusion,
+        status: conclusion || status,
         branch: head_branch,
         startDate: created_at,
-        endDate: updated_at,
-        commitId: head_commit.id,
-        repo: repository.name,
+        endDate: completed_at,
     }
 
     return pipelineData
