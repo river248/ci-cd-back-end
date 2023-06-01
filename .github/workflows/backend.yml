@@ -8,13 +8,15 @@ on:
     workflow_dispatch:
         # Inputs the workflow accepts.
         inputs:
-            BRANCH:
-                description: 'Branch to use'
+            name:
+                # Friendly description to be shown in the UI instead of 'name'
+                description: 'CI/CD to greet'
+                # Default value if no value is explicitly provided
+                default: 'Backend'
+                # Input has to be provided for the workflow to run
                 required: true
-                default: 'master'
-                type: choice
-                options:
-                    - master
+                # The data type of the input
+                type: string
 
 jobs:
     build:

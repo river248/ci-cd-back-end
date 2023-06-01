@@ -2,18 +2,17 @@ import { Octokit } from 'octokit'
 
 const triggerWorkflow = async () => {
     const octokit = new Octokit({
-        auth: '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',
+        auth: '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',
     })
 
     try {
         const res = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
             owner: 'river248',
             repo: 'ci-cd-back-end',
-            workflow_id: 'Github River Pipeline',
+            workflow_id: 'backend.yml',
             ref: 'master',
             inputs: {
-                name: 'Mona the Octocat',
-                home: 'San Francisco, CA',
+                name: 'Backend',
             },
             headers: {
                 'X-GitHub-Api-Version': '2022-11-28',
