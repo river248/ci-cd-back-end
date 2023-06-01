@@ -1,18 +1,29 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# This is a basic workflow that is manually triggered
 
-name: CI/CD River Backend
+name: Pipeline for master
 
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
 on:
-    push:
-        branches: ['master']
-    pull_request:
-        branches: ['master']
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Person to greet'
+        # Default value if no value is explicitly provided
+        default: 'World'
+        # Input has to be provided for the workflow to run
+        required: true
+        # The data type of the input
+        type: string
 
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
+            - name: Send greeting
+              run: echo "Hello ${{ inputs.name }}"
             - uses: actions/checkout@v3
             - name: Use Node.js 18
               uses: actions/setup-node@v3
