@@ -2,11 +2,11 @@ import { Octokit } from 'octokit'
 
 const triggerWorkflow = async () => {
     const octokit = new Octokit({
-        auth: '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',
+        auth: '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',
     })
 
     try {
-        await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+        const res = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
             owner: 'river248',
             repo: 'ci-cd-back-end',
             workflow_id: 'Github River Pipeline',
@@ -20,7 +20,7 @@ const triggerWorkflow = async () => {
             },
         })
 
-        return undefined
+        return res
     } catch (error) {
         console.log(error)
         throw new Error(error)
