@@ -20,7 +20,7 @@ import { corsConfig } from './configs/cors'
 //         process.exit(1)
 //     })
 
-const bootServer = () => {
+const bootServer = async () => {
     const app = express()
     const httpServer = createServer(app)
     const io = new Server(httpServer, {
@@ -29,6 +29,7 @@ const bootServer = () => {
     const socketService = new SocketServices()
 
     global._io = io
+    global.datafile = 1
 
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
@@ -41,6 +42,20 @@ const bootServer = () => {
     app.use('/v1', apiV1)
 
     global._io.on('connection', socketService.connection)
+    // Octokit.js
+    // https://github.com/octokit/core.js#readme
+    // const octokit = new Octokit({
+    //     auth: 'YOUR-TOKEN',
+    // })
+
+    // await octokit.request('GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}', {
+    //     owner: 'river248',
+    //     repo: 'ci-cd-backend',
+    //     workflow_id: 'CI/CD River Backend',
+    //     headers: {
+    //         'X-GitHub-Api-Version': '2022-11-28',
+    //     },
+    // })
 
     httpServer.listen(8080, () => {
         console.log(`Hello CI/CD App, I'm running at :${8080}/`)
