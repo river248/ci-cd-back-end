@@ -2,6 +2,7 @@ import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import cors from 'cors'
+import { Octokit } from 'octokit'
 // import { credential } from 'firebase-admin'
 // import { initializeApp } from 'firebase-admin/app'
 
@@ -10,6 +11,7 @@ import cors from 'cors'
 import { apiV1 } from './routes/v1'
 import SocketServices from './services/socket.service'
 import { corsConfig } from './configs/cors'
+import { env } from './configs/environment'
 // import { firebaseCredentials } from './config/firebase'
 
 // connectDB()
@@ -23,13 +25,18 @@ import { corsConfig } from './configs/cors'
 const bootServer = async () => {
     const app = express()
     const httpServer = createServer(app)
+
     const io = new Server(httpServer, {
         cors: corsConfig,
     })
     const socketService = new SocketServices()
 
+    const octokit = new Octokit({
+        auth: env.GITHUB_AUTH,
+    })
+
     global._io = io
-    global.datafile = 1
+    global.octokit = octokit
 
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
@@ -42,20 +49,6 @@ const bootServer = async () => {
     app.use('/v1', apiV1)
 
     global._io.on('connection', socketService.connection)
-    // Octokit.js
-    // https://github.com/octokit/core.js#readme
-    // const octokit = new Octokit({
-    //     auth: 'YOUR-TOKEN',
-    // })
-
-    // await octokit.request('GET /repos/{owner}/{repo}/actions/workflows/{workflow_id}', {
-    //     owner: 'river248',
-    //     repo: 'ci-cd-backend',
-    //     workflow_id: 'CI/CD River Backend',
-    //     headers: {
-    //         'X-GitHub-Api-Version': '2022-11-28',
-    //     },
-    // })
 
     httpServer.listen(8080, () => {
         console.log(`Hello CI/CD App, I'm running at :${8080}/`)

@@ -1,16 +1,12 @@
-import { Octokit } from 'octokit'
+import { env } from '~/configs/environment'
 
-const triggerWorkflow = async () => {
-    const octokit = new Octokit({
-        auth: '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',
-    })
-
+const triggerWorkflow = async (repo, branch) => {
     try {
-        const res = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
-            owner: 'river248',
-            repo: 'ci-cd-back-end',
+        await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+            owner: env.GITHUB_OWNER,
+            repo,
             workflow_id: 'backend.yml',
-            ref: 'master',
+            ref: branch,
             inputs: {
                 name: 'Backend',
             },
@@ -18,10 +14,7 @@ const triggerWorkflow = async () => {
                 'X-GitHub-Api-Version': '2022-11-28',
             },
         })
-
-        return res
     } catch (error) {
-        console.log(error)
         throw new Error(error)
     }
 }
