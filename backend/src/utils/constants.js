@@ -16,6 +16,21 @@ export const githubAPI = {
     WORKFLOW_DISPATCH_ROUTE: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
 }
 
+export const workflowStatus = {
+    QUEUED: 'queued',
+    IN_PROGRESS: 'in_progress',
+    WAITING: 'waiting',
+    COMPLETED: 'completed',
+    NEUTRAL: 'neutral',
+    SUCCESS: 'success',
+    FAILURE: 'failure',
+    CANCELLED: 'cancelled',
+    ACTION_REQUIRED: 'action_required',
+    TIMED_OUT: 'timed_out',
+    SKIPPED: 'skipped',
+    STALE: 'stale',
+}
+
 export const socketEvent = {
     USING_PIPELINE: 'using-pipeline',
     UPDATE_PIPELINE_DATA: 'update-pipeline-data',

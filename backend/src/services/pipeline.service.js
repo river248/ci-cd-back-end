@@ -1,7 +1,11 @@
 import { env } from '~/configs/environment'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
-import { githubAPI } from '~/utils/constants'
+import { githubAPI, workflowStatus } from '~/utils/constants'
+
+//========================================================================================+
+//                                   PRIVATE FUNCTIONS                                    |
+//========================================================================================+
 
 const validateBranch = async (repo, branchName) => {
     try {
@@ -24,6 +28,33 @@ const validateBranch = async (repo, branchName) => {
     }
 }
 
+const summaryJob = (jobs) => {
+    let progress = 0
+    let successJob = 0
+    let compeletedJob = 0
+    const totalJob = jobs.length
+
+    for (const job of jobs) {
+        const { status, conclusion } = job
+
+        if (status === workflowStatus.COMPLETED) {
+            compeletedJob += 1
+
+            if (conclusion === workflowStatus.SUCCESS || conclusion === workflowStatus.SKIPPED) {
+                successJob += 1
+            }
+
+            progress = Math.round((compeletedJob / totalJob) * 100)
+        }
+    }
+
+    return { progress, successJob, totalJob }
+}
+
+//========================================================================================+
+//                                    PUBLIC FUNCTIONS                                    |
+//========================================================================================+
+
 const triggerWorkflow = async (repo, branchName) => {
     try {
         await validateBranch(repo, branchName)
@@ -45,24 +76,32 @@ const triggerWorkflow = async (repo, branchName) => {
     }
 }
 
-const handleDataFromGithubActions = (payload) => {
+const summary = (payload) => {
     const { workflow_job, repository } = payload
-    const { status, conclusion, head_branch, head_sha, created_at, completed_at, name } = workflow_job
+    const { status, conclusion, head_branch, head_sha, created_at, completed_at, name, steps } = workflow_job
+    const { progress, successJob, totalJob } = summaryJob(steps)
 
     const pipelineData = {
         status: conclusion || status,
-        branch: head_branch,
+        branchName: head_branch,
         startDate: created_at,
         endDate: completed_at,
         commitId: head_sha,
         repository: repository.name,
         stage: name,
+        progress,
+        successJob,
+        totalJob,
     }
 
     return pipelineData
 }
 
+//========================================================================================+
+//                                 EXPORT PUBLIC FUNCTIONS                                |
+//========================================================================================+
+
 export const PipeLineService = {
     triggerWorkflow,
-    handleDataFromGithubActions,
+    summary,
 }

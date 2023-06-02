@@ -13,8 +13,8 @@ const triggerWorkflow = async (req, res) => {
     }
 }
 
-const handleDataFromGithubAction = (req, res) => {
-    const result = PipeLineService.handleDataFromGithubActions(req.body)
+const getWorkflowDataFromGithub = (req, res) => {
+    const result = PipeLineService.summary(req.body)
     const { repository } = result
 
     _io.in(repository).emit(socketEvent.UPDATE_PIPELINE_DATA, result)
@@ -23,5 +23,5 @@ const handleDataFromGithubAction = (req, res) => {
 
 export const PipeLineController = {
     triggerWorkflow,
-    handleDataFromGithubAction,
+    getWorkflowDataFromGithub,
 }
