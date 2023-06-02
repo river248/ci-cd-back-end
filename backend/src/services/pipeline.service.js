@@ -21,9 +21,8 @@ const triggerWorkflow = async (repo, branch) => {
 
 const handleDataFromGithubActions = (payload) => {
     const { workflow_job, repository } = payload
-    const { status, conclusion, head_branch, head_sha, created_at, completed_at } = workflow_job
+    const { status, conclusion, head_branch, head_sha, created_at, completed_at, name } = workflow_job
 
-    console.log(repository)
     const pipelineData = {
         status: conclusion || status,
         branch: head_branch,
@@ -31,6 +30,7 @@ const handleDataFromGithubActions = (payload) => {
         endDate: completed_at,
         commitId: head_sha,
         repository: repository.name,
+        stage: name,
     }
 
     return pipelineData
