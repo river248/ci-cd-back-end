@@ -25,7 +25,6 @@ jobs:
       - name: Send greeting
         run: |
           echo "Hello ${{ inputs.name }}"
-          echo "Branch ${GITHUB_HEAD_REF}"
           echo "Branch ${GITHUB_REF#refs/heads/}"
       - name: Checkout
         uses: actions/checkout@v3
@@ -36,10 +35,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          BRANCH: ${GITHUB_REF#refs/heads/}
         with:
           args: >
             -Dsonar.projectKey=river248_ci-cd-github-actions
-            -Dsonar.branch.name=${GITHUB_HEAD_REF}
+            -Dsonar.branch.name=${GITHUB_REF#refs/heads/}
             -Dsonar.sources=./backend/src
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.cobol.copy.directories=copybooks
