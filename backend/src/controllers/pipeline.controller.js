@@ -13,12 +13,18 @@ const triggerWorkflow = async (req, res) => {
     }
 }
 
-const getWorkflowDataFromGithub = (req, res) => {
-    const result = PipeLineService.summary(req.body)
-    const { repository } = result
+const getWorkflowDataFromGithub = async (req, res) => {
+    try {
+        const result = await PipeLineService.summary(req.body)
+        const { repository } = result
 
-    _io.in(repository).emit(socketEvent.UPDATE_PIPELINE_DATA, result)
-    res.status(HttpStatusCode.OK).json(result)
+        _io.in(repository).emit(socketEvent.UPDATE_PIPELINE_DATA, result)
+        res.status(HttpStatusCode.OK).json(result)
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            message: error.message,
+        })
+    }
 }
 
 export const PipeLineController = {
