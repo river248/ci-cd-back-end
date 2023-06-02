@@ -10,6 +10,7 @@ export const HttpStatusCode = {
 
 export const socketEvent = {
     USING_PIPELINE: 'using-pipeline',
+    UPDATE_PIPELINE_DATA: 'update-data-pipeline',
 }
 
 export const clientHost = ['http://localhost:3000']

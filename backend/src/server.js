@@ -36,7 +36,7 @@ const bootServer = async () => {
     })
 
     global._io = io
-    global.octokit = octokit
+    global._octokit = octokit
 
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }))
