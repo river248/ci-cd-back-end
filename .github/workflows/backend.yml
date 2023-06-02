@@ -34,7 +34,7 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: 4a8c15d7f786b7c5bb73a14736d196779c6a82a9
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
             -Dsonar.projectName=ci-cd-github-actions
@@ -48,7 +48,6 @@ jobs:
             -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
             -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
             -Dsonar.pli.marginRight=0
-            -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.organization=river248
       - name: Use Node.js 18
         uses: actions/setup-node@v3
