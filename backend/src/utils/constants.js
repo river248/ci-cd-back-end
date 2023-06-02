@@ -8,6 +8,14 @@ export const HttpStatusCode = {
     INTERNAL_SERVER: 500,
 }
 
+export const githubAPI = {
+    HEADERS: {
+        'X-GitHub-Api-Version': '2022-11-28',
+    },
+    GET_BRANCHES_ROUTE: 'GET /repos/{owner}/{repo}/branches',
+    WORKFLOW_DISPATCH_ROUTE: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
+}
+
 export const socketEvent = {
     USING_PIPELINE: 'using-pipeline',
     UPDATE_PIPELINE_DATA: 'update-pipeline-data',

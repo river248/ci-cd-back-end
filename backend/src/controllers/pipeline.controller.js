@@ -3,11 +3,11 @@ import { HttpStatusCode, socketEvent } from '~/utils/constants'
 
 const triggerWorkflow = async (req, res) => {
     try {
-        const { repo, branch } = req.body
-        await PipeLineService.triggerWorkflow(repo, branch)
+        const { repo, branchName } = req.body
+        await PipeLineService.triggerWorkflow(repo, branchName)
         res.status(HttpStatusCode.OK).json({ message: 'Trigger successfully!' })
     } catch (error) {
-        res.status(HttpStatusCode.INTERNAL_SERVER).json({
+        res.status(error.statusCode()).json({
             message: error.message,
         })
     }

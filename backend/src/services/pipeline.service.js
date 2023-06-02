@@ -1,21 +1,47 @@
 import { env } from '~/configs/environment'
+import InternalServer from '~/errors/internalServer.error'
+import NotFound from '~/errors/notfound.error'
+import { githubAPI } from '~/utils/constants'
 
-const triggerWorkflow = async (repo, branch) => {
+const validateBranch = async (repo, branchName) => {
     try {
-        await _octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+        const res = await _octokit.request(githubAPI.GET_BRANCHES_ROUTE, {
+            owner: env.GITHUB_OWNER,
+            repo,
+            headers: githubAPI.HEADERS,
+        })
+
+        const branches = res.data.map((branch) => branch.name)
+
+        if (!branches.includes(branchName)) {
+            throw new NotFound(`Not found branch '${branchName}' in repo '${repo}'`)
+        }
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+        throw new InternalServer(error.message)
+    }
+}
+
+const triggerWorkflow = async (repo, branchName) => {
+    try {
+        await validateBranch(repo, branchName)
+        await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
             owner: env.GITHUB_OWNER,
             repo,
             workflow_id: 'backend.yml',
-            ref: branch,
+            ref: branchName,
             inputs: {
                 name: 'Backend',
             },
-            headers: {
-                'X-GitHub-Api-Version': '2022-11-28',
-            },
+            headers: githubAPI.HEADERS,
         })
     } catch (error) {
-        throw new Error(error)
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+        throw new InternalServer(error.message)
     }
 }
 
