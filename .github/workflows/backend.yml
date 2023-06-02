@@ -23,11 +23,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send greeting
-        run: echo "Hello ${{ inputs.name }}"
+        run: |
+          echo "Hello ${{ inputs.name }}"
+          echo "Branch ${GITHUB_REF##*/}"
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Working on Bachend
+      - name: Working on Backend
         run: echo "I'm working on Backend"
+      # - name: SonarCloud Scan
+      #   uses: SonarSource/sonarcloud-github-action@v1.9.1
+      #   with:
+      #   args: # optional
+      #   projectBaseDir: ./backend
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
