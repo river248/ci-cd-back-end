@@ -48,7 +48,7 @@ const bootServer = async () => {
 
     app.use('/v1', apiV1)
 
-    global._io.on('connection', socketService.connection)
+    _io.on('connection', socketService.connection)
 
     httpServer.listen(8080, () => {
         console.log(`Hello CI/CD App, I'm running at :${8080}/`)

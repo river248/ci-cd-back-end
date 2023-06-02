@@ -17,7 +17,7 @@ const handleDataFromGithubAction = (req, res) => {
     const result = PipeLineService.handleDataFromGithubActions(req.body)
     const { repository } = result
 
-    _io.to(repository).emit(socketEvent.UPDATE_PIPELINE_DATA, result)
+    _io.in(repository).emit(socketEvent.UPDATE_PIPELINE_DATA, result)
     res.status(HttpStatusCode.OK).json(result)
 }
 

@@ -1,15 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { socketEvent } from '~/utils/constants'
+import { socket, socketEvent } from '~/utils/constants'
 
 function Dashboard() {
-    useEffect(() => {
-        socket.emit(socketEvent.USING_PIPELINE, user.userId)
+    const [status, setStatus] = useState(null)
 
-        return () => socket.off(socketEvent.USING_PIPELINE)
+    useEffect(() => {
+        socket.emit(socketEvent.USING_PIPELINE, 'ci-cd-github-actions')
+        socket.on(socketEvent.UPDATE_PIPELINE_DATA, (data) => {
+            console.log(data)
+            setStatus(data.status)
+        })
+
+        return () => {
+            socket.off(socketEvent.USING_PIPELINE)
+            socket.off(socketEvent.UPDATE_PIPELINE_DATA)
+        }
     }, [])
 
-    return <div>Dashboard</div>
+    return <div>{status}</div>
 }
 
 export default Dashboard

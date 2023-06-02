@@ -6,7 +6,7 @@ export const socket = io(API_ROOT)
 
 export const socketEvent = {
     USING_PIPELINE: 'using-pipeline',
-    UPDATE_PIPELINE_DATA: 'udpate-pipeline-data',
+    UPDATE_PIPELINE_DATA: 'update-pipeline-data',
 }
 
 export const httpStatusCode = {
