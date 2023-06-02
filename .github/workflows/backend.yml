@@ -38,7 +38,6 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=river248_ci-cd-github-actions
-            -Dsonar.branch.name=${{GITHUB_REF##*/}}
             -Dsonar.sources=./backend/src
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.cobol.copy.directories=copybooks
