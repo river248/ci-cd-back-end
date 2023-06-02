@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: Github River Pipeline
+name: Github River Backend Pipeline
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -25,10 +25,15 @@ jobs:
             - name: Send greeting
               run: echo "Hello ${{ inputs.name }}"
             - uses: actions/checkout@v3
+            - name: Working on Bachend
+              run: echo "I'm working on Backend"
             - name: Use Node.js 18
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - run: npm ci
-            - run: npm run build --if-present
+            - name: Installing dependencies and generate build folder
+              working-directory: ./backend
+              run: |
+                  npm ci
+                  npm run build --if-present
         # - run: npm test
