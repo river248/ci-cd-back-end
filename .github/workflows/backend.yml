@@ -26,18 +26,20 @@ jobs:
         run: |
           echo "Hello ${{ inputs.name }}"
           echo "Branch ${GITHUB_REF##*/}"
+          echo "GITHUB_TOKEN ${{ secrets.GITHUB_TOKEN }}"
+          echo "SONAR_TOKEN ${{ secrets.SONAR_TOKEN }}"
       - name: Checkout
         uses: actions/checkout@v3
       - name: Working on Backend
         run: echo "I'm working on Backend"
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v1.9.1
+        uses: SonarSource/sonarcloud-github-action@master
         with:
-          projectBaseDir: ./backend/src
           args: >
             -Dsonar.projectName=ci-cd-github-actions
             -Dsonar.projectKey=river248_ci-cd-github-actions
             -Dsonar.branch.name=${GITHUB_REF##*/}
+            -Dsonar.sources=./backend/src
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.cobol.copy.directories=copybooks
             -Dsonar.cobol.file.suffixes=cbl,cpy
