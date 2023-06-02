@@ -5,35 +5,39 @@ name: Github River Backend Pipeline
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-    workflow_dispatch:
-        # Inputs the workflow accepts.
-        inputs:
-            name:
-                # Friendly description to be shown in the UI instead of 'name'
-                description: 'CI/CD to greet'
-                # Default value if no value is explicitly provided
-                default: 'Backend'
-                # Input has to be provided for the workflow to run
-                required: true
-                # The data type of the input
-                type: string
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: "CI/CD to greet"
+        # Default value if no value is explicitly provided
+        default: "Backend"
+        # Input has to be provided for the workflow to run
+        required: true
+        # The data type of the input
+        type: string
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Send greeting
-              run: echo "Hello ${{ inputs.name }}"
-            - uses: actions/checkout@v3
-            - name: Working on Bachend
-              run: echo "I'm working on Backend"
-            - name: Use Node.js 18
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-            - name: Installing dependencies and generate build folder
-              working-directory: ./backend
-              run: |
-                  npm ci
-                  npm run build --if-present
-        # - run: npm test
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send greeting
+        run: echo "Hello ${{ inputs.name }}"
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Working on Bachend
+        run: echo "I'm working on Backend"
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Installing dependencies...
+        working-directory: ./backend
+        run: npm ci
+      - name: Running unit test...
+        working-directory: ./backend
+        run: npm run test
+      - name: Generate build folder...
+        working-directory: ./backend
+        run: npm run build --if-present
