@@ -1,8 +1,8 @@
-import axios from 'axios'
 import { env } from '~/configs/environment'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { githubAPI, workflowStatus } from '~/utils/constants'
+import { MetricService } from './metric.service'
 
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
@@ -52,32 +52,6 @@ const summaryJob = (jobs) => {
     return { progress, successJob, totalJob }
 }
 
-const createMetric = async (jobs, metricName) => {
-    try {
-        const metricData = jobs.find((job) => job.name === metricName)
-        const { status } = metricData
-        let metric = {
-            name: metricName,
-            actual: 0,
-            total: 0,
-        }
-
-        if (status === workflowStatus.COMPLETED) {
-            const res = await axios.get(
-                'https://sonarcloud.io/api/qualitygates/project_status?projectKey=river248_ci-cd-github-actions',
-            )
-            const qualityGates = res.data?.projectStatus.conditions
-            const sonarOkQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'OK').length
-            const sonarErrorQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'ERROR').length
-            metric = { ...metric, actual: sonarOkQualityGates, total: sonarErrorQualityGates + sonarOkQualityGates }
-        }
-
-        return metric
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
-
 //========================================================================================+
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
@@ -106,14 +80,35 @@ const triggerWorkflow = async (repo, branchName) => {
 const summary = async (payload) => {
     try {
         const { workflow_job, repository } = payload
-        const { status, conclusion, head_branch, head_sha, created_at, completed_at, name, steps } = workflow_job
+        const {
+            run_id,
+            status,
+            conclusion,
+            head_branch,
+            head_sha,
+            created_at,
+            started_at,
+            completed_at,
+            name,
+            steps,
+            run_url,
+        } = workflow_job
         const { progress, successJob, totalJob } = summaryJob(steps)
-        const codeQuality = await createMetric(steps, 'Code Quality')
+
+        if (status === workflowStatus.QUEUED) {
+            // insert data into mongodb
+        } else {
+            //  update data
+        }
+
+        const metrics = await MetricService.addMetric(name, steps, status)
 
         const pipelineData = {
+            executionId: run_id,
             status: conclusion || status,
-            branchName: head_branch,
-            startDate: created_at,
+            codePipelineBranch: head_branch,
+            buildStartTime: created_at,
+            startDate: started_at,
             endDate: completed_at,
             commitId: head_sha,
             repository: repository.name,
@@ -121,7 +116,8 @@ const summary = async (payload) => {
             progress,
             successJob,
             totalJob,
-            metrics: [codeQuality],
+            metrics,
+            pipelineUrl: run_url,
         }
 
         return pipelineData

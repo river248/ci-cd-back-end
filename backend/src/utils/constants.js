@@ -14,6 +14,7 @@ export const githubAPI = {
     },
     GET_BRANCHES_ROUTE: 'GET /repos/{owner}/{repo}/branches',
     WORKFLOW_DISPATCH_ROUTE: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
+    SONAR_REPORT_URL: 'https://sonarcloud.io/api/qualitygates/project_status',
 }
 
 export const workflowStatus = {
@@ -29,6 +30,11 @@ export const workflowStatus = {
     TIMED_OUT: 'timed_out',
     SKIPPED: 'skipped',
     STALE: 'stale',
+}
+
+export const stageMetrics = {
+    BUILD: ['Code Quality', 'Unit Tests', 'Unit Test Coverage'],
+    TEST: [],
 }
 
 export const socketEvent = {
