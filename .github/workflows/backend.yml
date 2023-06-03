@@ -28,8 +28,10 @@ jobs:
           echo "Branch ${GITHUB_REF#refs/heads/}"
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Working on Backend
-        run: echo "I'm working on Backend"
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
       - name: Code Quality
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -47,16 +49,11 @@ jobs:
             -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
             -Dsonar.pli.marginRight=0
             -Dsonar.organization=river248
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Installing dependencies...
+      - name: Unit Tests
         working-directory: ./backend
-        run: npm ci
-      - name: Running unit test...
-        working-directory: ./backend
-        run: npm run test
+        run: |
+          npm ci
+          npm run test
       - name: Generate build folder...
         working-directory: ./backend
         run: npm run build --if-present
