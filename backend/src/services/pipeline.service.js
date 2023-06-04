@@ -1,8 +1,10 @@
-import axios from 'axios'
 import { env } from '~/configs/environment'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { githubAPI, workflowStatus } from '~/utils/constants'
+import { MetricService } from './metric.service'
+import { StageModel } from '~/models/stage.model'
+import { RepositoryModel } from '~/models/repository.model'
 
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
@@ -52,32 +54,6 @@ const summaryJob = (jobs) => {
     return { progress, successJob, totalJob }
 }
 
-const createMetric = async (jobs, metricName) => {
-    try {
-        const metricData = jobs.find((job) => job.name === metricName)
-        const { status } = metricData
-        let metric = {
-            name: metricName,
-            actual: 0,
-            total: 0,
-        }
-
-        if (status === workflowStatus.COMPLETED) {
-            const res = await axios.get(
-                'https://sonarcloud.io/api/qualitygates/project_status?projectKey=river248_ci-cd-github-actions',
-            )
-            const qualityGates = res.data?.projectStatus.conditions
-            const sonarOkQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'OK').length
-            const sonarErrorQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'ERROR').length
-            metric = { ...metric, actual: sonarOkQualityGates, total: sonarErrorQualityGates + sonarOkQualityGates }
-        }
-
-        return metric
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
-
 //========================================================================================+
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
@@ -103,25 +79,59 @@ const triggerWorkflow = async (repo, branchName) => {
     }
 }
 
-const summary = async (payload) => {
+const handlePipelineData = async (payload) => {
     try {
         const { workflow_job, repository } = payload
-        const { status, conclusion, head_branch, head_sha, created_at, completed_at, name, steps } = workflow_job
+        const { run_id, status, conclusion, head_branch, head_sha, completed_at, name, steps, run_url } = workflow_job
         const { progress, successJob, totalJob } = summaryJob(steps)
-        const codeQuality = await createMetric(steps, 'Code Quality')
+        const executionId = run_id.toString()
+        const buildStartTime = new Date(workflow_job.created_at)
+        const startDateTime = new Date(workflow_job.started_at)
+
+        if (status === workflowStatus.QUEUED) {
+            await StageModel.createNew({
+                executionId,
+                name,
+                repository: repository.name,
+                codePipelineBranch: head_branch,
+                commitId: head_sha,
+                status,
+                buildStartTime,
+                startDateTime,
+                progress,
+                actual: successJob,
+                total: totalJob,
+            })
+        } else {
+            await StageModel.update(name, run_id.toString, {
+                status,
+                endDateTime: completed_at ? new Date(completed_at) : completed_at,
+                progress,
+                actual: successJob,
+                total: totalJob,
+            })
+        }
+
+        const metrics = await MetricService.addMetric(
+            { id: executionId, stage: name, status, repository: repository.name },
+            steps,
+        )
 
         const pipelineData = {
+            executionId,
             status: conclusion || status,
-            branchName: head_branch,
-            startDate: created_at,
-            endDate: completed_at,
+            codePipelineBranch: head_branch,
+            buildStartTime,
+            startDateTime,
+            endDateTime: completed_at ? new Date(completed_at) : completed_at,
             commitId: head_sha,
             repository: repository.name,
             stage: name,
             progress,
             successJob,
             totalJob,
-            metrics: [codeQuality],
+            metrics,
+            pipelineUrl: run_url,
         }
 
         return pipelineData
@@ -130,11 +140,25 @@ const summary = async (payload) => {
     }
 }
 
+const getFullPipeline = async (repository) => {
+    try {
+        const repo = await RepositoryModel.findRepository(repository)
+        if (repo) {
+            const pipeline = await Promise.all(
+                repo.stages.map(async (stage) => await StageModel.getFullStage(repository, stage)),
+            )
+
+            return pipeline
+        }
+        return []
+    } catch (error) {}
+}
 //========================================================================================+
 //                                 EXPORT PUBLIC FUNCTIONS                                |
 //========================================================================================+
 
 export const PipeLineService = {
     triggerWorkflow,
-    summary,
+    handlePipelineData,
+    getFullPipeline,
 }

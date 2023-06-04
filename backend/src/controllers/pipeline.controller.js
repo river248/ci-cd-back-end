@@ -15,7 +15,7 @@ const triggerWorkflow = async (req, res) => {
 
 const getWorkflowDataFromGithub = async (req, res) => {
     try {
-        const result = await PipeLineService.summary(req.body)
+        const result = await PipeLineService.handlePipelineData(req.body)
         const { repository } = result
 
         _io.in(repository).emit(socketEvent.UPDATE_PIPELINE_DATA, result)
@@ -27,7 +27,19 @@ const getWorkflowDataFromGithub = async (req, res) => {
     }
 }
 
+const getFullPipeline = async (req, res) => {
+    try {
+        const result = await PipeLineService.getFullPipeline(req.params.repository)
+        res.status(HttpStatusCode.OK).json(result)
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            message: error.message,
+        })
+    }
+}
+
 export const PipeLineController = {
     triggerWorkflow,
     getWorkflowDataFromGithub,
+    getFullPipeline,
 }

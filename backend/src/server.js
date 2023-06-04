@@ -6,21 +6,20 @@ import { Octokit } from 'octokit'
 // import { credential } from 'firebase-admin'
 // import { initializeApp } from 'firebase-admin/app'
 
-// import { env } from './config/environment'
-// import { connectDB } from './config/mongodb'
+import { env } from './configs/environment'
+import { connectDB } from './configs/mongodb'
 import { apiV1 } from './routes/v1'
 import SocketServices from './services/socket.service'
 import { corsConfig } from './configs/cors'
-import { env } from './configs/environment'
 // import { firebaseCredentials } from './config/firebase'
 
-// connectDB()
-//     .then(() => console.log('Connected successfully to database server!'))
-//     .then(() => bootServer())
-//     .catch((error) => {
-//         console.error(error)
-//         process.exit(1)
-//     })
+connectDB()
+    .then(() => console.log('Connected successfully to database server!'))
+    .then(() => bootServer())
+    .catch((error) => {
+        console.error(error)
+        process.exit(1)
+    })
 
 const bootServer = async () => {
     const app = express()
@@ -54,5 +53,3 @@ const bootServer = async () => {
         console.log(`Hello CI/CD App, I'm running at :${8080}/`)
     })
 }
-
-bootServer()
