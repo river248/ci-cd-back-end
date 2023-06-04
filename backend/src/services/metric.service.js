@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { isEmpty } from 'lodash'
+import InternalServer from '~/errors/internalServer.error'
+import { MetricModel } from '~/models/metric.model'
 
 import { githubAPI, stageMetrics, workflowStatus } from '~/utils/constants'
 
@@ -27,29 +29,50 @@ const getMetricReport = async (metricKey) => {
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
 
-const addMetric = async (stage, jobs, executionStatus) => {
-    const metrics = jobs.filter((job) => stageMetrics[stage.toUpperCase()].includes(job.name))
+const addMetric = async (execution, jobs) => {
+    const executionId = execution.id
+    const executionStage = execution.stage
+    const executionRepository = execution.repository
+    const executionStatus = execution.status
 
-    if (executionStatus === workflowStatus.IN_PROGRESS && isEmpty(metrics)) {
-        return stageMetrics[stage.toUpperCase()].map((metric) => ({
-            name: metric,
-            status: workflowStatus.IN_PROGRESS,
-            actual: null,
-            total: null,
-            started_at: null,
-            completed_at: null,
-        }))
-    }
+    const metrics = jobs.filter((job) => stageMetrics[executionStage.toUpperCase()].includes(job.name))
 
     try {
+        if (executionStatus === workflowStatus.IN_PROGRESS && isEmpty(metrics)) {
+            const result = await Promise.all(
+                stageMetrics[executionStage.toUpperCase()].map(async (metric) => {
+                    await MetricModel.createNew({
+                        name: metric,
+                        stage: executionStage,
+                        repository: executionRepository,
+                        executionId,
+                        status: workflowStatus.IN_PROGRESS,
+                    })
+
+                    return {
+                        name: metric,
+                        status: workflowStatus.IN_PROGRESS,
+                        actual: null,
+                        total: null,
+                        startedAt: null,
+                        completedAt: null,
+                    }
+                }),
+            )
+
+            return result
+        }
+
         const metricData = await Promise.all(
             metrics.map(async (metric) => {
-                const { status, name, conclusion } = metric
+                const { status, name, conclusion, started_at, completed_at } = metric
 
                 let result = {
                     ...metric,
                     actual: null,
                     total: null,
+                    startedAt: started_at,
+                    completedAt: completed_at,
                 }
 
                 if (status === workflowStatus.COMPLETED) {
@@ -61,6 +84,19 @@ const addMetric = async (stage, jobs, executionStatus) => {
                         result = { ...result, ...res, status: conclusion }
                     }
                 }
+                await MetricModel.update({
+                    repository: executionRepository,
+                    name,
+                    stage: executionStage,
+                    executionId,
+                    data: {
+                        status: result.status,
+                        startedAt: result.startedAt,
+                        completedAt: result.completedAt,
+                        actual: result.actual,
+                        total: result.total,
+                    },
+                })
 
                 delete result.conclusion
                 delete result.number

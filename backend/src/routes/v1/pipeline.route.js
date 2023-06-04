@@ -9,5 +9,6 @@ const router = express.Router()
 router.post('/data', PipeLineController.getWorkflowDataFromGithub)
 
 router.post('/trigger-workflow', PipeLineController.triggerWorkflow)
+router.get('/:repository', PipeLineController.getFullPipeline)
 
 export const PipeLineRoute = router
