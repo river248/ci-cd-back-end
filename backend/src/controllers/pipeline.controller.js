@@ -1,10 +1,10 @@
 import { PipeLineService } from '~/services/pipeline.service'
 import { HttpStatusCode, socketEvent } from '~/utils/constants'
 
-const triggerWorkflow = async (req, res) => {
+const triggerPipeline = async (req, res) => {
     try {
-        const { repo, branchName } = req.body
-        await PipeLineService.triggerWorkflow(repo, branchName)
+        const { repository, branchName } = req.body
+        await PipeLineService.triggerPipeline(repository, branchName)
         res.status(HttpStatusCode.OK).json({ message: 'Trigger successfully!' })
     } catch (error) {
         res.status(error.statusCode()).json({
@@ -30,6 +30,7 @@ const getWorkflowDataFromGithub = async (req, res) => {
 const getFullPipeline = async (req, res) => {
     try {
         const result = await PipeLineService.getFullPipeline(req.params.repository)
+
         res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
@@ -39,7 +40,7 @@ const getFullPipeline = async (req, res) => {
 }
 
 export const PipeLineController = {
-    triggerWorkflow,
+    triggerPipeline,
     getWorkflowDataFromGithub,
     getFullPipeline,
 }
