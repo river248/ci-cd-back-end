@@ -51,7 +51,7 @@ jobs:
                       -Dsonar.organization=river248
             - name: Ping Webhook
               run: |
-                  echo "Hello ${{ inputs.name }}"
+                  echo "Hello ${{ secrets.GITHUB_TOKEN }}"
                   curl -L \
                     -X POST \
                     -H "Accept: application/vnd.github+json" \
