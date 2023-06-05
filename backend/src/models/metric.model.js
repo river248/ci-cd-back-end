@@ -2,6 +2,7 @@ import Joi from 'joi'
 
 import { getDB } from '~/configs/mongodb'
 import InternalServer from '~/errors/internalServer.error'
+import NotFound from '~/errors/notfound.error'
 import { collection } from '~/utils/constants'
 
 const metricCollectionSchema = Joi.object({
@@ -24,6 +25,7 @@ const createNew = async (data) => {
     try {
         const value = await validateSchema(data)
         await getDB().collection(collection.METRIC).insertOne(value)
+        return value
     } catch (error) {
         throw new InternalServer(error)
     }
@@ -31,9 +33,27 @@ const createNew = async (data) => {
 
 const update = async ({ repository, name, stage, executionId, data }) => {
     try {
-        await getDB()
+        const res = await getDB()
             .collection(collection.METRIC)
             .findOneAndUpdate({ name, executionId, stage, repository }, { $set: data }, { returnOriginal: false })
+
+        if (res.value) {
+            delete res.value._id
+            return { ...res.value, ...data }
+        }
+
+        throw new NotFound(
+            `Not found metric '${name}' with execution '${executionId}' of stage '${name} in repo '${repository}'`,
+        )
+    } catch (error) {
+        throw new InternalServer(error)
+    }
+}
+
+const findMetric = async ({ name, stage, executionId, repository }) => {
+    try {
+        const res = await getDB().collection(collection.METRIC).findOne({ name, executionId, stage, repository })
+        return res
     } catch (error) {
         throw new InternalServer(error)
     }
@@ -42,4 +62,5 @@ const update = async ({ repository, name, stage, executionId, data }) => {
 export const MetricModel = {
     createNew,
     update,
+    findMetric,
 }

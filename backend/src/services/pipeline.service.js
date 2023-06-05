@@ -58,7 +58,7 @@ const summaryJob = (jobs) => {
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
 
-const triggerWorkflow = async (repo, branchName) => {
+const triggerPipeline = async (repo, branchName) => {
     try {
         await validateBranch(repo, branchName)
         await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
@@ -75,6 +75,7 @@ const triggerWorkflow = async (repo, branchName) => {
         if (error instanceof NotFound) {
             throw new NotFound(error.message)
         }
+
         throw new InternalServer(error.message)
     }
 }
@@ -87,25 +88,42 @@ const handlePipelineData = async (payload) => {
         const executionId = run_id.toString()
         const buildStartTime = new Date(workflow_job.created_at)
         const startDateTime = new Date(workflow_job.started_at)
+        const stageStatus = conclusion || status
 
-        if (status === workflowStatus.QUEUED) {
-            await StageModel.createNew({
+        const workflowRunRes = await _octokit.request(githubAPI.GET_WORKFLOW_RUN_ROUTE, {
+            owner: env.GITHUB_OWNER,
+            repo: repository.name,
+            run_id: executionId,
+            headers: githubAPI.HEADERS,
+        })
+        const version = `0.0.${workflowRunRes.data.run_number}`
+        let pipelineData = null
+        const isExistedStage = await StageModel.findStageByExecutionId(repository.name, name, executionId)
+
+        if (isExistedStage) {
+            pipelineData = await StageModel.update({
+                repository: repository.name,
+                name,
+                executionId,
+                data: {
+                    status: stageStatus,
+                    endDateTime: completed_at ? new Date(completed_at) : completed_at,
+                    progress,
+                    actual: successJob,
+                    total: totalJob,
+                },
+            })
+        } else {
+            pipelineData = await StageModel.createNew({
                 executionId,
                 name,
                 repository: repository.name,
                 codePipelineBranch: head_branch,
+                version,
                 commitId: head_sha,
-                status,
+                status: stageStatus,
                 buildStartTime,
                 startDateTime,
-                progress,
-                actual: successJob,
-                total: totalJob,
-            })
-        } else {
-            await StageModel.update(name, run_id.toString, {
-                status,
-                endDateTime: completed_at ? new Date(completed_at) : completed_at,
                 progress,
                 actual: successJob,
                 total: totalJob,
@@ -113,29 +131,18 @@ const handlePipelineData = async (payload) => {
         }
 
         const metrics = await MetricService.addMetric(
-            { id: executionId, stage: name, status, repository: repository.name },
+            { id: executionId, stage: name, status: stageStatus, repository: repository.name },
             steps,
         )
 
-        const pipelineData = {
-            executionId,
-            status: conclusion || status,
-            codePipelineBranch: head_branch,
-            buildStartTime,
-            startDateTime,
-            endDateTime: completed_at ? new Date(completed_at) : completed_at,
-            commitId: head_sha,
-            repository: repository.name,
-            stage: name,
-            progress,
-            successJob,
-            totalJob,
-            metrics,
-            pipelineUrl: run_url,
-        }
+        pipelineData = { ...pipelineData, metrics }
 
         return pipelineData
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error.message)
     }
 }
@@ -145,20 +152,29 @@ const getFullPipeline = async (repository) => {
         const repo = await RepositoryModel.findRepository(repository)
         if (repo) {
             const pipeline = await Promise.all(
-                repo.stages.map(async (stage) => await StageModel.getFullStage(repository, stage)),
+                repo.stages.map(async (stage) => {
+                    let stageData = await StageModel.getFullStage(repository, stage)
+                    if (!stageData) {
+                        return { name: stage, metrics: [] }
+                    }
+
+                    return stageData
+                }),
             )
 
             return pipeline
         }
         return []
-    } catch (error) {}
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
 }
 //========================================================================================+
 //                                 EXPORT PUBLIC FUNCTIONS                                |
 //========================================================================================+
 
 export const PipeLineService = {
-    triggerWorkflow,
+    triggerPipeline,
     handlePipelineData,
     getFullPipeline,
 }

@@ -2,6 +2,7 @@ import Joi from 'joi'
 
 import { getDB } from '~/configs/mongodb'
 import InternalServer from '~/errors/internalServer.error'
+import NotFound from '~/errors/notfound.error'
 import { collection } from '~/utils/constants'
 
 const stageCollectionSchema = Joi.object({
@@ -11,6 +12,7 @@ const stageCollectionSchema = Joi.object({
     codePipelineBranch: Joi.string().required().trim(),
     commitId: Joi.string().required().trim(),
     status: Joi.string().required().trim(),
+    version: Joi.string().required().trim(),
     deploymentId: Joi.string().default(null),
     buildStartTime: Joi.date().timestamp().default(null),
     startDateTime: Joi.date().timestamp().default(null),
@@ -28,16 +30,24 @@ const createNew = async (data) => {
     try {
         const value = await validateSchema(data)
         await getDB().collection(collection.STAGE).insertOne(value)
+        return value
     } catch (error) {
         throw new InternalServer(error)
     }
 }
 
-const update = async (name, executionId, data) => {
+const update = async ({ repository, name, executionId, data }) => {
     try {
-        await getDB()
+        const res = await getDB()
             .collection(collection.STAGE)
-            .findOneAndUpdate({ name, executionId }, { $set: data }, { returnOriginal: false })
+            .findOneAndUpdate({ repository, name, executionId }, { $set: data }, { returnOriginal: false })
+
+        if (res.value) {
+            delete res.value._id
+            return { ...res.value, ...data }
+        }
+
+        throw new NotFound(`Not found execution '${executionId}' of stage '${name} in repo '${repository}'`)
     } catch (error) {
         throw new InternalServer(error)
     }
@@ -79,8 +89,18 @@ const getFullStage = async (repository, name) => {
     }
 }
 
+const findStageByExecutionId = async (repository, name, executionId) => {
+    try {
+        const res = await getDB().collection(collection.STAGE).findOne({ repository, name, executionId })
+        return res
+    } catch (error) {
+        throw new InternalServer(error)
+    }
+}
+
 export const StageModel = {
     createNew,
     update,
     getFullStage,
+    findStageByExecutionId,
 }
