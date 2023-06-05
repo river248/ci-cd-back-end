@@ -158,6 +158,7 @@ const getFullPipeline = async (repository) => {
                         return { name: stage, metrics: [] }
                     }
 
+                    stageData.metrics.sort((metricA, metricB) => metricA.rank - metricB.rank)
                     return stageData
                 }),
             )

@@ -27,6 +27,63 @@ const getMetricReport = async (metricKey) => {
     }
 }
 
+const createAndUpdateMetric = async ({
+    name,
+    stage,
+    repository,
+    executionId,
+    rank,
+    status,
+
+    startedAt,
+    completedAt,
+    actual,
+    total,
+}) => {
+    try {
+        let metricData = null
+        const isExistedMetrics = await MetricModel.findMetric({
+            name,
+            executionId,
+            stage,
+            repository,
+        })
+
+        if (isExistedMetrics) {
+            metricData = await MetricModel.update({
+                name,
+                stage,
+                repository,
+                executionId,
+                data: {
+                    status,
+                    startedAt,
+                    completedAt,
+                    actual,
+                    total,
+                },
+            })
+        } else {
+            metricData = await MetricModel.createNew({
+                name,
+                stage,
+                repository,
+                rank,
+                executionId,
+                status,
+                startedAt,
+                completedAt,
+                actual,
+                total,
+            })
+        }
+
+        return metricData
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
 //========================================================================================+
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
@@ -42,38 +99,19 @@ const addMetric = async (execution, jobs) => {
     try {
         if (isEmpty(metrics)) {
             const result = await Promise.all(
-                stageMetrics[executionStage.toUpperCase()].map(async (metric) => {
-                    let metricData = null
-                    const isExistedMetrics = await MetricModel.findMetric({
+                stageMetrics[executionStage.toUpperCase()].map(async (metric, index) => {
+                    const metricData = await createAndUpdateMetric({
                         name: metric,
-                        executionId,
                         stage: executionStage,
                         repository: executionRepository,
+                        executionId,
+                        rank: index * 1 + 1,
+                        status: executionStatus,
+                        startedAt: null,
+                        completedAt: null,
+                        actual: null,
+                        total: null,
                     })
-
-                    if (isExistedMetrics) {
-                        metricData = await MetricModel.update({
-                            name: metric,
-                            stage: executionStage,
-                            repository: executionRepository,
-                            executionId,
-                            data: {
-                                status: executionStatus,
-                                startedAt: null,
-                                completedAt: null,
-                                actual: null,
-                                total: null,
-                            },
-                        })
-                    } else {
-                        metricData = await MetricModel.createNew({
-                            name: metric,
-                            stage: executionStage,
-                            repository: executionRepository,
-                            executionId,
-                            status: executionStatus,
-                        })
-                    }
 
                     return metricData
                 }),
@@ -83,7 +121,7 @@ const addMetric = async (execution, jobs) => {
         }
 
         const metricData = await Promise.all(
-            metrics.map(async (metric) => {
+            metrics.map(async (metric, index) => {
                 const { status, name, conclusion, started_at, completed_at } = metric
                 let result = null
                 let metricStatus =
@@ -106,40 +144,18 @@ const addMetric = async (execution, jobs) => {
                     }
                 }
 
-                const isExistedMetrics = await MetricModel.findMetric({
+                result = await createAndUpdateMetric({
                     name,
-                    executionId,
                     stage: executionStage,
                     repository: executionRepository,
+                    executionId,
+                    rank: index * 1 + 1,
+                    status: metricStatus,
+                    startedAt: new Date(started_at),
+                    completedAt: new Date(completed_at),
+                    actual,
+                    total,
                 })
-
-                if (isExistedMetrics) {
-                    result = await MetricModel.update({
-                        repository: executionRepository,
-                        name,
-                        stage: executionStage,
-                        executionId,
-                        data: {
-                            status: metricStatus,
-                            startedAt: started_at,
-                            completedAt: completed_at,
-                            actual,
-                            total,
-                        },
-                    })
-                } else {
-                    result = await MetricModel.createNew({
-                        name,
-                        stage: executionStage,
-                        repository: executionRepository,
-                        executionId,
-                        status: metricStatus,
-                        startedAt: started_at,
-                        completedAt: completed_at,
-                        actual,
-                        total,
-                    })
-                }
 
                 return result
             }),

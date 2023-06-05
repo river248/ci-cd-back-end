@@ -11,10 +11,11 @@ const metricCollectionSchema = Joi.object({
     name: Joi.string().required().trim(),
     stage: Joi.string().required().trim(),
     status: Joi.string().required().trim(),
-    startedAt: Joi.date().timestamp().default(null),
-    completedAt: Joi.date().timestamp().default(null),
-    actual: Joi.number().default(null),
-    total: Joi.number().default(null),
+    rank: Joi.number().required().min(1),
+    startedAt: Joi.date().timestamp().allow(null).default(null),
+    completedAt: Joi.date().timestamp().allow(null).default(null),
+    actual: Joi.number().allow(null).default(null),
+    total: Joi.number().allow(null).default(null),
 })
 
 const validateSchema = async (data) => {
