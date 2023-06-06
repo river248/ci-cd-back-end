@@ -60,6 +60,7 @@ jobs:
                   npm ci
                   # npm run test
     unit_test_coverage:
+        needs: unit_tests
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
