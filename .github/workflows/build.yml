@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: Github River Backend Pipeline
+name: Build
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -12,14 +12,14 @@ on:
                 # Friendly description to be shown in the UI instead of 'name'
                 description: 'CI/CD to greet'
                 # Default value if no value is explicitly provided
-                default: 'Backend'
+                default: 'Build'
                 # Input has to be provided for the workflow to run
                 required: true
                 # The data type of the input
                 type: string
 
 jobs:
-    build:
+    code_quality:
         runs-on: ubuntu-latest
         steps:
             - name: Send greeting
@@ -28,11 +28,7 @@ jobs:
                   echo "Branch ${GITHUB_REF#refs/heads/}"
             - name: Checkout
               uses: actions/checkout@v3
-            - name: Use Node.js 18
-              uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-            - name: Code Quality
+            - name: Sonar Scanner
               uses: SonarSource/sonarcloud-github-action@master
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,23 +45,33 @@ jobs:
                       -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
                       -Dsonar.pli.marginRight=0
                       -Dsonar.organization=river248
-            - name: Unit Tests
+    unit_tests:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Use Node.js 18
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Running unit tests...
               working-directory: ./backend
               run: |
                   npm ci
-                  echo "Running unit tests..."
                   # npm run test
-            - name: Unit Test Coverage
-              working-directory: ./backend
-              run: echo "Reporting unit tests coverage..."
-            - name: Generate build folder...
-              working-directory: ./backend
-              run: npm run build --if-present
-    test:
-        needs: build
+    unit_test_coverage:
         runs-on: ubuntu-latest
         steps:
-            - name: Send greeting
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Use Node.js 18
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Generate build folder...
+              working-directory: ./backend
               run: |
-                  echo "Hello ${{ inputs.name }}"
-                  echo "Branch ${GITHUB_REF#refs/heads/}"
+                  echo "Reporting unit tests coverage..."
+                  npm run build --if-present
+    move_forward:
+        use: ./.github/workflows/test.yml
