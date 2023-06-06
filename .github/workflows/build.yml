@@ -74,4 +74,5 @@ jobs:
                   echo "Reporting unit tests coverage..."
                   npm run build --if-present
     move_forward:
+        needs: [code_quality, unit_tests, unit_test_coverage]
         uses: ./.github/workflows/test.yml
