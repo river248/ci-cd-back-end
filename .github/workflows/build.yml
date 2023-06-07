@@ -46,6 +46,7 @@ jobs:
                   projectBaseDir: ./backend/src
                   args: >
                       -Dsonar.projectKey=ci-cd-github-actions
+                      -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
@@ -104,7 +105,14 @@ jobs:
         needs: completed_stage
         runs-on: ubuntu-latest
         steps:
-            - name: "Trigger Test"
+            - name: Get branch names.
+              id: branch-names
+              uses: tj-actions/branch-names@v7
+            - name: Checkout branch
+              uses: actions/checkout@v3
+              with:
+                ref: ${{ steps.branch-names.outputs.ref_branch }}
+            - name: Trigger Test
               run: |
                   curl -L \
                     -X POST \
