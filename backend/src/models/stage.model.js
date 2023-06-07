@@ -17,9 +17,6 @@ const stageCollectionSchema = Joi.object({
     buildStartTime: Joi.date().timestamp().default(null),
     startDateTime: Joi.date().timestamp().default(null),
     endDateTime: Joi.date().timestamp().default(null),
-    actual: Joi.number().default(null),
-    total: Joi.number().default(null),
-    progress: Joi.number().min(0).max(100).default(0),
 })
 
 const validateSchema = async (data) => {
@@ -29,8 +26,8 @@ const validateSchema = async (data) => {
 const createNew = async (data) => {
     try {
         const value = await validateSchema(data)
-        await getDB().collection(collection.STAGE).insertOne(value)
-        return value
+        const res = await getDB().collection(collection.STAGE).insertOne(value)
+        return { ...value, _id: res.insertedId.toString() }
     } catch (error) {
         throw new InternalServer(error)
     }
@@ -43,8 +40,7 @@ const update = async ({ repository, name, executionId, data }) => {
             .findOneAndUpdate({ repository, name, executionId }, { $set: data }, { returnOriginal: false })
 
         if (res.value) {
-            delete res.value._id
-            return { ...res.value, ...data }
+            return { ...res.value, ...data, _id: res.value._id.toString() }
         }
 
         throw new NotFound(`Not found execution '${executionId}' of stage '${name} in repo '${repository}'`)
