@@ -25,22 +25,21 @@ const validateSchema = async (data) => {
 const createNew = async (data) => {
     try {
         const value = await validateSchema(data)
-        await getDB().collection(collection.METRIC).insertOne(value)
-        return value
+        const res = await getDB().collection(collection.METRIC).insertOne(value)
+        return { ...value, _id: res.insertedId.toString() }
     } catch (error) {
         throw new InternalServer(error)
     }
 }
 
-const update = async ({ repository, name, stage, executionId, data }) => {
+const update = async (repository, stage, executionId, name, data) => {
     try {
         const res = await getDB()
             .collection(collection.METRIC)
             .findOneAndUpdate({ name, executionId, stage, repository }, { $set: data }, { returnOriginal: false })
 
         if (res.value) {
-            delete res.value._id
-            return { ...res.value, ...data }
+            return { ...res.value, ...data, _id: res.value._id.toString() }
         }
 
         throw new NotFound(
@@ -51,9 +50,9 @@ const update = async ({ repository, name, stage, executionId, data }) => {
     }
 }
 
-const findMetric = async ({ name, stage, executionId, repository }) => {
+const findMetricsByStageAndExecution = async (repository, stage, executionId) => {
     try {
-        const res = await getDB().collection(collection.METRIC).findOne({ name, executionId, stage, repository })
+        const res = await getDB().collection(collection.METRIC).find({ repository, stage, executionId }).toArray()
         return res
     } catch (error) {
         throw new InternalServer(error)
@@ -63,5 +62,5 @@ const findMetric = async ({ name, stage, executionId, repository }) => {
 export const MetricModel = {
     createNew,
     update,
-    findMetric,
+    findMetricsByStageAndExecution,
 }
