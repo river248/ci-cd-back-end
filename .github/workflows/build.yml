@@ -53,6 +53,7 @@ jobs:
 #                       -Dsonar.pli.marginRight=0
 #                       -Dsonar.organization=river248
     unit_tests:
+        needs: started_stage
         runs-on: ubuntu-latest
         steps:
             - name: Get branch names.
@@ -91,8 +92,14 @@ jobs:
               run: |
                   echo "Reporting unit tests coverage..."
                   # npm run build --if-present
+    completed_stage:
+        needs: unit_test_coverage
+        runs-on: ubuntu-latest
+        steps:
+            - name: Send greeting
+              run: echo "Goodbye build stage"
     test:
-        # needs: [code_quality, unit_tests, unit_test_coverage]
+        needs: completed_stage
         runs-on: ubuntu-latest
         steps:
             - name: "Trigger Test"
