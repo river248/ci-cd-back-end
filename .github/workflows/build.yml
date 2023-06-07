@@ -25,7 +25,7 @@ jobs:
               id: branch-names
               uses: tj-actions/branch-names@v7
             - name: Send greeting
-              run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}"
+              run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm in build stage"
     code_quality:
         needs: start_stage
         runs-on: ubuntu-latest
