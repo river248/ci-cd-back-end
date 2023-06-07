@@ -44,7 +44,7 @@ jobs:
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
               with:
                   args: >
-                      -Dsonar.projectKey=river248_ci-cd-github-actions
+                      -Dsonar.projectKey=ci-cd-github-actions
                       -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
                       -Dsonar.sources=./backend/src
                       -Dsonar.sourceEncoding=UTF-8
@@ -96,7 +96,7 @@ jobs:
                   echo "Reporting unit tests coverage..."
                   # npm run build --if-present
     completed_stage:
-        needs: unit_test_coverage
+        needs: [code_quality, unit_tests, unit_test_coverage]
         runs-on: ubuntu-latest
         steps:
             - name: Send greeting
