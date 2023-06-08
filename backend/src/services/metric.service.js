@@ -1,10 +1,9 @@
 import axios from 'axios'
-import { isEmpty } from 'lodash'
 import InternalServer from '~/errors/internalServer.error'
-import NotFound from '~/errors/notfound.error'
 import { MetricModel } from '~/models/metric.model'
 
-import { githubAPI, stageMetrics, workflowStatus } from '~/utils/constants'
+import { githubAPI, workflowStatus } from '~/utils/constants'
+import { toTitleCase } from '~/utils/helpers'
 
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
@@ -12,8 +11,9 @@ import { githubAPI, stageMetrics, workflowStatus } from '~/utils/constants'
 
 const getMetricReport = async (metricKey) => {
     try {
-        if (metricKey === 'CODE_QUALITY') {
-            const res = await axios.get(`${githubAPI.SONAR_REPORT_URL}?projectKey=river248_ci-cd-github-actions`)
+        if (metricKey.includes('code_quality')) {
+            const [_metric, projectKey, branchName] = metricKey.split('/')
+            const res = await axios.get(`${githubAPI.SONAR_REPORT_URL}?projectKey=${projectKey}&branch=${branchName}`)
             const qualityGates = res.data?.projectStatus.conditions
             const sonarOkQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'OK').length
             const sonarErrorQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'ERROR').length
@@ -27,56 +27,46 @@ const getMetricReport = async (metricKey) => {
     }
 }
 
-const createAndUpdateMetric = async ({
-    name,
-    stage,
-    repository,
-    executionId,
-    rank,
-    status,
+//========================================================================================+
+//                                    PUBLIC FUNCTIONS                                    |
+//========================================================================================+
 
-    startedAt,
-    completedAt,
-    actual,
-    total,
-}) => {
+const createNew = async (data) => {
     try {
-        let metricData = null
-        const isExistedMetrics = await MetricModel.findMetric({
-            name,
-            executionId,
-            stage,
-            repository,
-        })
+        const res = await MetricModel.createNew(data)
+        return res
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
 
-        if (isExistedMetrics) {
-            metricData = await MetricModel.update({
-                name,
-                stage,
-                repository,
-                executionId,
-                data: {
-                    status,
-                    startedAt,
-                    completedAt,
-                    actual,
-                    total,
-                },
-            })
-        } else {
-            metricData = await MetricModel.createNew({
-                name,
-                stage,
-                repository,
-                rank,
-                executionId,
-                status,
-                startedAt,
-                completedAt,
-                actual,
-                total,
-            })
-        }
+const update = async (repository, stage, executionId, name, data) => {
+    try {
+        const res = await MetricModel.update(repository, stage, executionId, name, data)
+        return res
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
+const addMetric = async (repository, stage, executionId, metricKey, steps, data) => {
+    try {
+        const { status, startedAt, completedAt } = data
+        const metricName = toTitleCase(metricKey)
+
+        const metricReports = await Promise.all(
+            steps.filter((step) => step.name.includes(metricKey)).map(async (step) => getMetricReport(step.name)),
+        )
+
+        const totalReport = metricReports.reduce((acc, metricReport) => acc + metricReport.total, 0)
+        const actualReport = metricReports.reduce((acc, metricReport) => acc + metricReport.actual, 0)
+        const metricStatus = actualReport < totalReport ? workflowStatus.FAILURE : status
+
+        const metricData = await MetricModel.update(repository, stage, executionId, metricName, {
+            status: metricStatus,
+            startedAt,
+            completedAt,
+        })
 
         return metricData
     } catch (error) {
@@ -84,89 +74,12 @@ const createAndUpdateMetric = async ({
     }
 }
 
-//========================================================================================+
-//                                    PUBLIC FUNCTIONS                                    |
-//========================================================================================+
-
-const addMetric = async (execution, jobs) => {
-    const executionId = execution.id
-    const executionStage = execution.stage
-    const executionRepository = execution.repository
-    const executionStatus = execution.status
-
-    const metrics = jobs.filter((job) => stageMetrics[executionStage.toUpperCase()].includes(job.name))
-
+const findMetricsByStageAndExecution = async (repository, stage, executionId) => {
     try {
-        if (isEmpty(metrics)) {
-            const result = await Promise.all(
-                stageMetrics[executionStage.toUpperCase()].map(async (metric, index) => {
-                    const metricData = await createAndUpdateMetric({
-                        name: metric,
-                        stage: executionStage,
-                        repository: executionRepository,
-                        executionId,
-                        rank: index * 1 + 1,
-                        status: executionStatus,
-                        startedAt: null,
-                        completedAt: null,
-                        actual: null,
-                        total: null,
-                    })
-
-                    return metricData
-                }),
-            )
-
-            return result
-        }
-
-        const metricData = await Promise.all(
-            metrics.map(async (metric, index) => {
-                const { status, name, conclusion, started_at, completed_at } = metric
-                let result = null
-                let metricStatus =
-                    executionStatus === workflowStatus.IN_PROGRESS && status === workflowStatus.QUEUED
-                        ? workflowStatus.IN_PROGRESS
-                        : status
-                let actual = null
-                let total = null
-
-                if (status === workflowStatus.COMPLETED) {
-                    if (conclusion === workflowStatus.CANCELLED || conclusion === workflowStatus.SKIPPED) {
-                        metricStatus = workflowStatus.FAILURE
-                    } else {
-                        const metricKey = name.toUpperCase().replaceAll(' ', '_')
-                        const res = await getMetricReport(metricKey)
-                        metricStatus =
-                            res.total !== res.actual || !res.actual || !res.total ? workflowStatus.FAILURE : conclusion
-                        actual = res.actual
-                        total = res.total
-                    }
-                }
-
-                result = await createAndUpdateMetric({
-                    name,
-                    stage: executionStage,
-                    repository: executionRepository,
-                    executionId,
-                    rank: index * 1 + 1,
-                    status: metricStatus,
-                    startedAt: new Date(started_at),
-                    completedAt: new Date(completed_at),
-                    actual,
-                    total,
-                })
-
-                return result
-            }),
-        )
-
-        return metricData
+        let res = await MetricModel.findMetricsByStageAndExecution(repository, stage, executionId)
+        res = res.sort((metricA, metricB) => metricA.rank - metricB.rank)
+        return res
     } catch (error) {
-        if (error instanceof NotFound) {
-            throw new InternalServer(error.message)
-        }
-
         throw new InternalServer(error.message)
     }
 }
@@ -176,5 +89,8 @@ const addMetric = async (execution, jobs) => {
 //========================================================================================+
 
 export const MetricService = {
+    createNew,
+    update,
     addMetric,
+    findMetricsByStageAndExecution,
 }

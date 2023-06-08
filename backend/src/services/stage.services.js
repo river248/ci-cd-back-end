@@ -106,7 +106,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
             const stageData = await StageService.update(repository, stage, executionId, data)
 
             const metricData = await Promise.all(
-                stageMetrics.BUILD.map(async (item) => {
+                stageMetrics[stage.toUpperCase()].map(async (item) => {
                     const metricRes = await MetricService.update(repository, stage, executionId, item, {
                         status: workflowStatus.IN_PROGRESS,
                     })

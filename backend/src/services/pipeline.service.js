@@ -5,7 +5,7 @@ import { githubAPI, workflowStatus } from '~/utils/constants'
 import { MetricService } from './metric.service'
 import { StageModel } from '~/models/stage.model'
 import { RepositoryModel } from '~/models/repository.model'
-
+import { StageService } from './stage.services'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -29,29 +29,6 @@ const validateBranch = async (repo, branchName) => {
         }
         throw new InternalServer(error.message)
     }
-}
-
-const summaryJob = (jobs) => {
-    let progress = 0
-    let successJob = 0
-    let compeletedJob = 0
-    const totalJob = jobs.length
-
-    for (const job of jobs) {
-        const { status, conclusion } = job
-
-        if (status === workflowStatus.COMPLETED) {
-            compeletedJob += 1
-
-            if (conclusion === workflowStatus.SUCCESS || conclusion === workflowStatus.SKIPPED) {
-                successJob += 1
-            }
-
-            progress = Math.round((compeletedJob / totalJob) * 100)
-        }
-    }
-
-    return { progress, successJob, totalJob }
 }
 
 //========================================================================================+
@@ -83,61 +60,73 @@ const triggerPipeline = async (repo, branchName) => {
 const handlePipelineData = async (payload) => {
     try {
         const { workflow_job, repository } = payload
-        const { run_id, status, conclusion, head_branch, head_sha, completed_at, name, steps, run_url } = workflow_job
-        const { progress, successJob, totalJob } = summaryJob(steps)
-        const executionId = run_id.toString()
-        const buildStartTime = new Date(workflow_job.created_at)
-        const startDateTime = new Date(workflow_job.started_at)
-        const stageStatus = conclusion || status
+        const repo = repository.name
+        const executionId = workflow_job.run_id.toString()
+        const jobName = workflow_job.name
+        const jobStatus = workflow_job.conclusion
+        const pipelineStatus = workflow_job.status
+        const codePipelineBranch = workflow_job.head_branch
+        const commitId = workflow_job.head_sha
+        const buildStartTime = workflow_job.created_at
+        const startDateTime = workflow_job.started_at
+        const endStartTime = workflow_job.completed_at
+        const jobSteps = workflow_job.steps
+        const stage = workflow_job.workflow_name.toLowerCase()
+        const isStartStage = jobName === 'start_stage'
+        const isFinishStage = jobName === 'finish_stage'
 
-        const workflowRunRes = await _octokit.request(githubAPI.GET_WORKFLOW_RUN_ROUTE, {
-            owner: env.GITHUB_OWNER,
-            repo: repository.name,
-            run_id: executionId,
-            headers: githubAPI.HEADERS,
-        })
-        const version = `0.0.${workflowRunRes.data.run_number}`
-        let pipelineData = null
-        const isExistedStage = await StageModel.findStageByExecutionId(repository.name, name, executionId)
-
-        if (isExistedStage) {
-            pipelineData = await StageModel.update({
-                repository: repository.name,
-                name,
-                executionId,
-                data: {
-                    status: stageStatus,
-                    endDateTime: completed_at ? new Date(completed_at) : completed_at,
-                    progress,
-                    actual: successJob,
-                    total: totalJob,
-                },
-            })
-        } else {
-            pipelineData = await StageModel.createNew({
-                executionId,
-                name,
-                repository: repository.name,
-                codePipelineBranch: head_branch,
-                version,
-                commitId: head_sha,
-                status: stageStatus,
+        /**
+         * When stage starts build
+         * This block create new stage and metric
+         */
+        if (isStartStage) {
+            const initialJob = {
+                codePipelineBranch,
+                commitId,
                 buildStartTime,
                 startDateTime,
-                progress,
-                actual: successJob,
-                total: totalJob,
-            })
+                pipelineStatus,
+            }
+            const res = await StageService.startStage(repo, stage, executionId, initialJob)
+
+            if (res) {
+                return res
+            }
         }
 
-        const metrics = await MetricService.addMetric(
-            { id: executionId, stage: name, status: stageStatus, repository: repository.name },
-            steps,
-        )
+        /**
+         * When stage finishes build
+         * This block create update stage and metric
+         */
+        if (isFinishStage && pipelineStatus === workflowStatus.QUEUED) {
+            const res = await StageService.finishStage(repo, stage, executionId, endStartTime)
 
-        pipelineData = { ...pipelineData, metrics }
+            if (res) {
+                return res
+            }
+        }
 
-        return pipelineData
+        /**
+         * When stage is in progress
+         */
+        if (!isStartStage && !isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
+            await MetricService.addMetric(repo, stage, executionId, jobName, jobSteps, {
+                status: jobStatus,
+                startedAt: startDateTime,
+                completedAt: endStartTime,
+            })
+
+            const [stageData, metrics] = await Promise.all([
+                StageService.findStageByExecutionId(repo, stage, executionId),
+                MetricService.findMetricsByStageAndExecution(repo, stage, executionId),
+            ])
+
+            if (stageData) {
+                return { ...stageData, metrics }
+            }
+        }
+
+        return null
     } catch (error) {
         if (error instanceof NotFound) {
             throw new NotFound(error.message)
