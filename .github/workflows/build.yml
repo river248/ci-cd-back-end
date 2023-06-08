@@ -37,7 +37,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                 ref: ${{ steps.branch-names.outputs.ref_branch }}
-            - name: Sonar Scanner Backend
+            - name: code_quality_backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
               uses: SonarSource/sonarcloud-github-action@master
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,8 +45,7 @@ jobs:
               with:
                   projectBaseDir: ./backend/src
                   args: >
-                      -Dsonar.projectKey=ci-cd-github-actions
-                      -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
+                      -Dsonar.projectKey=ci-cd-github-actions-backend
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
