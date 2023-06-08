@@ -37,6 +37,7 @@ jobs:
               working-directory: ./backend
               run: npm run build --if-present
     finsish_stage:
+        if: ${{ always() }}
         needs: deployment_check
         runs-on: ubuntu-latest
         steps:
