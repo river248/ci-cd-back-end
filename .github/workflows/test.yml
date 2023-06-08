@@ -27,6 +27,7 @@ jobs:
             - name: Send greeting
               run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm in test stage"
     deployment_check:
+        needs: start_stage
         runs-on: ubuntu-latest
         steps:
             - name: Get branch names.
@@ -36,6 +37,7 @@ jobs:
               working-directory: ./backend
               run: npm run build --if-present
     finsish_stage:
+        needs: deployment_check
         runs-on: ubuntu-latest
         steps:
             - name: Get branch names.
