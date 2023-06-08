@@ -70,7 +70,7 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: Running unit tests...
+            - name: unit_tests/backend
               working-directory: ./backend
               run: |
                   npm ci
@@ -90,7 +90,7 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: Generate build folder...
+            - name: unit_test_coverage/backend
               working-directory: ./backend
               run: |
                   echo "Reporting unit tests coverage..."
