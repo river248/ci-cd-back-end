@@ -80,7 +80,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
 
             const stageData = await StageService.createNew(repository, stage, executionId, data)
 
-            const metricData = await Promise.all(
+            let metricData = await Promise.all(
                 stageMetrics[stage.toUpperCase()].map(async (item, index) => {
                     const metricRes = await MetricService.createNew({
                         executionId,
@@ -94,6 +94,8 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                 }),
             )
 
+            metricData.sort((metricA, metricB) => metricA.rank - metricB.rank)
+
             return { stageData, metrics: metricData }
         }
 
@@ -105,7 +107,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
 
             const stageData = await StageService.update(repository, stage, executionId, data)
 
-            const metricData = await Promise.all(
+            let metricData = await Promise.all(
                 stageMetrics[stage.toUpperCase()].map(async (item) => {
                     const metricRes = await MetricService.update(repository, stage, executionId, item, {
                         status: workflowStatus.IN_PROGRESS,
@@ -113,6 +115,8 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                     return metricRes
                 }),
             )
+
+            metricData.sort((metricA, metricB) => metricA.rank - metricB.rank)
 
             return { stageData, metrics: metricData }
         }

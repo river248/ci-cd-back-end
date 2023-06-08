@@ -116,10 +116,12 @@ const handlePipelineData = async (payload) => {
                 completedAt: endStartTime,
             })
 
-            const [stageData, metrics] = await Promise.all([
+            const [stageData, metricData] = await Promise.all([
                 StageService.findStageByExecutionId(repo, stage, executionId),
                 MetricService.findMetricsByStageAndExecution(repo, stage, executionId),
             ])
+
+            const metrics = metricData.sort((metricA, metricB) => metricA.rank - metricB.rank)
 
             if (stageData) {
                 return { ...stageData, metrics }
