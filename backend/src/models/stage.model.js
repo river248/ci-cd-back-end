@@ -1,7 +1,6 @@
 import Joi from 'joi'
 
 import { getDB } from '~/configs/mongodb'
-import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { collection } from '~/utils/constants'
 
@@ -29,7 +28,7 @@ const createNew = async (data) => {
         const res = await getDB().collection(collection.STAGE).insertOne(value)
         return { ...value, _id: res.insertedId.toString() }
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -49,7 +48,7 @@ const update = async (repository, name, executionId, data) => {
             throw new NotFound(error.message)
         }
 
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -85,7 +84,7 @@ const getFullStage = async (repository, name) => {
             .toArray()
         return res[0]
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -94,7 +93,7 @@ const findStageByExecutionId = async (repository, name, executionId) => {
         const res = await getDB().collection(collection.STAGE).findOne({ repository, name, executionId })
         return res
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -114,7 +113,7 @@ const findStages = async (repository, name, condition, limit) => {
             .toArray()
         return res
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 

@@ -1,7 +1,6 @@
 import Joi from 'joi'
 
 import { getDB } from '~/configs/mongodb'
-import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { collection } from '~/utils/constants'
 
@@ -35,7 +34,7 @@ const createNew = async (data) => {
         const res = await getDB().collection(collection.METRIC).insertOne(value)
         return { ...value, _id: res.insertedId.toString() }
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -59,7 +58,7 @@ const update = async (repository, stage, executionId, name, data, action) => {
             throw new NotFound(error.message)
         }
 
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -71,7 +70,7 @@ const findMetrics = async (repository, stage, conditions) => {
             .toArray()
         return res
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 

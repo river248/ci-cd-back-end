@@ -1,7 +1,6 @@
 import Joi from 'joi'
 
 import { getDB } from '~/configs/mongodb'
-import InternalServer from '~/errors/internalServer.error'
 import { collection } from '~/utils/constants'
 
 const repositoryCollectionSchema = Joi.object({
@@ -18,7 +17,7 @@ const createNew = async (data) => {
         const value = await validateSchema(data)
         await getDB().collection(collection.REPOSITORY).insertOne(value)
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -28,7 +27,7 @@ const update = async (name, data) => {
             .collection(collection.REPOSITORY)
             .findOneAndUpdate({ name }, { $set: data }, { returnOriginal: false })
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -37,7 +36,7 @@ const findAllRepositories = async () => {
         const res = await getDB().collection(collection.REPOSITORY).find({}).toArray()
         return res
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 
@@ -46,7 +45,7 @@ const findRepository = async (name) => {
         const res = await getDB().collection(collection.REPOSITORY).findOne({ name })
         return res
     } catch (error) {
-        throw new InternalServer(error)
+        throw new Error(error)
     }
 }
 

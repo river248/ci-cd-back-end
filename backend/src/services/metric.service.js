@@ -1,4 +1,5 @@
 import InternalServer from '~/errors/internalServer.error'
+import NotFound from '~/errors/notfound.error'
 import { MetricModel } from '~/models/metric.model'
 import { toTitleCase } from '~/utils/helpers'
 
@@ -20,6 +21,10 @@ const update = async (repository, stage, executionId, name, data, action) => {
         const res = await MetricModel.update(repository, stage, executionId, name, data, action)
         return res
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error.message)
     }
 }
@@ -44,6 +49,10 @@ const addMetric = async (repository, stage, executionId, metricKey, data) => {
 
         return metricData
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error.message)
     }
 }
@@ -64,6 +73,10 @@ const pushMetric = async (repository, stage, executionId, metricName, data) => {
 
         return metricData
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error.message)
     }
 }

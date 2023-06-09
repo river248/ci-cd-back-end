@@ -4,6 +4,7 @@ import { MetricService } from './metric.service'
 import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
 import { stageMetrics, workflowStatus } from '~/utils/constants'
+import NotFound from '~/errors/notfound.error'
 
 const createNew = async (data) => {
     try {
@@ -35,6 +36,10 @@ const update = async (repository, name, executionId, data) => {
 
         return result
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error.message)
     }
 }
@@ -150,6 +155,10 @@ const startStage = async (repository, stage, executionId, initialJob) => {
 
         return null
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error.message)
     }
 }
@@ -179,6 +188,10 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endSt
 
         return null
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error.message)
     }
 }
