@@ -1,7 +1,10 @@
+import axios from 'axios'
+import { isNull } from 'lodash'
+
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { MetricModel } from '~/models/metric.model'
-import { workflowStatus } from '~/utils/constants'
+import { githubAPI, workflowStatus } from '~/utils/constants'
 import { toTitleCase } from '~/utils/helpers'
 
 //========================================================================================+
@@ -24,7 +27,9 @@ const getMetricReport = async (metricKey) => {
             }
         }
 
-        return null
+        const [_metric, appMetricName] = metricKey.split('/')
+
+        return { name: appMetricName, actual: null, total: null }
     } catch (error) {
         throw new InternalServer(error.message)
     }
@@ -90,24 +95,32 @@ const addMetric = async (repository, stage, executionId, metricKey, steps, data)
         const metricName = toTitleCase(metricKey.replaceAll('_', ' '))
 
         const appMetricReports = await Promise.all(
-            steps.filter((step) => step.name.includes(metricKey).map(async (step) => getMetricReport(step.name))),
+            steps.filter((step) => step.name.includes(metricKey)).map(async (step) => await getMetricReport(step.name)),
         )
 
-        const appMetrics = appMetricReports.filter((appMetricReport) => !appMetricReport)
+        let total = null
+        let actual = null
+
+        appMetricReports.forEach((appMetricReport) => {
+            if (!isNull(appMetricReport.total)) {
+                total += appMetricReport.total
+            }
+
+            if (!isNull(appMetricReport.actual)) {
+                actual += appMetricReport.actual
+            }
+        })
 
         await Promise.all(
-            appMetrics.map(
-                async((appMetric) =>
-                    pushMetric(repository, stage, executionId, appMetric.name, {
+            appMetricReports.map(
+                async (appMetric) =>
+                    await pushMetric(repository, stage, executionId, metricName, {
+                        name: appMetric.name,
                         actual: appMetric.actual,
                         total: appMetric.total,
                     }),
-                ),
             ),
         )
-
-        const total = appMetrics.reduce((acc, appMetric) => acc + appMetric.total, 0)
-        const actual = appMetrics.reduce((acc, appMetric) => acc + appMetric.actual, 0)
 
         const metricStatus = !total || !actual || actual !== total ? workflowStatus.FAILURE : status
 
@@ -117,7 +130,7 @@ const addMetric = async (repository, stage, executionId, metricKey, steps, data)
             executionId,
             metricName,
             {
-                metricStatus,
+                status: metricStatus,
                 startedAt: new Date(startedAt),
                 completedAt: new Date(completedAt),
             },

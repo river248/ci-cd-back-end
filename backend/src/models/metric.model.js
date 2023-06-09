@@ -41,7 +41,6 @@ const createNew = async (data) => {
 const update = async (repository, stage, executionId, name, data, action) => {
     try {
         const key = `$${action}`
-
         const res = await getDB()
             .collection(collection.METRIC)
             .findOneAndUpdate({ name, executionId, stage, repository }, { [key]: data }, { returnOriginal: false })
