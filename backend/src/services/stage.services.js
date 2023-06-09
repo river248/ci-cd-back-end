@@ -1,30 +1,13 @@
+import { isEmpty } from 'lodash'
+
+import { MetricService } from './metric.service'
 import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
-import { githubAPI, stageMetrics, workflowStatus } from '~/utils/constants'
-import { MetricService } from './metric.service'
+import { stageMetrics, workflowStatus } from '~/utils/constants'
 
-const createNew = async (repository, name, executionId, data) => {
+const createNew = async (data) => {
     try {
-        const { codePipelineBranch, commitId, status, buildStartTime } = data
-
-        const workflowRunRes = await _octokit.request(githubAPI.GET_WORKFLOW_RUN_ROUTE, {
-            owner: env.GITHUB_OWNER,
-            repo: repository,
-            run_id: executionId,
-            headers: githubAPI.HEADERS,
-        })
-        const version = `0.0.${workflowRunRes.data.run_number}`
-        const createdData = {
-            executionId,
-            name,
-            repository,
-            codePipelineBranch,
-            commitId,
-            status,
-            version,
-            buildStartTime: new Date(buildStartTime),
-        }
-        const result = await StageModel.createNew(createdData)
+        const result = await StageModel.createNew(data)
 
         return result
     } catch (error) {
@@ -56,6 +39,16 @@ const update = async (repository, name, executionId, data) => {
     }
 }
 
+const findStages = async (repository, name, condition, limit) => {
+    try {
+        const stageData = await StageModel.findStages(repository, name, condition, limit)
+
+        return stageData
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
 const findStageByExecutionId = async (repository, name, executionId) => {
     try {
         const stageData = await StageModel.findStageByExecutionId(repository, name, executionId)
@@ -66,21 +59,52 @@ const findStageByExecutionId = async (repository, name, executionId) => {
     }
 }
 
+const generateVersion = async (repository, stage) => {
+    const DOT = '.'
+    const BUILD = 'build'
+    const FIRST_VERION = '0.0.1'
+    const ELEMENT_TO_GET_VERSION = 2
+
+    try {
+        const stages = await findStages(repository, BUILD, {}, 1)
+
+        if (isEmpty(stages)) {
+            return FIRST_VERION
+        }
+
+        const stageData = stages[0]
+
+        if (stage === BUILD) {
+            return `0.0.${stageData.version.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
+        }
+
+        return stageData.version
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
 const startStage = async (repository, stage, executionId, initialJob) => {
     try {
         const { codePipelineBranch, commitId, buildStartTime, startDateTime, status } = initialJob
 
         if (status === workflowStatus.QUEUED) {
+            const version = await generateVersion(repository, stage)
+
             const data = {
+                executionId,
+                name: stage,
+                repository,
                 codePipelineBranch,
                 commitId,
                 status: workflowStatus.QUEUED,
-                buildStartTime,
+                version,
+                buildStartTime: new Date(buildStartTime),
             }
 
-            const stageData = await StageService.createNew(repository, stage, executionId, data)
+            const stageData = await createNew(data)
 
-            let metricData = await Promise.all(
+            const metricData = await Promise.all(
                 stageMetrics[stage.toUpperCase()].map(async (item, index) => {
                     const metricRes = await MetricService.createNew({
                         executionId,
@@ -94,8 +118,6 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                 }),
             )
 
-            metricData.sort((metricA, metricB) => metricA.rank - metricB.rank)
-
             return { stageData, metrics: metricData }
         }
 
@@ -105,9 +127,9 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                 startDateTime,
             }
 
-            const stageData = await StageService.update(repository, stage, executionId, data)
+            const stageData = await update(repository, stage, executionId, data)
 
-            let metricData = await Promise.all(
+            const metricData = await Promise.all(
                 stageMetrics[stage.toUpperCase()].map(async (item) => {
                     const metricRes = await MetricService.update(repository, stage, executionId, item, {
                         status: workflowStatus.IN_PROGRESS,
@@ -115,8 +137,6 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                     return metricRes
                 }),
             )
-
-            metricData.sort((metricA, metricB) => metricA.rank - metricB.rank)
 
             return { stageData, metrics: metricData }
         }
@@ -127,7 +147,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
     }
 }
 
-const finishStage = async (repository, stage, executionId, endStartTime) => {
+const finishStage = async (repository, stage, executionId, pipelineStatus, endStartTime) => {
     try {
         const metricData = await MetricService.findMetricsByStageAndExecution(repository, stage, executionId)
         let isSuccess = true
@@ -140,9 +160,10 @@ const finishStage = async (repository, stage, executionId, endStartTime) => {
         })
 
         const data = {
-            status: isSuccess ? workflowStatus.SUCCESS : workflowStatus.FAILURE,
+            status: isSuccess ? pipelineStatus : workflowStatus.FAILURE,
             endStartTime,
         }
+
         const stageData = await StageService.update(repository, stage, executionId, data)
 
         if (stageData) {
@@ -158,6 +179,7 @@ const finishStage = async (repository, stage, executionId, endStartTime) => {
 export const StageService = {
     createNew,
     update,
+    findStages,
     findStageByExecutionId,
     startStage,
     finishStage,

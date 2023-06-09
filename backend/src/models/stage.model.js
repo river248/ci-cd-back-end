@@ -33,7 +33,7 @@ const createNew = async (data) => {
     }
 }
 
-const update = async ({ repository, name, executionId, data }) => {
+const update = async (repository, name, executionId, data) => {
     try {
         const res = await getDB()
             .collection(collection.STAGE)
@@ -94,9 +94,30 @@ const findStageByExecutionId = async (repository, name, executionId) => {
     }
 }
 
+/**
+ *
+ * @param {string} repository
+ * @param {string} name
+ * @param {object} condition
+ */
+const findStages = async (repository, name, condition, limit) => {
+    try {
+        const res = await getDB()
+            .collection(collection.STAGE)
+            .find({ repository, name, ...condition })
+            .sort({ buildStartTime: -1 })
+            .limit(limit)
+            .toArray()
+        return res
+    } catch (error) {
+        throw new InternalServer(error)
+    }
+}
+
 export const StageModel = {
     createNew,
     update,
     getFullStage,
+    findStages,
     findStageByExecutionId,
 }

@@ -52,20 +52,30 @@ const update = async (repository, stage, executionId, name, data) => {
 const addMetric = async (repository, stage, executionId, metricKey, steps, data) => {
     try {
         const { status, startedAt, completedAt } = data
-        const metricName = toTitleCase(metricKey)
+        const metricName = toTitleCase(metricKey.replaceAll('_', ' '))
 
         const metricReports = await Promise.all(
             steps.filter((step) => step.name.includes(metricKey)).map(async (step) => getMetricReport(step.name)),
         )
 
-        const totalReport = metricReports.reduce((acc, metricReport) => acc + metricReport.total, 0)
-        const actualReport = metricReports.reduce((acc, metricReport) => acc + metricReport.actual, 0)
+        const totalReport = metricReports.reduce(
+            (acc, metricReport) => (metricReport.total ? acc + metricReport.total : acc),
+            0,
+        )
+        const actualReport = metricReports.reduce(
+            (acc, metricReport) => (metricReport.actual ? acc + metricReport.actual : acc),
+            0,
+        )
+
+        console.log('addMetric: ', totalReport, actualReport)
         const metricStatus = actualReport < totalReport ? workflowStatus.FAILURE : status
 
         const metricData = await MetricModel.update(repository, stage, executionId, metricName, {
             status: metricStatus,
-            startedAt,
-            completedAt,
+            startedAt: new Date(startedAt),
+            completedAt: new Date(completedAt),
+            actual: actualReport,
+            total: totalReport,
         })
 
         return metricData
@@ -76,8 +86,8 @@ const addMetric = async (repository, stage, executionId, metricKey, steps, data)
 
 const findMetricsByStageAndExecution = async (repository, stage, executionId) => {
     try {
-        let res = await MetricModel.findMetricsByStageAndExecution(repository, stage, executionId)
-        res = res.sort((metricA, metricB) => metricA.rank - metricB.rank)
+        const res = await MetricModel.findMetricsByStageAndExecution(repository, stage, executionId)
+
         return res
     } catch (error) {
         throw new InternalServer(error.message)

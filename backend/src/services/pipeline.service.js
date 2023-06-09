@@ -85,7 +85,7 @@ const handlePipelineData = async (payload) => {
                 commitId,
                 buildStartTime,
                 startDateTime,
-                pipelineStatus,
+                status: pipelineStatus,
             }
             const res = await StageService.startStage(repo, stage, executionId, initialJob)
 
@@ -98,8 +98,9 @@ const handlePipelineData = async (payload) => {
          * When stage finishes build
          * This block create update stage and metric
          */
-        if (isFinishStage && pipelineStatus === workflowStatus.QUEUED) {
-            const res = await StageService.finishStage(repo, stage, executionId, endStartTime)
+
+        if (isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
+            const res = await StageService.finishStage(repo, stage, executionId, jobStatus, endStartTime)
 
             if (res) {
                 return res
@@ -121,10 +122,8 @@ const handlePipelineData = async (payload) => {
                 MetricService.findMetricsByStageAndExecution(repo, stage, executionId),
             ])
 
-            const metrics = metricData.sort((metricA, metricB) => metricA.rank - metricB.rank)
-
             if (stageData) {
-                return { ...stageData, metrics }
+                return { ...stageData, metrics: metricData }
             }
         }
 
@@ -144,12 +143,11 @@ const getFullPipeline = async (repository) => {
         if (repo) {
             const pipeline = await Promise.all(
                 repo.stages.map(async (stage) => {
-                    let stageData = await StageModel.getFullStage(repository, stage)
+                    const stageData = await StageModel.getFullStage(repository, stage)
                     if (!stageData) {
                         return { name: stage, metrics: [] }
                     }
 
-                    stageData.metrics.sort((metricA, metricB) => metricA.rank - metricB.rank)
                     return stageData
                 }),
             )
