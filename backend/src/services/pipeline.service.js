@@ -111,7 +111,7 @@ const handlePipelineData = async (payload) => {
          * When stage is in progress
          */
         if (!isStartStage && !isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
-            await MetricService.addMetric(repo, stage, executionId, jobName, {
+            await MetricService.addMetric(repo, stage, executionId, jobName, jobSteps, {
                 status: jobStatus,
                 startedAt: startDateTime,
                 completedAt: endStartTime,

@@ -1,7 +1,62 @@
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { MetricModel } from '~/models/metric.model'
+import { workflowStatus } from '~/utils/constants'
 import { toTitleCase } from '~/utils/helpers'
+
+//========================================================================================+
+//                                   PRIVATE FUNCTIONS                                    |
+//========================================================================================+
+
+const getMetricReport = async (metricKey) => {
+    try {
+        if (metricKey.includes('code_quality')) {
+            const [_metric, appMetricName, projectKey, branchName] = metricKey.split('/')
+            const res = await axios.get(`${githubAPI.SONAR_REPORT_URL}?projectKey=${projectKey}&branch=${branchName}`)
+            const qualityGates = res.data?.projectStatus.conditions
+            const sonarOkQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'OK').length
+            const sonarErrorQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'ERROR').length
+
+            return {
+                name: appMetricName,
+                actual: sonarOkQualityGates,
+                total: sonarErrorQualityGates + sonarOkQualityGates,
+            }
+        }
+
+        return null
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
+const pushMetric = async (repository, stage, executionId, metricName, data) => {
+    try {
+        const { name, actual, total } = data
+
+        const dataToPush = {
+            appMetrics: {
+                name,
+                actual,
+                total,
+            },
+        }
+
+        const metricData = await update(repository, stage, executionId, metricName, dataToPush, 'push')
+
+        return metricData
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
+//========================================================================================+
+//                                    PUBLIC FUNCTIONS                                    |
+//========================================================================================+
 
 const createNew = async (data) => {
     try {
@@ -29,10 +84,32 @@ const update = async (repository, stage, executionId, name, data, action) => {
     }
 }
 
-const addMetric = async (repository, stage, executionId, metricKey, data) => {
+const addMetric = async (repository, stage, executionId, metricKey, steps, data) => {
     try {
         const { status, startedAt, completedAt } = data
         const metricName = toTitleCase(metricKey.replaceAll('_', ' '))
+
+        const appMetricReports = await Promise.all(
+            steps.filter((step) => step.name.includes(metricKey).map(async (step) => getMetricReport(step.name))),
+        )
+
+        const appMetrics = appMetricReports.filter((appMetricReport) => !appMetricReport)
+
+        await Promise.all(
+            appMetrics.map(
+                async((appMetric) =>
+                    pushMetric(repository, stage, executionId, appMetric.name, {
+                        actual: appMetric.actual,
+                        total: appMetric.total,
+                    }),
+                ),
+            ),
+        )
+
+        const total = appMetrics.reduce((acc, appMetric) => acc + appMetric.total, 0)
+        const actual = appMetrics.reduce((acc, appMetric) => acc + appMetric.actual, 0)
+
+        const metricStatus = !total || !actual || actual !== total ? workflowStatus.FAILURE : status
 
         const metricData = await update(
             repository,
@@ -40,36 +117,12 @@ const addMetric = async (repository, stage, executionId, metricKey, data) => {
             executionId,
             metricName,
             {
-                status,
+                metricStatus,
                 startedAt: new Date(startedAt),
                 completedAt: new Date(completedAt),
             },
             'set',
         )
-
-        return metricData
-    } catch (error) {
-        if (error instanceof NotFound) {
-            throw new NotFound(error.message)
-        }
-
-        throw new InternalServer(error.message)
-    }
-}
-
-const pushMetric = async (repository, stage, executionId, metricName, data) => {
-    try {
-        const { name, actual, total } = data
-
-        const dataToPush = {
-            appMetrics: {
-                name,
-                actual,
-                total,
-            },
-        }
-
-        const metricData = await update(repository, stage, executionId, metricName, dataToPush, 'push')
 
         return metricData
     } catch (error) {
