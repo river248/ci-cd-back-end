@@ -55,12 +55,9 @@ jobs:
                       -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
                       -Dsonar.pli.marginRight=0
                       -Dsonar.organization=river248
-#             - name: Sonar Report
-#               run: |
-#                   curl -L \
-#                     -X GET \
-#                     -H "Accept: application/vnd.github+json" \
-#                     https://api.github.com/repos/river248/ci-cd-github-actions/actions/workflows/test.yml/dispatches 
+            - name: Sonar Report
+              run: |
+                  curl -L -X GET -H "Accept: application/vnd.github+json" https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }}
     unit_tests:
         needs: start_stage
         runs-on: ubuntu-latest
