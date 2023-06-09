@@ -37,7 +37,7 @@ jobs:
               uses: actions/checkout@v3
               with:
                 ref: ${{ steps.branch-names.outputs.ref_branch }}
-            - name: code_quality_backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
+            - name: Sonar Scaner
               uses: SonarSource/sonarcloud-github-action@master
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,6 +55,12 @@ jobs:
                       -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
                       -Dsonar.pli.marginRight=0
                       -Dsonar.organization=river248
+#             - name: Sonar Report
+#               run: |
+#                   curl -L \
+#                     -X GET \
+#                     -H "Accept: application/vnd.github+json" \
+#                     https://api.github.com/repos/river248/ci-cd-github-actions/actions/workflows/test.yml/dispatches 
     unit_tests:
         needs: start_stage
         runs-on: ubuntu-latest
@@ -70,7 +76,7 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: unit_tests/backend
+            - name: Backend Unit Tests 
               working-directory: ./backend
               run: |
                   npm ci
@@ -90,7 +96,7 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: unit_test_coverage/backend
+            - name: Backend Unit Test Coverage
               working-directory: ./backend
               run: |
                   echo "Reporting unit tests coverage..."
