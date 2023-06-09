@@ -58,15 +58,9 @@ jobs:
             - name: Sonar Report
               run: |
                   curl -L -X GET -H "Accept: application/vnd.github+json" https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} > report.json
-            - name: Read report
-              run: |
-                  cat report.json
-                  sonar_ok_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' result.json)"
-                  sonar_error_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' result.json)"
-                  sonar_total_errors="$((sonar_ok_quality_gates+sonar_error_quality_gates))"
                   curl -L -X PUT -H "Accept: application/vnd.github+json" \
                     http://localhost:8080/v1/metric/push-metric \
-                    -d '{"repository": "ci-cd-github-actions", "stage": "build", "executionId": "${{ github.run_id}}", "metricName": "Code Quality", "name": "Backend", "actual": ${{ sonar_ok_quality_gates }}, "total": ${{ sonar_total_errors }}}'
+                    -d '{"repository": "ci-cd-github-actions", "stage": "build", "executionId": "${{ github.run_id}}", "metricName": "Code Quality", "name": "Backend", "actual": $(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' result.json), "total": $(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' result.json) + $(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' result.json)}'                  
     unit_tests:
         needs: start_stage
         runs-on: ubuntu-latest
