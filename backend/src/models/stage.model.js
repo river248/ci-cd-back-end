@@ -45,6 +45,10 @@ const update = async (repository, name, executionId, data) => {
 
         throw new NotFound(`Not found execution '${executionId}' of stage '${name} in repo '${repository}'`)
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error)
     }
 }

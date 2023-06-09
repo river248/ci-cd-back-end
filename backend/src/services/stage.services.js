@@ -131,9 +131,16 @@ const startStage = async (repository, stage, executionId, initialJob) => {
 
             const metricData = await Promise.all(
                 stageMetrics[stage.toUpperCase()].map(async (item) => {
-                    const metricRes = await MetricService.update(repository, stage, executionId, item, {
-                        status: workflowStatus.IN_PROGRESS,
-                    })
+                    const metricRes = await MetricService.update(
+                        repository,
+                        stage,
+                        executionId,
+                        item,
+                        {
+                            status: workflowStatus.IN_PROGRESS,
+                        },
+                        'set',
+                    )
                     return metricRes
                 }),
             )
@@ -149,7 +156,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
 
 const finishStage = async (repository, stage, executionId, pipelineStatus, endStartTime) => {
     try {
-        const metricData = await MetricService.findMetricsByStageAndExecution(repository, stage, executionId)
+        const metricData = await MetricService.findMetrics(repository, stage, { executionId })
         let isSuccess = true
 
         metricData.forEach((item) => {
@@ -175,6 +182,10 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endSt
         throw new InternalServer(error.message)
     }
 }
+
+//========================================================================================+
+//                                 EXPORT PUBLIC FUNCTIONS                                |
+//========================================================================================+
 
 export const StageService = {
     createNew,

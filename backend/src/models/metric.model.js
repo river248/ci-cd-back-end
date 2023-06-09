@@ -12,10 +12,17 @@ const metricCollectionSchema = Joi.object({
     stage: Joi.string().required().trim(),
     status: Joi.string().required().trim(),
     rank: Joi.number().required().min(1),
+    appMetrics: Joi.array()
+        .items(
+            Joi.object({
+                name: Joi.string().trim(),
+                actual: Joi.number().min(0),
+                total: Joi.number().min(0),
+            }),
+        )
+        .default([]),
     startedAt: Joi.date().timestamp().allow(null).default(null),
     completedAt: Joi.date().timestamp().allow(null).default(null),
-    actual: Joi.number().allow(null).default(null),
-    total: Joi.number().allow(null).default(null),
 })
 
 const validateSchema = async (data) => {
@@ -32,11 +39,13 @@ const createNew = async (data) => {
     }
 }
 
-const update = async (repository, stage, executionId, name, data) => {
+const update = async (repository, stage, executionId, name, data, action) => {
     try {
+        const key = `$${action}`
+
         const res = await getDB()
             .collection(collection.METRIC)
-            .findOneAndUpdate({ name, executionId, stage, repository }, { $set: data }, { returnOriginal: false })
+            .findOneAndUpdate({ name, executionId, stage, repository }, { [key]: data }, { returnOriginal: false })
 
         if (res.value) {
             return { ...res.value, ...data, _id: res.value._id.toString() }
@@ -46,13 +55,20 @@ const update = async (repository, stage, executionId, name, data) => {
             `Not found metric '${name}' with execution '${executionId}' of stage '${name} in repo '${repository}'`,
         )
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
         throw new InternalServer(error)
     }
 }
 
-const findMetricsByStageAndExecution = async (repository, stage, executionId) => {
+const findMetrics = async (repository, stage, conditions) => {
     try {
-        const res = await getDB().collection(collection.METRIC).find({ repository, stage, executionId }).toArray()
+        const res = await getDB()
+            .collection(collection.METRIC)
+            .find({ repository, stage, ...conditions })
+            .toArray()
         return res
     } catch (error) {
         throw new InternalServer(error)
@@ -62,5 +78,5 @@ const findMetricsByStageAndExecution = async (repository, stage, executionId) =>
 export const MetricModel = {
     createNew,
     update,
-    findMetricsByStageAndExecution,
+    findMetrics,
 }
