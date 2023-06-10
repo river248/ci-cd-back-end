@@ -80,7 +80,7 @@ jobs:
           total_gates="$((success_gates+failure_gates))"
           curl -X POST https://ff0d-118-68-85-106.ngrok-free.app/v1/metric \
             -H "Content-Type: application/json" \
-            -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","total":${total_gates},"actual":${{ success_gates }}}'
+            -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","total":${total_gates},"actual":${success_gates}}'
           npm ci
           # npm run test
           curl -X POST https://ff0d-118-68-85-106.ngrok-free.app/v1/metric \
