@@ -41,10 +41,10 @@ const triggerPipeline = async (repo, branchName) => {
         await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
             owner: env.GITHUB_OWNER,
             repo,
-            workflow_id: 'backend.yml',
+            workflow_id: 'build.yml',
             ref: branchName,
             inputs: {
-                name: 'Backend',
+                name: 'Build',
             },
             headers: githubAPI.HEADERS,
         })
