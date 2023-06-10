@@ -40,7 +40,7 @@ jobs:
       - name: Test
         id: test
         run: | 
-          curl -X GET https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} > report.json
+          curl -X GET https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} >> report.json
           cat report.json
           sonar_ok_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' report.json)"
           echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' report.json)" >> "$GITHUB_OUTPUT"
