@@ -15,6 +15,7 @@ const metricCollectionSchema = Joi.object({
         .items(
             Joi.object({
                 name: Joi.string().trim(),
+                reportUrl: Joi.string().trim(),
                 actual: Joi.number().min(0),
                 total: Joi.number().min(0),
             }),
