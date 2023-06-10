@@ -177,7 +177,7 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endSt
 
         const data = {
             status: isSuccess ? pipelineStatus : workflowStatus.FAILURE,
-            endStartTime,
+            endStartTime: new Date(endStartTime),
         }
 
         const stageData = await StageService.update(repository, stage, executionId, data)
