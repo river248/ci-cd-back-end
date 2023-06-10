@@ -37,13 +37,17 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.branch-names.outputs.ref_branch }}
-      - run: | 
+      - name: Test
+        id: test
+        run: | 
           curl -X GET https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} > report.json
           cat report.json
           sonar_ok_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' report.json)"
-          sonar_error_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' report.json)"
-          sonar_total_errors="$((sonar_ok_quality_gates+sonar_error_quality_gates))"
+          echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' report.json)" >> "$GITHUB_OUTPUT"
+          echo "sonar_total_errors=$((sonar_ok_quality_gates+sonar_error_quality_gates))" >> "$GITHUB_OUTPUT"
           echo Pushing sonar metric with $sonar_ok_quality_gates over $sonar_total_errors
+      - name: Test2
+        run: echo "The test is ${{steps.test.ouputs.sonar_error_quality_gates }}"
 #       - name: code_quality/backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
 #         uses: SonarSource/sonarcloud-github-action@master
 #         env:
