@@ -6,6 +6,7 @@ import { MetricService } from './metric.service'
 import { StageModel } from '~/models/stage.model'
 import { RepositoryModel } from '~/models/repository.model'
 import { StageService } from './stage.services'
+import { isEmpty } from 'lodash'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -117,10 +118,29 @@ const handlePipelineData = async (payload) => {
                 completedAt: endStartTime,
             })
 
-            const [stageData, metricData] = await Promise.all([
+            let [stageData, metricData] = await Promise.all([
                 StageService.findStageByExecutionId(repo, stage, executionId),
                 MetricService.findMetrics(repo, stage, { executionId }),
             ])
+
+            const inProgressMetrics = metricData.filter((metric) => metric.status === workflowStatus.IN_PROGRESS)
+
+            if (!isEmpty(inProgressMetrics)) {
+                await Promise.all(
+                    inProgressMetrics.map(
+                        async (inProgressMetric) =>
+                            await MetricService.update(
+                                inProgressMetric.repository,
+                                inProgressMetric.stage,
+                                inProgressMetric.executionId,
+                                inProgressMetric.name,
+                                { status: workflowStatus.FAILURE },
+                                'set',
+                            ),
+                    ),
+                )
+                metricData
+            }
 
             if (stageData) {
                 return { ...stageData, metrics: metricData }
