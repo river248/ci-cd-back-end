@@ -73,7 +73,7 @@ jobs:
       - name: unit_tests/backend
         working-directory: ./backend
         run: |
-          curl -X GET https://sonarcloud.io/api/qualitygates/project_status -H "Content-Type: application/json" >> result.json
+          curl -X GET https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions&branch=${{ steps.branch-names.outputs.ref_branch }} -H "Content-Type: application/json" >> result.json
           cat result.json
           sonar_ok_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' result.json)"
           sonar_error_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' result.json)"
