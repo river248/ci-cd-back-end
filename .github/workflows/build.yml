@@ -73,13 +73,15 @@ jobs:
       - name: unit_tests/backend
         working-directory: ./backend
         run: |
+          curl -X GET https://sonarcloud.io/api/qualitygates/project_status} -H "Content-Type: application/json" >> result.json
+          cat result.json
+          sonar_ok_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' result.json)"
+          sonar_error_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' result.json)"
           npm ci
           # npm run test
-          curl -L \
-            -X POST \
+          curl -X POST https://ff0d-118-68-85-106.ngrok-free.app/v1/metric \
             -H "Content-Type: application/json" \
-            https://ff0d-118-68-85-106.ngrok-free.app/v1/metric \
-            -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","total":1,"actual": 1}'
+            -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","total":1,"actual":1}'
   unit_test_coverage:
     if: ${{ always() }}
     needs: unit_tests
