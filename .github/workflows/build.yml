@@ -44,7 +44,7 @@ jobs:
           echo "JSON_RESPONSE<<$EOF" >> "$GITHUB_ENV"
           curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} >> "$GITHUB_ENV"
           echo "$EOF" >> "$GITHUB_ENV"
-          echo "REPORT=$JSON_RESPONSE" >> "$GITHUB_OUTPUT"
+          echo "REPORT=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
 #           echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' report.json)" >> "$GITHUB_OUTPUT"
 #           echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' report.json)" >> "$GITHUB_OUTPUT"
 #           echo "sonar_total_errors=$((sonar_ok_quality_gates+sonar_error_quality_gates))" >> "$GITHUB_OUTPUT"
