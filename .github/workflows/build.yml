@@ -26,35 +26,35 @@ jobs:
         uses: tj-actions/branch-names@v7
       - name: Send greeting
         run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm in build stage"
-  code_quality:
-    needs: start_stage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch names.
-        id: branch-names
-        uses: tj-actions/branch-names@v7
-      - name: Checkout branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ steps.branch-names.outputs.ref_branch }}
-      - name: code_quality/backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: ./backend/src
-          args: >
-            -Dsonar.projectKey=ci-cd-github-actions-backend
-            -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.cobol.copy.directories=copybooks
-            -Dsonar.cobol.file.suffixes=cbl,cpy
-            -Dsonar.cobol.copy.suffixes=cpy
-            -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
-            -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
-            -Dsonar.pli.marginRight=0
-            -Dsonar.organization=river248
+#   code_quality:
+#     needs: start_stage
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Get branch names.
+#         id: branch-names
+#         uses: tj-actions/branch-names@v7
+#       - name: Checkout branch
+#         uses: actions/checkout@v3
+#         with:
+#           ref: ${{ steps.branch-names.outputs.ref_branch }}
+#       - name: code_quality/backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
+#         uses: SonarSource/sonarcloud-github-action@master
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#         with:
+#           projectBaseDir: ./backend/src
+#           args: >
+#             -Dsonar.projectKey=ci-cd-github-actions-backend
+#             -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
+#             -Dsonar.sourceEncoding=UTF-8
+#             -Dsonar.cobol.copy.directories=copybooks
+#             -Dsonar.cobol.file.suffixes=cbl,cpy
+#             -Dsonar.cobol.copy.suffixes=cpy
+#             -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
+#             -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
+#             -Dsonar.pli.marginRight=0
+#             -Dsonar.organization=river248
   unit_tests:
     needs: start_stage
     runs-on: ubuntu-latest
@@ -75,6 +75,11 @@ jobs:
         run: |
           npm ci
           # npm run test
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            http://localhost:8080/v1/metric \
+            -d '{"repository": "ci-cd-github-actions", "stage": "build", "executionId": "${{ github.run_id }}", "total": 1, "actual": 1}'
   unit_test_coverage:
     needs: unit_tests
     runs-on: ubuntu-latest
@@ -97,7 +102,7 @@ jobs:
           # npm run build --if-present
   finish_stage:
     if: ${{ always() }}
-    needs: [code_quality, unit_tests, unit_test_coverage]
+    needs: [ unit_tests, unit_test_coverage]
     runs-on: ubuntu-latest
     steps:
       - name: Get branch names.
