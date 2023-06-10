@@ -70,7 +70,7 @@ const handlePipelineData = async (payload) => {
         const commitId = workflow_job.head_sha
         const buildStartTime = workflow_job.created_at
         const startDateTime = workflow_job.started_at
-        const endStartTime = workflow_job.completed_at
+        const endDateTime = workflow_job.completed_at
         const jobSteps = workflow_job.steps
         const stage = workflow_job.workflow_name.toLowerCase()
         const isStartStage = jobName === 'start_stage'
@@ -101,7 +101,7 @@ const handlePipelineData = async (payload) => {
          */
 
         if (isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
-            const res = await StageService.finishStage(repo, stage, executionId, jobStatus, endStartTime)
+            const res = await StageService.finishStage(repo, stage, executionId, jobStatus, endDateTime)
 
             if (res) {
                 return res
@@ -115,7 +115,7 @@ const handlePipelineData = async (payload) => {
             await MetricService.addMetric(repo, stage, executionId, jobName, jobSteps, {
                 status: jobStatus,
                 startedAt: startDateTime,
-                completedAt: endStartTime,
+                completedAt: endDateTime,
             })
 
             const [stageData, metricData] = await Promise.all([

@@ -163,7 +163,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
     }
 }
 
-const finishStage = async (repository, stage, executionId, pipelineStatus, endStartTime) => {
+const finishStage = async (repository, stage, executionId, pipelineStatus, endDateTime) => {
     try {
         let metricData = await MetricService.findMetrics(repository, stage, { executionId })
         const inProgressMetrics = []
@@ -212,10 +212,10 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endSt
 
         const data = {
             status: isSuccess ? pipelineStatus : workflowStatus.FAILURE,
-            endStartTime: new Date(endStartTime),
+            endDateTime,
         }
 
-        const stageData = await StageService.update(repository, stage, executionId, data)
+        const stageData = await update(repository, stage, executionId, data)
 
         if (stageData) {
             return { ...stageData, metrics: metricData }
