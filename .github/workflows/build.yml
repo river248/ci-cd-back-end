@@ -77,7 +77,7 @@ jobs:
           # npm run test
           curl -L \
             -X POST \
-            -H "Accept: application/vnd.github+json" \
+            -H "Accept: application/json" \
             https://ff0d-118-68-85-106.ngrok-free.app/v1/metric \
             -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","total":1,"actual": 1}'
   unit_test_coverage:
