@@ -79,7 +79,7 @@ jobs:
             -X POST \
             -H "Accept: application/vnd.github+json" \
             https://ff0d-118-68-85-106.ngrok-free.app/v1/metric \
-            -d '{"repository": "ci-cd-github-actions", "stage": "build", "executionId": "${{ github.run_id }}", "total": 1, "actual": 1}'
+            -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","total":1,"actual": 1}'
   unit_test_coverage:
     if: ${{ always() }}
     needs: unit_tests
