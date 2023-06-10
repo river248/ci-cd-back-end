@@ -38,7 +38,7 @@ jobs:
         with:
           ref: ${{ steps.branch-names.outputs.ref_branch }}
       - run: | 
-          curl -X GET https://sonarcloud.io/api/qualitygates/project_status??projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} >> report.json
+          curl -X GET https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} >> report.json
           cat report.json
           sonar_ok_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' result.json)"
           sonar_error_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' result.json)"
