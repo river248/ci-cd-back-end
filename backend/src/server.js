@@ -49,7 +49,7 @@ const bootServer = async () => {
 
     _io.on('connection', socketService.connection)
 
-    httpServer.listen(8080, () => {
-        console.log(`Hello CI/CD App, I'm running at :${8080}/`)
+    httpServer.listen(process.env.PORT || 8080, () => {
+        console.log(`Hello CI/CD App, I'm running at :${process.env.PORT || 8080}/`)
     })
 }

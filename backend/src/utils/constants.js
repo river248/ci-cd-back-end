@@ -51,4 +51,4 @@ export const socketEvent = {
 
 export const clientHost = ['http://localhost:3000']
 
-export const serverHost = 'http://localhost:8080'
+export const serverHost = 'https://ci-cd-github-actions.onrender.com'
