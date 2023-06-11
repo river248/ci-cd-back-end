@@ -40,21 +40,12 @@ jobs:
       - name: Test
         id: test
         run: | 
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "JSON_RESPONSE<<$EOF" >> "$GITHUB_ENV"
-          curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} >> "$GITHUB_ENV"
-          echo "$EOF" >> "$GITHUB_ENV"
-          echo "REPORT=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
-#           echo Pushing sonar metric with $sonar_ok_quality_gates over $sonar_total_errors
-      - name: Test2
-        id: test2
-        run: |
-          echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' ${{ steps.test.outputs.REPORT }})" >> "$GITHUB_OUTPUT"
-          echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' ${{ steps.test.outputs.REPORT }})" >> "$GITHUB_OUTPUT"
-          echo "sonar_total_errors=$((sonar_ok_quality_gates+sonar_error_quality_gates))" >> "$GITHUB_OUTPUT"
-      - name: Test3
-        run: |
-          echo "Thisi ${{ steps.test2.sonar_ok_quality_gates }}"
+          curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} -o report.json
+          cat report.json
+          sonar_ok_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' report.json)"
+          sonar_error_quality_gates="$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' report.json)"
+          sonar_total_errors="$((sonar_ok_quality_gates+sonar_error_quality_gates))"
+          echo Test $sonar_ok_quality_gates
 #       - name: code_quality/backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
 #         uses: SonarSource/sonarcloud-github-action@master
 #         env:
