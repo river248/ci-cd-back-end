@@ -40,14 +40,14 @@ jobs:
       - name: Test
         id: test
         run: | 
-          curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} > report.json
-          echo "REPORT=$(cat report.json)" >> "$GITHUB_OUTPUT"
+         curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }}) > ./report.json
+         echo "REPORT=$(cat ./report.json)" >> "$GITHUB_OUTPUT"
 #         echo Pushing sonar metric with $sonar_ok_quality_gates over $sonar_total_errors
       - name: Test2
         id: test2
         run: |
-          echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' ${{ steps.test.outputs.REPORT }}.json)" >> "$GITHUB_OUTPUT"
-          echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' ${{ steps.test.outputs.REPORT }}.json)" >> "$GITHUB_OUTPUT"
+          echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' ${{ steps.test.outputs.REPORT }})" >> "$GITHUB_OUTPUT"
+          echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' ${{ steps.test.outputs.REPORT }})" >> "$GITHUB_OUTPUT"
           echo "sonar_total_errors=$((sonar_ok_quality_gates+sonar_error_quality_gates))" >> "$GITHUB_OUTPUT"
       - name: Test3
         run: |
