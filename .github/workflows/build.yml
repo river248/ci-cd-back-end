@@ -39,14 +39,23 @@ jobs:
           ref: ${{ steps.branch-names.outputs.ref_branch }}
       - name: Test
         id: test
+        shell: bash
         run: | 
-         echo "REPORT=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
-#         echo Pushing sonar metric with $sonar_ok_quality_gates over $sonar_total_errors
-      - name: Test2
-        id: test2
+          curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} > report.json
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: report
+          path: report.json
+      - name: Upload report
+        uses: actions/download-artifact@v3
+        with:
+          name: report
+      - name: Test 2
         run: |
-          echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' ${{ steps.test.outputs.REPORT }})" >> "$GITHUB_OUTPUT"
-          echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' ${{ steps.test.outputs.REPORT }})" >> "$GITHUB_OUTPUT"
+          cat report.json
+          echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' report.json" >> "$GITHUB_OUTPUT"
+          echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' report.json" >> "$GITHUB_OUTPUT"
           echo "sonar_total_errors=$((sonar_ok_quality_gates+sonar_error_quality_gates))" >> "$GITHUB_OUTPUT"
       - name: Test3
         run: |
