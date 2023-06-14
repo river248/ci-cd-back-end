@@ -52,10 +52,11 @@ jobs:
         with:
           name: report
       - name: Test 2
+        shell: bash
         run: |
-          cat report.json
-          echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' report.json" >> "$GITHUB_OUTPUT"
-          echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' report.json" >> "$GITHUB_OUTPUT"
+          report_sonar=`cat report.json`
+          echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' $report_sonar" >> "$GITHUB_OUTPUT"
+          echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' $report_sonar" >> "$GITHUB_OUTPUT"
           echo "sonar_total_errors=$((sonar_ok_quality_gates+sonar_error_quality_gates))" >> "$GITHUB_OUTPUT"
       - name: Test3
         run: |
