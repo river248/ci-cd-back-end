@@ -40,7 +40,7 @@ jobs:
       - name: Test
         id: test
         run: | 
-         REPORT=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }}) >> "$GITHUB_OUTPUT"
+         echo "REPORT=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
 #         echo Pushing sonar metric with $sonar_ok_quality_gates over $sonar_total_errors
       - name: Test2
         id: test2
