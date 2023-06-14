@@ -51,6 +51,7 @@ jobs:
         with:
           name: report
       - name: Test 2
+        shell: bash
         run: |
           cat report.json
           echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' report.json)" >> "$GITHUB_OUTPUT"
