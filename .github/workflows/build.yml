@@ -45,7 +45,7 @@ jobs:
           curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} >> "$GITHUB_ENV"
           echo "$EOF" >> "$GITHUB_ENV"
       - run: |
-          echo '${{ fromJson(env.JSON_RESPONSE).projectStatus.conditions }}'
+          echo ${{ fromJson(env.JSON_RESPONSE).projectStatus.conditions }}
 #       - name: Upload report
 #         uses: actions/upload-artifact@v3
 #         with:
