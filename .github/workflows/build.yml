@@ -66,7 +66,7 @@ jobs:
             -d '{\
               "repository":"ci-cd-github-actions",\
               "stage":"build",\
-              "executionId":"${{ github.run_id }}"\
+              "executionId":"${{ github.run_id }}",\
               "metricName":"Code Quality",\
               "appMetricName":"backend",\
               "data": ${{ toJSON(steps.sonar_report.outputs.report) }}\
