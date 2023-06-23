@@ -40,7 +40,7 @@ jobs:
       - name: Test
         id: test
         run: |
-          echo "JSON_RESPONSE=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_ENV"
+          echo "JSON_RESPONSE=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
           echo "test $JSON_RESPONSE"
       - run: |
           echo ${{ fromJson(env.JSON_RESPONSE).projectStatus.conditions }}
