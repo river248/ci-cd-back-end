@@ -41,8 +41,11 @@ jobs:
         id: test
         run: |
           echo "REPORT=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
-      - run: |
-          echo ${{ steps.test.outputs.REPORT }}
+      - name: Trigger Test
+        run: |
+          curl -X POST https://6809-118-68-85-98.ngrok-free.app/v1/metric \
+            -H "Content-Type: application/json" \
+            -d "${{ steps.test.outputs.REPORT }"
 #       - name: code_quality/backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
 #         uses: SonarSource/sonarcloud-github-action@master
 #         env:
