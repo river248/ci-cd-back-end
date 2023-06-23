@@ -37,24 +37,53 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.branch-names.outputs.ref_branch }}
-      - name: code_quality/backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: ./backend/src
-          args: >
-            -Dsonar.projectKey=ci-cd-github-actions-backend
-            -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.cobol.copy.directories=copybooks
-            -Dsonar.cobol.file.suffixes=cbl,cpy
-            -Dsonar.cobol.copy.suffixes=cpy
-            -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
-            -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
-            -Dsonar.pli.marginRight=0
-            -Dsonar.organization=river248
+      - name: Test
+        id: test
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "JSON_RESPONSE<<$EOF" >> "$GITHUB_ENV"
+          curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }} >> "$GITHUB_ENV"
+          echo "$EOF" >> "$GITHUB_ENV"
+      - run: |
+          echo ${{ fromJson(env.JSON_RESPONSE).projectStatus.conditions }}
+#       - name: Upload report
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: report
+#           path: report.json
+#       - name: Upload report
+#         uses: actions/download-artifact@v3
+#         with:
+#           name: report
+#       - name: Test 2
+#         shell: bash
+#         run: |
+#           cat report.json
+#           echo "sonar_ok_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "OK")] | length' report.json)" >> "$GITHUB_OUTPUT"
+#           echo "sonar_error_quality_gates=$(jq '[.projectStatus.conditions[] | select(.status == "ERROR")] | length' report.json)" >> "$GITHUB_OUTPUT"
+#           echo "sonar_total_errors=$((sonar_ok_quality_gates+sonar_error_quality_gates))" >> "$GITHUB_OUTPUT"
+#           echo Pushing sonar metric for $sonar_ok_quality_gates over $sonar_total_errors
+#       - name: Test3
+#         run: |
+#           echo "Thisi ${{ steps.test2.sonar_ok_quality_gates }}"
+#       - name: code_quality/backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
+#         uses: SonarSource/sonarcloud-github-action@master
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#         with:
+#           projectBaseDir: ./backend/src
+#           args: >
+#             -Dsonar.projectKey=ci-cd-github-actions-backend
+#             -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
+#             -Dsonar.sourceEncoding=UTF-8
+#             -Dsonar.cobol.copy.directories=copybooks
+#             -Dsonar.cobol.file.suffixes=cbl,cpy
+#             -Dsonar.cobol.copy.suffixes=cpy
+#             -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
+#             -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
+#             -Dsonar.pli.marginRight=0
+#             -Dsonar.organization=river248
   unit_tests:
     needs: start_stage
     runs-on: ubuntu-latest
