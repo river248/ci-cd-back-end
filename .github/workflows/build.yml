@@ -84,10 +84,10 @@ jobs:
         run: |
           npm ci
           npm run test
-          echo "js_test_cnt=$(xmllint --xpath "string(/testsuites/@tests)" junit.xml)" >> $GITHUB_OUTPUT"
-          echo "js_test_error=$(xmllint --xpath "string(/testsuites/@errors)" junit.xml)" >> $GITHUB_OUTPUT"
-          echo "js_test_failures=$(xmllint --xpath "string(/testsuites/@failures)" junit.xml)" >> $GITHUB_OUTPUT"
-          echo "js_test_success=$(($js_test_cnt - ($js_test_error - $js_test_failures)))" >> $GITHUB_OUTPUT"
+          echo "js_test_cnt=$(xmllint --xpath "string(/testsuites/@tests)" junit.xml)" >> "$GITHUB_OUTPUT"
+          echo "js_test_error=$(xmllint --xpath "string(/testsuites/@errors)" junit.xml)" >> "$GITHUB_OUTPUT"
+          echo "js_test_failures=$(xmllint --xpath "string(/testsuites/@failures)" junit.xml)" >> "$GITHUB_OUTPUT"
+          echo "js_test_success=$(($js_test_cnt - ($js_test_error - $js_test_failures)))" >> "$GITHUB_OUTPUT"
           echo ${{ js_test_success }}
           # curl -X POST https://ff0d-118-68-85-106.ngrok-free.app/v1/metric \
           #  -H "Content-Type: application/json" \
