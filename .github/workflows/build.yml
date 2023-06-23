@@ -45,7 +45,7 @@ jobs:
         run: |
           curl -X POST https://6809-118-68-85-98.ngrok-free.app/v1/metric \
             -H "Content-Type: application/json" \
-            -d '{"data": ${{ toJSON(steps.test.outputs.REPORT) }}}'
+            -d ${{ toJSON(steps.test.outputs.REPORT) }}
 #       - name: code_quality/backend/ci-cd-github-actions-backend/${{ steps.branch-names.outputs.ref_branch }}
 #         uses: SonarSource/sonarcloud-github-action@master
 #         env:
