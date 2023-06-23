@@ -7,7 +7,7 @@
         "node": "18.16.0"
     },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jest",
         "eslint": "eslint src",
         "clean": "rm -rf build && mkdir build",
         "build-babel": "babel ./src -d ./build/src",
@@ -20,6 +20,18 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
+    "jest": {
+        "reporters": [
+            "default",
+            "jest-junit",
+            "jest-html-reporters"
+        ],
+        "collectCoverageFrom": [
+            "**/*.{js,jsx}",
+            "!**/node_modules/**",
+            "!**/coverage/**"
+        ]
+    },
     "devDependencies": {
         "@babel/cli": "^7.21.5",
         "@babel/core": "^7.22.1",
@@ -27,6 +39,9 @@
         "@babel/plugin-transform-runtime": "^7.22.4",
         "@babel/preset-env": "^7.22.4",
         "babel-plugin-module-resolver": "^5.0.0",
+        "jest": "^29.5.0",
+        "jest-html-reporters": "^3.1.4",
+        "jest-junit": "^16.0.0",
         "nodemon": "^2.0.22"
     },
     "dependencies": {
