@@ -63,14 +63,7 @@ jobs:
         run: |
           curl -X POST https://6809-118-68-85-98.ngrok-free.app/v1/metric/push-metric \
             -H "Content-Type: application/json" \
-            -d '{\
-              "repository":"ci-cd-github-actions",\
-              "stage":"build",\
-              "executionId":"${{ github.run_id }}",\
-              "metricName":"Code Quality",\
-              "appMetricName":"backend",\
-              "data": ${{ toJSON(steps.sonar_report.outputs.report) }}\
-              }'
+            -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","data": ${{ toJSON(steps.sonar_report.outputs.report) }}}'
   unit_tests:
     needs: start_stage
     runs-on: ubuntu-latest
