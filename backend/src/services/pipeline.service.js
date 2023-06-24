@@ -1,3 +1,5 @@
+import { isEmpty } from 'lodash'
+
 import { env } from '~/configs/environment'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
@@ -40,7 +42,6 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
         let total = 0
 
         const metrics = await MetricService.findMetrics(repository, stage, { executionId, name: metricName })
-
         if (isEmpty(metrics)) {
             throw new NotFound(
                 `Not found metric ${metricName} with executionId ${executionId} for stage ${stage} at repo ${repository}`,
@@ -48,7 +49,6 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
         }
 
         const { appMetrics } = metrics[0]
-
         appMetrics.forEach((appMetric) => {
             actual += appMetric.actual
             total += appMetric.total

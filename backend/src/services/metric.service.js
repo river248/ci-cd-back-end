@@ -32,13 +32,13 @@ const update = async (repository, stage, executionId, name, data, action) => {
     }
 }
 
-const pushMetric = async (repository, stage, executionId, metricName, appMetricName, data) => {
+const pushMetric = async (repository, stage, executionId, metricName, appMetricName, reportUrl, data) => {
     try {
         const dataFromJSON = JSON.parse(data)
         const appMetricData = {
             appMetrics: {
                 name: appMetricName,
-                reportUrl: null,
+                reportUrl: reportUrl ? reportUrl : null,
                 actual: null,
                 total: null,
             },

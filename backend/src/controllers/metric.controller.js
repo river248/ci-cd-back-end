@@ -3,8 +3,16 @@ import { HttpStatusCode } from '~/utils/constants'
 
 const pushMetric = async (req, res) => {
     try {
-        const { repository, stage, executionId, metricName, appMetricName, data } = req.body
-        const result = await MetricService.pushMetric(repository, stage, executionId, metricName, appMetricName, data)
+        const { repository, stage, executionId, metricName, appMetricName, reportUrl, data } = req.body
+        const result = await MetricService.pushMetric(
+            repository,
+            stage,
+            executionId,
+            metricName,
+            appMetricName,
+            reportUrl,
+            data,
+        )
         res.status(HttpStatusCode.OK).json({ result })
     } catch (error) {
         res.status(error.statusCode()).json({
