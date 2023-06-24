@@ -92,8 +92,7 @@ jobs:
             - name: Push metric
               if: ${{ always() }}
               run: |
-                  echo "Unit test report: ${{ toJSON(steps.unit_test_report.outputs.report) }}"
-                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data": "{/"numPassedTests/": ${{ fromJSON(steps.unit_test_report.outputs.report).numPassedTests }}, /"numTotalTests/": ${{ fromJSON(steps.unit_test_report.outputs.report).numTotalTests }}}' \
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data": "{\"numPassedTests\": ${{ fromJSON(steps.unit_test_report.outputs.report).numPassedTests }}, \"numTotalTests\": ${{ fromJSON(steps.unit_test_report.outputs.report).numTotalTests }}}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
     unit_test_coverage:
