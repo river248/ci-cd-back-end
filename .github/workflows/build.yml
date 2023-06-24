@@ -80,15 +80,18 @@ jobs:
         with:
           node-version: 18
       - name: Run unit test
-        id: unit_test_report
         working-directory: ./backend
         run: |
           npm ci
           npm run test
+      - name: Read report unit tests
+        if: ${{ always() }}
+        id: unit_test_report
+        run: |
           echo "report=$(cat junit.json)" >> "$GITHUB_OUTPUT"
       - name: Report unit tests
         run: |
-          echo "Test: ${{ steps.unit_test_report.outputs.report }}"
+          echo "Unit test: ${{ stepsunit_test_report.outputs.report }}
   unit_test_coverage:
     if: ${{ always() }}
     needs: unit_tests
