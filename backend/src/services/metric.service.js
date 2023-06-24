@@ -6,6 +6,32 @@ import { MetricModel } from '~/models/metric.model'
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
 
+const createNew = async (data) => {
+    try {
+        const res = await MetricModel.createNew(data)
+        return res
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
+const update = async (repository, stage, executionId, name, data, action) => {
+    try {
+        if (!['set', 'push'].includes(action)) {
+            throw new InternalServer('Invalid action. Action must be "set" or "push"')
+        }
+
+        const res = await MetricModel.update(repository, stage, executionId, name, data, action)
+        return res
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
 const pushMetric = async (repository, stage, executionId, metricName, appMetricName, data) => {
     try {
         const dataFromJSON = JSON.parse(data)
@@ -35,32 +61,6 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
         }
 
         const res = await update(repository, stage, executionId, metricName, appMetricData, 'push')
-        return res
-    } catch (error) {
-        if (error instanceof NotFound) {
-            throw new NotFound(error.message)
-        }
-
-        throw new InternalServer(error.message)
-    }
-}
-
-const createNew = async (data) => {
-    try {
-        const res = await MetricModel.createNew(data)
-        return res
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
-
-const update = async (repository, stage, executionId, name, data, action) => {
-    try {
-        if (!['set', 'push'].includes(action)) {
-            throw new InternalServer('Invalid action. Action must be "set" or "push"')
-        }
-
-        const res = await MetricModel.update(repository, stage, executionId, name, data, action)
         return res
     } catch (error) {
         if (error instanceof NotFound) {

@@ -32,6 +32,53 @@ const validateBranch = async (repo, branchName) => {
     }
 }
 
+const handleCompletedJob = async (repository, stage, executionId, metricName, data) => {
+    try {
+        const { jobStatus, startDateTime, endDateTime } = data
+        let status = workflowStatus.SUCCESS
+
+        if (jobStatus !== workflowStatus.SUCCESS) {
+            status = workflowStatus.FAILURE
+        } else {
+            const metrics = await MetricService.findMetrics(repository, stage, { executionId, name: metricName })
+
+            if (isEmpty(metrics)) {
+                throw new NotFound(
+                    `Not found metric ${metricName} with executionId ${executionId} for stage ${stage} at repo ${repository}`,
+                )
+            }
+
+            const { appMetrics } = metrics[0]
+            let actual = 0
+            let total = 0
+
+            appMetrics.forEach((appMetric) => {
+                actual += appMetric.actual
+                total += appMetric.total
+            })
+
+            status = actual !== total ? workflowStatus.FAILURE : workflowStatus.SUCCESS
+        }
+
+        const res = await MetricService.update(
+            repository,
+            stage,
+            executionId,
+            toTitleCase(metricName.replaceAll('_', ' ')),
+            { status, startedAt: new Date(startDateTime), completedAt: new Date(endDateTime) },
+            'set',
+        )
+
+        return res
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
 //========================================================================================+
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
@@ -111,14 +158,7 @@ const handlePipelineData = async (payload) => {
          * When stage is in progress
          */
         if (!isStartStage && !isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
-            await MetricService.update(
-                repo,
-                stage,
-                executionId,
-                toTitleCase(jobName.replaceAll('_', ' ')),
-                { completedAt: endDateTime },
-                'set',
-            )
+            await handleCompletedJob(repo, stage, executionId, jobName, { jobStatus, startDateTime, endDateTime })
 
             const [stageData, metricData] = await Promise.all([
                 StageService.findStageByExecutionId(repo, stage, executionId),
