@@ -90,6 +90,7 @@ jobs:
         run: |
           echo "report=$(cat ./backend/junit.json)" >> "$GITHUB_OUTPUT"
       - name: Report unit tests
+        if: ${{ always() }}
         run: |
           echo "Unit test: ${{ steps.unit_test_report.outputs.report }}"
   unit_test_coverage:
