@@ -30,8 +30,8 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
         if (metricName === 'Unit Tests') {
             const { numPassedTests, numTotalTests } = dataFromJSON
 
-            appMetricData.appMetrics.actual = numPassedTests * 1
-            appMetricData.appMetrics.total = numTotalTests * 1
+            appMetricData.appMetrics.actual = numPassedTests
+            appMetricData.appMetrics.total = numTotalTests
         }
 
         const res = await update(repository, stage, executionId, metricName, appMetricData, 'push')
