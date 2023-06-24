@@ -5,135 +5,135 @@ name: Build
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  workflow_dispatch:
-    # Inputs the workflow accepts.
-    inputs:
-      name:
-        # Friendly description to be shown in the UI instead of 'name'
-        description: "CI/CD to greet"
-        # Default value if no value is explicitly provided
-        default: "Build"
-        # Input has to be provided for the workflow to run
-        required: true
-        # The data type of the input
-        type: string
+    workflow_dispatch:
+        # Inputs the workflow accepts.
+        inputs:
+            name:
+                # Friendly description to be shown in the UI instead of 'name'
+                description: 'CI/CD to greet'
+                # Default value if no value is explicitly provided
+                default: 'Build'
+                # Input has to be provided for the workflow to run
+                required: true
+                # The data type of the input
+                type: string
 jobs:
-  start_stage:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch names.
-        id: branch-names
-        uses: tj-actions/branch-names@v7
-      - name: Send greeting
-        run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm in build stage"
-  code_quality:
-    needs: start_stage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch names.
-        id: branch-names
-        uses: tj-actions/branch-names@v7
-      - name: Checkout branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ steps.branch-names.outputs.ref_branch }}
-      - name: Sonar scanner
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: ./backend/src
-          args: >
-            -Dsonar.projectKey=ci-cd-github-actions-backend
-            -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.cobol.copy.directories=copybooks
-            -Dsonar.cobol.file.suffixes=cbl,cpy
-            -Dsonar.cobol.copy.suffixes=cpy
-            -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
-            -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
-            -Dsonar.pli.marginRight=0
-            -Dsonar.organization=river248
-      - name: Get sonar report
-        id: sonar_report
-        run: |
-          echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
-      - name: Push metric
-        run: |
-          curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","data":${{ toJSON(steps.sonar_report.outputs.report) }}}' \
-            -H "Content-Type: application/json" \
-            -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
-  unit_tests:
-    needs: start_stage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch names.
-        id: branch-names
-        uses: tj-actions/branch-names@v7
-      - name: Checkout branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ steps.branch-names.outputs.ref_branch }}
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Run unit test
-        working-directory: ./backend
-        run: |
-          npm ci
-          npm run test
-      - name: Get report unit tests
+    start_stage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get branch names.
+              id: branch-names
+              uses: tj-actions/branch-names@v7
+            - name: Send greeting
+              run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm in build stage"
+    code_quality:
+        needs: start_stage
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get branch names.
+              id: branch-names
+              uses: tj-actions/branch-names@v7
+            - name: Checkout branch
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ steps.branch-names.outputs.ref_branch }}
+            - name: Sonar scanner
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+              with:
+                  projectBaseDir: ./backend/src
+                  args: >
+                      -Dsonar.projectKey=ci-cd-github-actions-backend
+                      -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
+                      -Dsonar.sourceEncoding=UTF-8
+                      -Dsonar.cobol.copy.directories=copybooks
+                      -Dsonar.cobol.file.suffixes=cbl,cpy
+                      -Dsonar.cobol.copy.suffixes=cpy
+                      -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
+                      -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
+                      -Dsonar.pli.marginRight=0
+                      -Dsonar.organization=river248
+            - name: Get sonar report
+              id: sonar_report
+              run: |
+                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
+            - name: Push metric
+              run: |
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","data":${{ toJSON(steps.sonar_report.outputs.report) }}}' \
+                    -H "Content-Type: application/json" \
+                    -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
+    unit_tests:
+        needs: start_stage
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get branch names.
+              id: branch-names
+              uses: tj-actions/branch-names@v7
+            - name: Checkout branch
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ steps.branch-names.outputs.ref_branch }}
+            - name: Use Node.js 18
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Run unit test
+              working-directory: ./backend
+              run: |
+                  npm ci
+                  npm run test
+            - name: Get report unit tests
+              if: ${{ always() }}
+              id: unit_test_report
+              run: |
+                  echo "report=$(cat ./backend/junit.json)" >> "$GITHUB_OUTPUT"
+            - name: Push metric
+              if: ${{ always() }}
+              run: |
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data": $(cat ./backend/junit.json)}' \
+                    -H "Content-Type: application/json" \
+                    -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
+    unit_test_coverage:
         if: ${{ always() }}
-        id: unit_test_report
-        run: |
-          echo "report=$(cat ./backend/junit.json)" >> "$GITHUB_OUTPUT"
-      - name: Push metric
+        needs: unit_tests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get branch names.
+              id: branch-names
+              uses: tj-actions/branch-names@v7
+            - name: Checkout branch
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ steps.branch-names.outputs.ref_branch }}
+            - name: Use Node.js 18
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: unit_test_coverage/backend
+              working-directory: ./backend
+              run: |
+                  echo "Reporting unit tests coverage..."
+                  # npm run build --if-present
+    finish_stage:
         if: ${{ always() }}
-        run: |
-          curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data":${{ steps.unit_test_report.outputs.report }}}' \
-            -H "Content-Type: application/json" \
-            -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
-  unit_test_coverage:
-    if: ${{ always() }}
-    needs: unit_tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch names.
-        id: branch-names
-        uses: tj-actions/branch-names@v7
-      - name: Checkout branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ steps.branch-names.outputs.ref_branch }}
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: unit_test_coverage/backend
-        working-directory: ./backend
-        run: |
-          echo "Reporting unit tests coverage..."
-          # npm run build --if-present
-  finish_stage:
-    if: ${{ always() }}
-    needs: [code_quality, unit_tests, unit_test_coverage]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch names.
-        id: branch-names
-        uses: tj-actions/branch-names@v7
-      # - name: Checkout branch
-      #   uses: actions/checkout@v3
-      #   with:
-      #     ref: ${{ steps.branch-names.outputs.ref_branch }}
-      # - name: Trigger Test
-      #   run: |
-      #     curl -L \
-      #       -X POST \
-      #       -H "Accept: application/vnd.github+json" \
-      #       -H "Authorization: ${{ secrets.BEARER_TOKEN }}" \
-      #       -H "X-GitHub-Api-Version: 2022-11-28" \
-      #       https://api.github.com/repos/river248/ci-cd-github-actions/actions/workflows/test.yml/dispatches \
-      #       -d '{"ref":"${{ steps.branch-names.outputs.ref_branch }}","inputs":{"name":"Test"}}'
+        needs: [code_quality, unit_tests, unit_test_coverage]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Get branch names.
+              id: branch-names
+              uses: tj-actions/branch-names@v7
+            # - name: Checkout branch
+            #   uses: actions/checkout@v3
+            #   with:
+            #     ref: ${{ steps.branch-names.outputs.ref_branch }}
+            # - name: Trigger Test
+            #   run: |
+            #     curl -L \
+            #       -X POST \
+            #       -H "Accept: application/vnd.github+json" \
+            #       -H "Authorization: ${{ secrets.BEARER_TOKEN }}" \
+            #       -H "X-GitHub-Api-Version: 2022-11-28" \
+            #       https://api.github.com/repos/river248/ci-cd-github-actions/actions/workflows/test.yml/dispatches \
+            #       -d '{"ref":"${{ steps.branch-names.outputs.ref_branch }}","inputs":{"name":"Test"}}'
