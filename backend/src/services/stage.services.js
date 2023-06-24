@@ -5,6 +5,7 @@ import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
 import { stageMetrics, workflowStatus } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
+import { updateAction } from '~/utils/constants'
 
 const createNew = async (data) => {
     try {
@@ -144,7 +145,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                         {
                             status: workflowStatus.IN_PROGRESS,
                         },
-                        'set',
+                        updateAction.SET,
                     )
                     return metricRes
                 }),
@@ -188,7 +189,7 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
                             inProgressMetric.executionId,
                             inProgressMetric.name,
                             { status: workflowStatus.FAILURE },
-                            'set',
+                            updateAction.SET,
                         ),
                 ),
             )

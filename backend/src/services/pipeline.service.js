@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash'
+import { isEmpty, isNil } from 'lodash'
 
 import { env } from '~/configs/environment'
 import InternalServer from '~/errors/internalServer.error'
@@ -9,6 +9,7 @@ import { StageModel } from '~/models/stage.model'
 import { RepositoryModel } from '~/models/repository.model'
 import { StageService } from './stage.services'
 import { toTitleCase } from '~/utils/helpers'
+import { updateAction } from '~/utils/constants'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -49,13 +50,19 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
         }
 
         const { appMetrics } = metrics[0]
-        appMetrics.forEach((appMetric) => {
-            actual += appMetric.actual
-            total += appMetric.total
-        })
 
-        const status =
-            actual !== total || jobStatus === workflowStatus.FAILURE ? workflowStatus.FAILURE : workflowStatus.SUCCESS
+        if (isEmpty(appMetrics)) {
+            actual = null
+            total = null
+        } else {
+            appMetrics.forEach((appMetric) => {
+                actual += appMetric.actual
+                total += appMetric.total
+            })
+        }
+
+        const isFailed = isNil(total) || isNil(actual) || actual !== total || jobStatus === workflowStatus.FAILURE
+        const status = isFailed ? workflowStatus.FAILURE : workflowStatus.SUCCESS
 
         const res = await MetricService.update(
             repository,
@@ -63,7 +70,7 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
             executionId,
             metricName,
             { actual, total, status, startedAt: new Date(startDateTime), completedAt: new Date(endDateTime) },
-            'set',
+            updateAction.SET,
         )
 
         return res

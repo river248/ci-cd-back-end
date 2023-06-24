@@ -1,6 +1,7 @@
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { MetricModel } from '~/models/metric.model'
+import { updateAction } from '~/utils/constants'
 
 //========================================================================================+
 //                                    PUBLIC FUNCTIONS                                    |
@@ -17,7 +18,7 @@ const createNew = async (data) => {
 
 const update = async (repository, stage, executionId, name, data, action) => {
     try {
-        if (!['set', 'push'].includes(action)) {
+        if (![updateAction.SET, updateAction.PUSH].includes(action)) {
             throw new InternalServer('Invalid action. Action must be "set" or "push"')
         }
 
@@ -60,7 +61,7 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
             appMetricData.appMetrics.total = numTotalTests
         }
 
-        const res = await update(repository, stage, executionId, metricName, appMetricData, 'push')
+        const res = await update(repository, stage, executionId, metricName, appMetricData, updateAction.PUSH)
         return res
     } catch (error) {
         if (error instanceof NotFound) {

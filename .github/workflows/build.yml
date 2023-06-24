@@ -61,7 +61,7 @@ jobs:
                   echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
-                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.branch-names.outputs.ref_branch }}&id=ci-cd-github-backend","data":${{ toJSON(steps.sonar_report.outputs.report) }}}' \
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.branch-names.outputs.ref_branch }}&id=ci-cd-github-actions-backend","data":${{ toJSON(steps.sonar_report.outputs.report) }}}' \
                     -H "Content-Type: application/json" \
                     -X POST https://c1a8-1-53-235-79.ngrok-free.app/v1/metric/push-metric
     unit_tests:
