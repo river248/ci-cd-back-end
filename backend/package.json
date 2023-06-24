@@ -7,7 +7,7 @@
         "node": "18.16.0"
     },
     "scripts": {
-        "test": "jest",
+        "test": "jest --json --outputFile=junit.json",
         "eslint": "eslint src",
         "clean": "rm -rf build && mkdir build",
         "build-babel": "babel ./src -d ./build/src",
