@@ -11,6 +11,8 @@ const metricCollectionSchema = Joi.object({
     stage: Joi.string().required().trim(),
     status: Joi.string().required().trim(),
     rank: Joi.number().required().min(1),
+    actual: Joi.number().min(0).default(null),
+    total: Joi.number().min(0).default(null),
     appMetrics: Joi.array()
         .items(
             Joi.object({

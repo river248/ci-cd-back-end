@@ -35,37 +35,33 @@ const validateBranch = async (repo, branchName) => {
 const handleCompletedJob = async (repository, stage, executionId, metricName, data) => {
     try {
         const { jobStatus, startDateTime, endDateTime } = data
-        let status = workflowStatus.SUCCESS
+        let actual = 0
+        let total = 0
 
-        if (jobStatus !== workflowStatus.SUCCESS) {
-            status = workflowStatus.FAILURE
-        } else {
-            const metrics = await MetricService.findMetrics(repository, stage, { executionId, name: metricName })
+        const metrics = await MetricService.findMetrics(repository, stage, { executionId, name: metricName })
 
-            if (isEmpty(metrics)) {
-                throw new NotFound(
-                    `Not found metric ${metricName} with executionId ${executionId} for stage ${stage} at repo ${repository}`,
-                )
-            }
-
-            const { appMetrics } = metrics[0]
-            let actual = 0
-            let total = 0
-
-            appMetrics.forEach((appMetric) => {
-                actual += appMetric.actual
-                total += appMetric.total
-            })
-
-            status = actual !== total ? workflowStatus.FAILURE : workflowStatus.SUCCESS
+        if (isEmpty(metrics)) {
+            throw new NotFound(
+                `Not found metric ${metricName} with executionId ${executionId} for stage ${stage} at repo ${repository}`,
+            )
         }
+
+        const { appMetrics } = metrics[0]
+
+        appMetrics.forEach((appMetric) => {
+            actual += appMetric.actual
+            total += appMetric.total
+        })
+
+        const status =
+            actual !== total || jobStatus === workflowStatus.FAILURE ? workflowStatus.FAILURE : workflowStatus.SUCCESS
 
         const res = await MetricService.update(
             repository,
             stage,
             executionId,
             toTitleCase(metricName.replaceAll('_', ' ')),
-            { status, startedAt: new Date(startDateTime), completedAt: new Date(endDateTime) },
+            { actual, total, status, startedAt: new Date(startDateTime), completedAt: new Date(endDateTime) },
             'set',
         )
 
