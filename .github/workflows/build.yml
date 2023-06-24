@@ -94,7 +94,7 @@ jobs:
         run: |
           curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data":${{ toJSON(steps.unit_test_report.outputs.report) }}}' \
             -H "Content-Type: application/json" \
-            -X POST https://cac7-118-68-85-98.ngrok-free.app/v1/metric/push-metric
+            -X POST https://a72c-118-68-85-98.ngrok-free.app/v1/metric/push-metric
   unit_test_coverage:
     if: ${{ always() }}
     needs: unit_tests
