@@ -37,33 +37,33 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ steps.branch-names.outputs.ref_branch }}
-#       - name: Sonar scanner
-#         uses: SonarSource/sonarcloud-github-action@master
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#         with:
-#           projectBaseDir: ./backend/src
-#           args: >
-#             -Dsonar.projectKey=ci-cd-github-actions-backend
-#             -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
-#             -Dsonar.sourceEncoding=UTF-8
-#             -Dsonar.cobol.copy.directories=copybooks
-#             -Dsonar.cobol.file.suffixes=cbl,cpy
-#             -Dsonar.cobol.copy.suffixes=cpy
-#             -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
-#             -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
-#             -Dsonar.pli.marginRight=0
-#             -Dsonar.organization=river248
-#       - name: Get sonar report
-#         id: sonar_report
-#         run: |
-#           echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
-#       - name: Push metric
-#         run: |
-#           curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","data":${{ toJSON(steps.sonar_report.outputs.report) }}}' \
-#             -H "Content-Type: application/json" \
-#             -X POST https://6809-118-68-85-98.ngrok-free.app/v1/metric/push-metric
+      - name: Sonar scanner
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: ./backend/src
+          args: >
+            -Dsonar.projectKey=ci-cd-github-actions-backend
+            -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
+            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.cobol.copy.directories=copybooks
+            -Dsonar.cobol.file.suffixes=cbl,cpy
+            -Dsonar.cobol.copy.suffixes=cpy
+            -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
+            -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
+            -Dsonar.pli.marginRight=0
+            -Dsonar.organization=river248
+      - name: Get sonar report
+        id: sonar_report
+        run: |
+          echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
+      - name: Push metric
+        run: |
+          curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","data":${{ toJSON(steps.sonar_report.outputs.report) }}}' \
+            -H "Content-Type: application/json" \
+            -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
   unit_tests:
     needs: start_stage
     runs-on: ubuntu-latest
@@ -94,7 +94,7 @@ jobs:
         run: |
           curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data":${{ toJSON(steps.unit_test_report.outputs.report) }}}' \
             -H "Content-Type: application/json" \
-            -X POST https://4900-118-68-85-98.ngrok-free.app/v1/metric/push-metric
+            -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
   unit_test_coverage:
     if: ${{ always() }}
     needs: unit_tests
