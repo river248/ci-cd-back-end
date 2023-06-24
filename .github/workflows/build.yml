@@ -92,7 +92,7 @@ jobs:
             - name: Push metric
               if: ${{ always() }}
               run: |
-                  echo "Value ${{ fromJSON(steps.unit_test_report.outputs.test).numPassedTests }}"
+                  echo "Value ${{ fromJSON(steps.unit_test_report.outputs.report).numPassedTests }}"
                   echo "Unit test report: ${{ toJSON(steps.unit_test_report.outputs.report) }}"
                   curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data":${{ fromJSON(steps.unit_test_report.outputs.report).numPassedTests }}}' \
                     -H "Content-Type: application/json" \
