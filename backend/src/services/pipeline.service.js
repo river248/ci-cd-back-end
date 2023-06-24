@@ -6,7 +6,7 @@ import { MetricService } from './metric.service'
 import { StageModel } from '~/models/stage.model'
 import { RepositoryModel } from '~/models/repository.model'
 import { StageService } from './stage.services'
-import { isEmpty } from 'lodash'
+import { toTitleCase } from '~/utils/helpers'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -71,7 +71,6 @@ const handlePipelineData = async (payload) => {
         const buildStartTime = workflow_job.created_at
         const startDateTime = workflow_job.started_at
         const endDateTime = workflow_job.completed_at
-        const jobSteps = workflow_job.steps
         const stage = workflow_job.workflow_name.toLowerCase()
         const isStartStage = jobName === 'start_stage'
         const isFinishStage = jobName === 'finish_stage'
@@ -112,11 +111,14 @@ const handlePipelineData = async (payload) => {
          * When stage is in progress
          */
         if (!isStartStage && !isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
-            await MetricService.addMetric(repo, stage, executionId, jobName, jobSteps, {
-                status: jobStatus,
-                startedAt: startDateTime,
-                completedAt: endDateTime,
-            })
+            await MetricService.update(
+                repo,
+                stage,
+                executionId,
+                toTitleCase(jobName.replaceAll('_', ' ')),
+                { completedAt: endDateTime },
+                'set',
+            )
 
             const [stageData, metricData] = await Promise.all([
                 StageService.findStageByExecutionId(repo, stage, executionId),
