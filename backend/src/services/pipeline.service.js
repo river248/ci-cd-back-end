@@ -3,13 +3,12 @@ import { isEmpty, isNil } from 'lodash'
 import { env } from '~/configs/environment'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
-import { githubAPI, workflowStatus } from '~/utils/constants'
+import { githubAPI, updateAction, workflowStatus } from '~/utils/constants'
 import { MetricService } from './metric.service'
 import { StageModel } from '~/models/stage.model'
 import { RepositoryModel } from '~/models/repository.model'
 import { StageService } from './stage.services'
 import { toTitleCase } from '~/utils/helpers'
-import { updateAction } from '~/utils/constants'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+

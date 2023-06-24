@@ -39,6 +39,11 @@ export const stageMetrics = {
     TEST: [],
 }
 
+export const updateAction = {
+    SET: 'set',
+    PUSH: 'push',
+}
+
 export const collection = {
     METRIC: 'metrics',
     STAGE: 'stages',

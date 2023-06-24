@@ -3,9 +3,8 @@ import { isEmpty } from 'lodash'
 import { MetricService } from './metric.service'
 import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
-import { stageMetrics, workflowStatus } from '~/utils/constants'
+import { stageMetrics, updateAction, workflowStatus } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
-import { updateAction } from '~/utils/constants'
 
 const createNew = async (data) => {
     try {

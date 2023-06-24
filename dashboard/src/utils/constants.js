@@ -25,11 +25,6 @@ export const processName = {
     ABANDON: 'abandon',
 }
 
-export const updateAction = {
-    SET: 'set',
-    PUSH: 'push',
-}
-
 export const errorCode = {
     'auth/invalid-email': 'Invalid email!',
     'auth/user-not-found': 'Email does not exist!',
