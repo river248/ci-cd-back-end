@@ -91,7 +91,7 @@ jobs:
           echo "report=$(cat junit.json)" >> "$GITHUB_OUTPUT"
       - name: Report unit tests
         run: |
-          echo "Unit test: ${{ stepsunit_test_report.outputs.report }}
+          echo "Unit test: ${{ steps.unit_test_report.outputs.report }}"
   unit_test_coverage:
     if: ${{ always() }}
     needs: unit_tests
