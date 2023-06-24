@@ -32,9 +32,10 @@ const validateBranch = async (repo, branchName) => {
     }
 }
 
-const handleCompletedJob = async (repository, stage, executionId, metricName, data) => {
+const handleCompletedJob = async (repository, stage, executionId, metricKey, data) => {
     try {
         const { jobStatus, startDateTime, endDateTime } = data
+        const metricName = toTitleCase(metricKey.replaceAll('_', ' '))
         let actual = 0
         let total = 0
 
@@ -60,7 +61,7 @@ const handleCompletedJob = async (repository, stage, executionId, metricName, da
             repository,
             stage,
             executionId,
-            toTitleCase(metricName.replaceAll('_', ' ')),
+            metricName,
             { actual, total, status, startedAt: new Date(startDateTime), completedAt: new Date(endDateTime) },
             'set',
         )
