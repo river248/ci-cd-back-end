@@ -13,10 +13,7 @@ export const githubAPI = {
         'X-GitHub-Api-Version': '2022-11-28',
     },
     GET_BRANCHES_ROUTE: 'GET /repos/{owner}/{repo}/branches',
-    GET_WORKFLOW_RUN_ROUTE: 'GET /repos/{owner}/{repo}/actions/runs/{run_id}',
     WORKFLOW_DISPATCH_ROUTE: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
-    SONAR_REPORT_URL: 'https://sonarcloud.io/api/qualitygates/project_status',
-    SONAR_REPORT_SUMMARY: 'https://sonarcloud.io/summary/new_code',
 }
 
 export const workflowStatus = {

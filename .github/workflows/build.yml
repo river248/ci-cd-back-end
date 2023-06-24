@@ -63,7 +63,7 @@ jobs:
               run: |
                   curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.branch-names.outputs.ref_branch }}&id=ci-cd-github-actions-backend","data":${{ toJSON(steps.sonar_report.outputs.report) }}}' \
                     -H "Content-Type: application/json" \
-                    -X POST https://c1a8-1-53-235-79.ngrok-free.app/v1/metric/push-metric
+                    -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
     unit_tests:
         needs: start_stage
         runs-on: ubuntu-latest
@@ -94,7 +94,7 @@ jobs:
               run: |
                   curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data": "{\"numPassedTests\": ${{ fromJSON(steps.unit_test_report.outputs.report).numPassedTests }}, \"numTotalTests\": ${{ fromJSON(steps.unit_test_report.outputs.report).numTotalTests }}}"}' \
                     -H "Content-Type: application/json" \
-                    -X POST https://c1a8-1-53-235-79.ngrok-free.app/v1/metric/push-metric
+                    -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
     unit_test_coverage:
         if: ${{ always() }}
         needs: unit_tests
