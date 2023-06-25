@@ -1,24 +1,27 @@
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import ReactDOM from 'react-dom/client'
+import CssBaseline from '@mui/material/CssBaseline'
 // import { Provider } from 'react-redux'
+// import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles'
 import { Slide, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 import App from './App'
-// import GlobalStyles from './components/GlobalStyles'
+import GlobalStyles from './components/GlobalStyles'
 // import AuthProvider from './context/AuthProvider'
 // import store from './redux/store'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
     <React.StrictMode>
+        <CssBaseline />
         <Router>
             {/* <AuthProvider> */}
             {/* <Provider store={store}> */}
-            {/* <GlobalStyles> */}
-            <App />
-            {/* </GlobalStyles> */}
+            <GlobalStyles>
+                <App />
+            </GlobalStyles>
             {/* </Provider> */}
             {/* </AuthProvider> */}
             <ToastContainer

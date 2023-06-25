@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client'
 
-export const API_ROOT = 'http://localhost:8080'
+export const API_ROOT = 'https://ci-cd-github-actions.onrender.com'
 
 export const socket = io(API_ROOT)
 

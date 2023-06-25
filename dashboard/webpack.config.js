@@ -1,7 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const webpack = require('webpack')
 
 module.exports = {
     entry: { bundle: path.resolve(__dirname, 'src/index.js') },
@@ -30,8 +29,35 @@ module.exports = {
                 use: ['babel-loader'],
             },
             {
-                test: /\.(css|scss|module.scss)$/,
-                use: ['style-loader', 'css-loader', 'sass-loader'],
+                test: /\.(css|scss)$/,
+                exclude: /\.(module.scss)$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: { modules: { localIdentName: '[local]' } },
+                    },
+                    'sass-loader',
+                ],
+            },
+            {
+                test: /\.(module.scss)$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: {
+                                auto: /\.module\.\w+$/i,
+                                localIdentName:
+                                    process.env.NODE_ENV === 'production'
+                                        ? '[hash:base64]'
+                                        : '[name]__[local]--[hash:base64:5]',
+                            },
+                        },
+                    },
+                    'sass-loader',
+                ],
             },
             {
                 test: /\.(png|jpg|jpeg|svg|gif)$/i,
@@ -60,7 +86,6 @@ module.exports = {
             template: 'public/index.html',
             meta: {
                 viewport: 'width=device-width, initial-scale=1',
-                'theme-color': '#000000',
                 description: 'Web site created using webpack',
             },
             // favicon: 'public/logo192.png',
