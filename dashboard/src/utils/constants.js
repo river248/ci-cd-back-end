@@ -20,9 +20,8 @@ export const httpStatusCode = {
 export const processName = {
     QUEUED: 'queued',
     IN_PROGRESS: 'in_progress',
-    SUCCESS: 'in_progress',
-    FAILED: 'failed',
-    ABANDON: 'abandon',
+    SUCCESS: 'success',
+    FAILURE: 'failure',
 }
 
 export const errorCode = {

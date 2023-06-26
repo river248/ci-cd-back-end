@@ -23,7 +23,7 @@ function BuildAction({ disabled, branch, onSetBranch, onTrigger, onStop }) {
             <Stack marginTop={1} direction={'row'} spacing={1}>
                 <Button
                     disabled={disabled}
-                    sx={{ fontSize: 12 }}
+                    sx={{ fontSize: 13 }}
                     variant={'contained'}
                     defaultText={false}
                     fullWidth
@@ -34,7 +34,7 @@ function BuildAction({ disabled, branch, onSetBranch, onTrigger, onStop }) {
                 </Button>
                 <Button
                     disabled={disabled}
-                    sx={{ fontSize: 12 }}
+                    sx={{ fontSize: 13 }}
                     variant={'contained'}
                     defaultText={false}
                     fullWidth
