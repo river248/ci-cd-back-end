@@ -2,6 +2,8 @@ import { styled } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 
+import Button from '~/components/Button'
+
 export const Wrapper = styled(Paper)(({ theme }) => ({
     borderRadius: 0,
     position: 'fixed',
@@ -28,4 +30,16 @@ export const Search = styled(TextField)(({ theme }) => ({
     [theme.breakpoints.down('sm')]: {
         width: 200,
     },
+}))
+
+export const Dropdown = styled(Paper)(({ theme }) => ({
+    display: 'flex',
+    marginTop: theme.spacing(1),
+    flexDirection: 'column',
+}))
+
+export const DropdownItem = styled(Button)(({ theme }) => ({
+    width: 250,
+    padding: theme.spacing(1, 2),
+    justifyContent: 'flex-start',
 }))

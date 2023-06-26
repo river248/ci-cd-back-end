@@ -1,19 +1,20 @@
 import React from 'react'
-import MuiButton from '@mui/material/Button'
 import PropTypes from 'prop-types'
 
-import { Content } from './Button.styles'
+import { Content, MuiButton } from './Button.styles'
 
-function Button({ children, ...passProps }) {
+function Button({ children, uppercase = true, italic, ...passProps }) {
     return (
-        <MuiButton {...passProps}>
-            <Content>{children}</Content>
+        <MuiButton uppercase={uppercase.toString()} {...passProps}>
+            <Content italic={italic.toString()}>{children}</Content>
         </MuiButton>
     )
 }
 
 Button.propTypes = {
     children: PropTypes.string.isRequired,
+    uppercase: PropTypes.bool,
+    italic: PropTypes.bool,
 }
 
 export default React.memo(Button)

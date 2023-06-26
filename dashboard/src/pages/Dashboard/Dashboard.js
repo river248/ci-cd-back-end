@@ -7,7 +7,7 @@ import { Title } from './Dashboard.styles'
 
 function Dashboard() {
     return (
-        <Box padding={1}>
+        <Box padding={2}>
             <Title>Repositories</Title>
             <Grid container spacing={2}>
                 <Grid item xl={2} lg={2.4} md={3} sm={4} xs={6}>
