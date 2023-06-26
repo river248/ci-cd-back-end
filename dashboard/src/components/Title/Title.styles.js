@@ -1,7 +1,7 @@
 import { styled } from '@mui/material/styles'
 
-export const Title = styled('h1')(({ theme }) => ({
+export const MuiTitle = styled('h1')(({ theme }) => ({
     textAlign: 'center',
     padding: theme.spacing(1),
-    marginBottom: theme.spacing(2),
+    color: theme.palette.common.white,
 }))

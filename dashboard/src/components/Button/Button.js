@@ -1,12 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import MuiButton from '@mui/material/Button'
 
-import { Content, MuiButton } from './Button.styles'
+import { Content } from './Button.styles'
 
-function Button({ children, uppercase = true, italic, ...passProps }) {
+function Button({ children, uppercase = true, italic = false, defaultText = true, ...passProps }) {
     return (
-        <MuiButton uppercase={uppercase.toString()} {...passProps}>
-            <Content italic={italic.toString()}>{children}</Content>
+        <MuiButton {...passProps}>
+            <Content uppercase={`${uppercase}`} italic={`${italic}`} defaultText={`${defaultText}`}>
+                {children}
+            </Content>
         </MuiButton>
     )
 }
@@ -14,6 +17,7 @@ function Button({ children, uppercase = true, italic, ...passProps }) {
 Button.propTypes = {
     children: PropTypes.string.isRequired,
     uppercase: PropTypes.bool,
+    italic: PropTypes.bool,
     italic: PropTypes.bool,
 }
 

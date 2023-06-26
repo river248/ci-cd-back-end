@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material'
 
 import Header from '~/layouts/components/Header'
 
-function HeaderLayoutContainer({ hasSeach }) {
+function HeaderLayoutContainer() {
     const [popperAnchor, setPopperAnchor] = useState(null)
     const [openPopper, setOpenPopper] = useState(false)
     const [popperPlacement, setPopperPlacement] = useState()
@@ -40,7 +40,6 @@ function HeaderLayoutContainer({ hasSeach }) {
             avatar={
                 'https://congluan-cdn.congluan.vn/files/content/2022/05/26/doraemon-nobita-va-cuoc-chien-vu-tru-ti-hon-goi-tron-mua-he-trong-man-anh-183307801.jpg'
             }
-            hasSearch={hasSeach}
             openPopper={openPopper}
             popperAnchor={popperAnchor}
             popperPlacement={popperPlacement}

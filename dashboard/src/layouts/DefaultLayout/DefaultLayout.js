@@ -7,7 +7,7 @@ import HeaderLayoutContainer from '~/containers/HeaderLayoutContainer'
 function DefaultLayout({ children }) {
     return (
         <Fragment>
-            <HeaderLayoutContainer hasSeach />
+            <HeaderLayoutContainer />
             <Box flexGrow={1} paddingTop={7.5}>
                 {children}
             </Box>

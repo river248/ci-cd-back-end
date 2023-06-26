@@ -36,7 +36,7 @@ function Repository({ name, imageUrl }) {
                 </Link>
                 <Tooltip arrow title={'Delete'}>
                     <IconButton>
-                        <DeleteIcon style={{ color: 'red' }} />
+                        <DeleteIcon sx={{ color: 'red' }} />
                     </IconButton>
                 </Tooltip>
             </CardActions>

@@ -3,13 +3,13 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 
 import Repository from '~/components/Repository'
-import { Title } from './Dashboard.styles'
+import Title from '~/components/Title'
 
 function Dashboard() {
     return (
         <Box padding={2}>
-            <Title>Repositories</Title>
-            <Grid container spacing={2}>
+            <Title content={'Repositories'} />
+            <Grid container spacing={2} marginTop={2}>
                 <Grid item xl={2} lg={2.4} md={3} sm={4} xs={6}>
                     <Repository
                         name={'ci-cd-github-actions'}
