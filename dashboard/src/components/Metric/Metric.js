@@ -7,9 +7,7 @@ import Box from '@mui/material/Box'
 import { processName } from '~/utils/constants'
 import StatusIcon from '~/components/StatusIcon'
 
-function Metric({ data }) {
-    const { name, actual, total, status } = data
-
+function Metric({ name, actual, total, status }) {
     return (
         <Stack marginTop={1} direction={'row'}>
             <Box flexGrow={1}>
@@ -17,7 +15,7 @@ function Metric({ data }) {
                     {name}
                 </Typography>
                 <Typography variant={'h6'} component={'div'} fontWeight={'normal'} fontSize={14}>
-                    {actual}/{total}
+                    {actual ?? '?'}/{total ?? '?'}
                 </Typography>
             </Box>
             <StatusIcon status={status} />
@@ -26,17 +24,10 @@ function Metric({ data }) {
 }
 
 Metric.propTypes = {
-    data: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        actual: PropTypes.number,
-        total: PropTypes.number,
-        status: PropTypes.oneOf([
-            processName.QUEUED,
-            processName.IN_PROGRESS,
-            processName.FAILURE,
-            processName.SUCCESS,
-        ]),
-    }),
+    name: PropTypes.string.isRequired,
+    actual: PropTypes.number,
+    total: PropTypes.number,
+    status: PropTypes.oneOf([processName.QUEUED, processName.IN_PROGRESS, processName.FAILURE, processName.SUCCESS]),
 }
 
 export default React.memo(Metric)

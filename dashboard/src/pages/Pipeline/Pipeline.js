@@ -3,20 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { isEmpty } from 'lodash'
 
 import { useQueryHook } from '~/hooks'
 import Title from '~/components/Title'
 import routes from '~/configs/routes'
-import BuildActionContainer from '~/containers/BuildActionContainer'
-import LatesBuild from '~/components/LatesBuild'
 import { processName } from '~/utils/constants'
-import Metric from '~/components/Metric'
+import StageContainer from '~/containers/StageContainer'
 
 function Pipeline() {
     const query = useQueryHook()
@@ -36,7 +30,7 @@ function Pipeline() {
         branch: 'master',
         version: '0.0.1',
         commit: 'abc123',
-        startTime: new Date(),
+        startTime: '2023-06-27T10:58:44.117354',
         duration: '5m 6s',
     }))
 
@@ -48,55 +42,8 @@ function Pipeline() {
                 </IconButton>
                 <Title content={query.get('repo')} />
             </Stack>
-            <Stack direction={'row'} spacing={2}>
-                <Paper sx={{ padding: theme.spacing(1), backgroundColor: theme.palette.grey[300], width: 270 }}>
-                    <Typography
-                        padding={1}
-                        marginBottom={1}
-                        variant={'h6'}
-                        component={'div'}
-                        fontSize={16}
-                        textAlign={'center'}
-                    >
-                        BUILD
-                    </Typography>
 
-                    <BuildActionContainer />
-
-                    <Box marginTop={1}>
-                        <Paper sx={{ padding: theme.spacing(1) }}>
-                            <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
-                                <Typography variant={'h6'} component={'span'} fontSize={14}>
-                                    LATEST BUILD
-                                </Typography>
-                                <CheckCircleIcon sx={{ color: theme.palette.success.main }} />
-                            </Stack>
-
-                            {!isEmpty(latesBuild) && <LatesBuild data={latesBuild} />}
-                        </Paper>
-                    </Box>
-
-                    <Box marginTop={1}>
-                        <Paper sx={{ padding: 1 }}>
-                            <Typography variant={'h6'} component={'span'} fontSize={14}>
-                                METRICS
-                            </Typography>
-                            {!isEmpty(metrics) &&
-                                metrics.map((metric) => (
-                                    <Metric
-                                        key={metric.name}
-                                        data={{
-                                            name: metric.name,
-                                            actual: metric.actual,
-                                            total: metric.total,
-                                            status: metric.status,
-                                        }}
-                                    />
-                                ))}
-                        </Paper>
-                    </Box>
-                </Paper>
-            </Stack>
+            <StageContainer latesBuild={latesBuild ?? {}} metrics={metrics} />
         </Box>
     )
 }

@@ -1,53 +1,56 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
+import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { format } from 'date-fns'
+import { useTheme } from '@mui/material/styles'
 
-function LatesBuild({ data }) {
-    const { branch, version, commit, startTime, duration } = data
-    const convertToMetadata = () => [
-        { name: 'Branch:', value: branch, tooltip: branch?.length > 21 ? branch : '' },
-        { name: 'Version:', value: version, tooltip: '' },
-        { name: 'Commit:', value: commit, tooltip: '' },
-        { name: 'Start time:', value: format(startTime, 'dd/MM/yyyy HH:mm'), tooltip: '' },
-        { name: 'Duration:', value: duration, tooltip: '' },
-    ]
-
+function LatesBuild({ dataName, hasLink, toolTipContent, dataValue, onGoto }) {
+    const theme = useTheme()
     return (
-        <Fragment>
-            {convertToMetadata().map((item) => (
-                <Stack key={item.name} marginTop={1} direction={'row'}>
-                    <Typography width={'30%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                        {item.name}
-                    </Typography>
-                    <Tooltip arrow title={item.tooltip}>
+        <Stack marginTop={1} direction={'row'}>
+            <Typography width={'30%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
+                {dataName}:
+            </Typography>
+            <Tooltip arrow title={toolTipContent}>
+                {hasLink ? (
+                    <Box width={'70%'}>
                         <Typography
-                            width={'70%'}
                             variant={'h6'}
                             component={'span'}
                             fontWeight={'normal'}
                             fontSize={14}
                             noWrap
+                            sx={{ cursor: 'pointer', textDecoration: 'underline', color: theme.palette.primary.main }}
+                            onClick={() => onGoto(dataName, dataValue)}
                         >
-                            {item.value}
+                            {dataValue}
                         </Typography>
-                    </Tooltip>
-                </Stack>
-            ))}
-        </Fragment>
+                    </Box>
+                ) : (
+                    <Typography
+                        width={'70%'}
+                        variant={'h6'}
+                        component={'span'}
+                        fontWeight={'normal'}
+                        fontSize={14}
+                        noWrap
+                    >
+                        {dataValue}
+                    </Typography>
+                )}
+            </Tooltip>
+        </Stack>
     )
 }
 
 LatesBuild.propTypes = {
-    data: PropTypes.shape({
-        branch: PropTypes.string,
-        version: PropTypes.string,
-        commit: PropTypes.string,
-        startTime: PropTypes.instanceOf(Date),
-        duration: PropTypes.string,
-    }),
+    dataName: PropTypes.string,
+    hasLink: PropTypes.bool,
+    toolTipContent: PropTypes.string,
+    dataValue: PropTypes.string,
+    onGoto: PropTypes.func,
 }
 
 export default React.memo(LatesBuild)
