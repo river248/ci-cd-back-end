@@ -21,7 +21,6 @@ function LatesBuild({ dataName, hasLink, toolTipContent, dataValue, onGoto }) {
                             component={'span'}
                             fontWeight={'normal'}
                             fontSize={14}
-                            noWrap
                             sx={{ cursor: 'pointer', textDecoration: 'underline', color: theme.palette.primary.main }}
                             onClick={() => onGoto(dataName, dataValue)}
                         >

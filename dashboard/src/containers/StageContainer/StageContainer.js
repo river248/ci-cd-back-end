@@ -5,7 +5,21 @@ import Stage from '~/components/Stage'
 import { StageProvider } from '~/contexts/StageContext'
 import { processName } from '~/utils/constants'
 
-function StageContainer({ latesBuild, metrics }) {
+function StageContainer({ stage }) {
+    const { codePipelineBranch, commitId, version, status, startDateTime, endDateTime, name, metrics } = stage
+
+    let latesBuild = {}
+
+    if (codePipelineBranch || version || commitId || startDateTime || endDateTime) {
+        latesBuild = {
+            codePipelineBranch,
+            version,
+            commitId,
+            startDateTime,
+            endDateTime,
+        }
+    }
+
     const value = {
         latesBuild,
         metrics,
@@ -13,7 +27,7 @@ function StageContainer({ latesBuild, metrics }) {
 
     return (
         <StageProvider value={value}>
-            <Stage />
+            <Stage name={name} status={status} />
         </StageProvider>
     )
 }

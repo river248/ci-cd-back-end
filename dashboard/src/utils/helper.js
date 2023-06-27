@@ -1,4 +1,30 @@
+import { differenceInSeconds } from 'date-fns'
+
 import { httpStatusCode } from './constants'
+
+const beautifySecond = (timeDiff) => {
+    let duration = ''
+
+    const seconds = timeDiff % 60
+    timeDiff = (timeDiff - seconds) / 60
+    const minutes = timeDiff % 60
+    timeDiff = (timeDiff - minutes) / 60
+    const hours = timeDiff
+
+    hours ? (duration += `${hours}h `) : (duration += '')
+    minutes ? (duration += `${minutes}m `) : (duration += '')
+    seconds ? (duration += `${seconds}s`) : (duration += '')
+    return duration
+}
+
+export const differenceInTime = (startDateTime, endDateTime) => {
+    const startDate = new Date(startDateTime)
+    const endDate = new Date(endDateTime)
+
+    const timeDiff = differenceInSeconds(endDate, startDate)
+
+    return beautifySecond(timeDiff)
+}
 
 export const resExceptionMessageHandler = (exception) => {
     if (exception.response) {

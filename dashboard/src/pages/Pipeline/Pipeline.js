@@ -1,4 +1,6 @@
-import React, { useMemo } from 'react'
+import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import Box from '@mui/material/Box'
@@ -9,30 +11,18 @@ import { useTheme } from '@mui/material/styles'
 import { useQueryHook } from '~/hooks'
 import Title from '~/components/Title'
 import routes from '~/configs/routes'
-import { processName } from '~/utils/constants'
 import StageContainer from '~/containers/StageContainer'
+import { handleFetchFullPipeline } from '~/redux/async-logics/pipelineLogic'
+import { processName } from '~/utils/constants'
 
-function Pipeline() {
+function Pipeline({ stages, getFullPipeline }) {
     const query = useQueryHook()
     const theme = useTheme()
     const navigate = useNavigate()
 
-    const metrics = useMemo(
-        () => [
-            { name: 'Code Quality', actual: 10, total: 10, status: processName.SUCCESS },
-            { name: 'Unit Tests', actual: 10, total: 10, status: processName.IN_PROGRESS },
-            { name: 'Unit Test Coverage', actual: 10, total: 10, status: processName.QUEUED },
-        ],
-        [],
-    )
-
-    const latesBuild = useMemo(() => ({
-        branch: 'master',
-        version: '0.0.1',
-        commit: 'abc123',
-        startTime: '2023-06-27T10:58:44.117354',
-        duration: '5m 6s',
-    }))
+    useEffect(() => {
+        getFullPipeline(query.get('repo'))
+    }, [query.get('repo')])
 
     return (
         <Box paddingX={2} paddingY={1}>
@@ -43,9 +33,76 @@ function Pipeline() {
                 <Title content={query.get('repo')} />
             </Stack>
 
-            <StageContainer latesBuild={latesBuild ?? {}} metrics={metrics} />
+            <Stack direction={'row'} spacing={2}>
+                {stages.map((stage) => (
+                    <StageContainer key={stage.name} stage={stage} />
+                ))}
+            </Stack>
         </Box>
     )
 }
 
-export default Pipeline
+Pipeline.propTypes = {
+    stages: PropTypes.arrayOf(
+        PropTypes.shape({
+            _id: PropTypes.string,
+            repository: PropTypes.string,
+            name: PropTypes.string,
+            executionId: PropTypes.string,
+            version: PropTypes.string,
+            status: PropTypes.oneOf([
+                processName.QUEUED,
+                processName.IN_PROGRESS,
+                processName.SUCCESS,
+                processName.FAILURE,
+            ]),
+            codePipelineBranch: PropTypes.string,
+            metrics: PropTypes.arrayOf(
+                PropTypes.shape({
+                    _id: PropTypes.string,
+                    repository: PropTypes.string,
+                    stage: PropTypes.string,
+                    name: PropTypes.string,
+                    rank: PropTypes.number,
+                    actual: PropTypes.number,
+                    total: PropTypes.number,
+                    status: PropTypes.oneOf([
+                        processName.QUEUED,
+                        processName.IN_PROGRESS,
+                        processName.SUCCESS,
+                        processName.FAILURE,
+                    ]),
+                    appMetrics: PropTypes.arrayOf(
+                        PropTypes.shape({
+                            name: PropTypes.string,
+                            actual: PropTypes.number,
+                            total: PropTypes.number,
+                            reportUrl: PropTypes.string,
+                        }),
+                    ),
+                    completedAt: PropTypes.string,
+                    executionId: PropTypes.string,
+                    startedAt: PropTypes.string,
+                }),
+            ),
+            commitId: PropTypes.string,
+            deploymentId: PropTypes.string,
+            buildStartTime: PropTypes.string,
+            endDateTime: PropTypes.string,
+            startDateTime: PropTypes.string,
+        }),
+    ),
+    getFullPipeline: PropTypes.func,
+}
+
+const mapStateToProps = (state) => ({
+    stages: state.pipeline.stages,
+})
+
+const mapDispatchToProps = (dispatch) => ({
+    getFullPipeline: (repo) => {
+        dispatch(handleFetchFullPipeline(repo))
+    },
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Pipeline)
