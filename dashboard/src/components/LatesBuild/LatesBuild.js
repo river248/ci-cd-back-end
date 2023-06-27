@@ -1,60 +1,53 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { format } from 'date-fns'
-import { useTheme } from '@mui/material/styles'
 
-function LatesBuild({ version, commit, startTime, duration }) {
-    const theme = useTheme()
+function LatesBuild({ data }) {
+    const { branch, version, commit, startTime, duration } = data
+    const convertToMetadata = () => [
+        { name: 'Branch:', value: branch, tooltip: branch?.length > 21 ? branch : '' },
+        { name: 'Version:', value: version, tooltip: '' },
+        { name: 'Commit:', value: commit, tooltip: '' },
+        { name: 'Start time:', value: format(startTime, 'dd/MM/yyyy HH:mm'), tooltip: '' },
+        { name: 'Duration:', value: duration, tooltip: '' },
+    ]
+
     return (
-        <Paper sx={{ padding: theme.spacing(1) }}>
-            <Typography variant={'h6'} component={'span'} fontSize={14}>
-                LATEST BUILD
-            </Typography>
-
-            <Stack marginTop={1} direction={'row'}>
-                <Typography width={'30%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                    Version:
-                </Typography>
-                <Typography width={'70%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                    {version}
-                </Typography>
-            </Stack>
-            <Stack marginTop={1} direction={'row'}>
-                <Typography width={'30%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                    Commit:
-                </Typography>
-                <Typography width={'70%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                    {commit}
-                </Typography>
-            </Stack>
-            <Stack marginTop={1} direction={'row'}>
-                <Typography width={'30%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                    Start time:
-                </Typography>
-                <Typography width={'70%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                    {format(startTime, 'dd/MM/yyyy HH:mm')}
-                </Typography>
-            </Stack>
-            <Stack marginTop={1} direction={'row'}>
-                <Typography width={'30%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                    Duration:
-                </Typography>
-                <Typography width={'70%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
-                    {duration}
-                </Typography>
-            </Stack>
-        </Paper>
+        <Fragment>
+            {convertToMetadata().map((item) => (
+                <Stack key={item.name} marginTop={1} direction={'row'}>
+                    <Typography width={'30%'} variant={'h6'} component={'span'} fontWeight={'normal'} fontSize={14}>
+                        {item.name}
+                    </Typography>
+                    <Tooltip arrow title={item.tooltip}>
+                        <Typography
+                            width={'70%'}
+                            variant={'h6'}
+                            component={'span'}
+                            fontWeight={'normal'}
+                            fontSize={14}
+                            noWrap
+                        >
+                            {item.value}
+                        </Typography>
+                    </Tooltip>
+                </Stack>
+            ))}
+        </Fragment>
     )
 }
 
 LatesBuild.propTypes = {
-    version: PropTypes.string.isRequired,
-    commit: PropTypes.string.isRequired,
-    startTime: PropTypes.instanceOf(Date).isRequired,
-    duration: PropTypes.string,
+    data: PropTypes.shape({
+        branch: PropTypes.string,
+        version: PropTypes.string,
+        commit: PropTypes.string,
+        startTime: PropTypes.instanceOf(Date),
+        duration: PropTypes.string,
+    }),
 }
 
 export default React.memo(LatesBuild)

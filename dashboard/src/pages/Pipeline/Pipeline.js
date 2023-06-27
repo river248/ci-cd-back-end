@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
@@ -6,8 +7,8 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
-import { useNavigate } from 'react-router-dom'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { isEmpty } from 'lodash'
 
 import { useQueryHook } from '~/hooks'
 import Title from '~/components/Title'
@@ -31,6 +32,14 @@ function Pipeline() {
         [],
     )
 
+    const latesBuild = useMemo(() => ({
+        branch: 'master',
+        version: '0.0.1',
+        commit: 'abc123',
+        startTime: new Date(),
+        duration: '5m 6s',
+    }))
+
     return (
         <Box paddingX={2} paddingY={1}>
             <Stack direction={'row'} alignItems={'center'}>
@@ -41,23 +50,30 @@ function Pipeline() {
             </Stack>
             <Stack direction={'row'} spacing={2}>
                 <Paper sx={{ padding: theme.spacing(1), backgroundColor: theme.palette.grey[300], width: 270 }}>
-                    <Stack
+                    <Typography
                         padding={1}
                         marginBottom={1}
-                        direction={'row'}
-                        justifyContent={'space-between'}
-                        alignItems={'center'}
+                        variant={'h6'}
+                        component={'div'}
+                        fontSize={16}
+                        textAlign={'center'}
                     >
-                        <Typography variant={'h6'} component={'span'} fontSize={16}>
-                            BUILD
-                        </Typography>
-                        <CheckCircleIcon sx={{ color: theme.palette.success.main }} />
-                    </Stack>
+                        BUILD
+                    </Typography>
 
                     <BuildActionContainer />
 
                     <Box marginTop={1}>
-                        <LatesBuild version={'0.0.1'} commit={'abc123'} startTime={new Date()} duration={'5m 6s'} />
+                        <Paper sx={{ padding: theme.spacing(1) }}>
+                            <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
+                                <Typography variant={'h6'} component={'span'} fontSize={14}>
+                                    LATEST BUILD
+                                </Typography>
+                                <CheckCircleIcon sx={{ color: theme.palette.success.main }} />
+                            </Stack>
+
+                            {!isEmpty(latesBuild) && <LatesBuild data={latesBuild} />}
+                        </Paper>
                     </Box>
 
                     <Box marginTop={1}>
@@ -65,15 +81,18 @@ function Pipeline() {
                             <Typography variant={'h6'} component={'span'} fontSize={14}>
                                 METRICS
                             </Typography>
-                            {metrics.map((metric) => (
-                                <Metric
-                                    key={metric.name}
-                                    name={metric.name}
-                                    actual={metric.actual}
-                                    total={metric.total}
-                                    status={metric.status}
-                                />
-                            ))}
+                            {!isEmpty(metrics) &&
+                                metrics.map((metric) => (
+                                    <Metric
+                                        key={metric.name}
+                                        data={{
+                                            name: metric.name,
+                                            actual: metric.actual,
+                                            total: metric.total,
+                                            status: metric.status,
+                                        }}
+                                    />
+                                ))}
                         </Paper>
                     </Box>
                 </Paper>
@@ -82,4 +101,4 @@ function Pipeline() {
     )
 }
 
-export default Pipeline
+export default React.memo(Pipeline)
