@@ -101,4 +101,4 @@ function Pipeline() {
     )
 }
 
-export default React.memo(Pipeline)
+export default Pipeline
