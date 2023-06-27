@@ -21,7 +21,7 @@ const update = async (repository, data) => {
 
 const findAllRepositories = async () => {
     try {
-        const res = await RepositoryModel.update(repository, data)
+        const res = await RepositoryModel.findAllRepositories()
         return res
     } catch (error) {
         throw new InternalServer(error.message)

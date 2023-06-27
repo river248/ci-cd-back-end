@@ -1,3 +1,4 @@
+import { RepositoryService } from '~/services/repository.service'
 import { HttpStatusCode } from '~/utils/constants'
 
 const createNew = async (req, res) => {
@@ -24,7 +25,7 @@ const update = async (req, res) => {
 
 const findAllRepositories = async (req, res) => {
     try {
-        const result = await RepositoryService.update(repository, data)
+        const result = await RepositoryService.findAllRepositories()
         res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
