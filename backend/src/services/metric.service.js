@@ -103,8 +103,6 @@ const handlePushMetric = async (repository, stage, executionId, metricName, appM
             delete updatedMetric.stage
             delete updatedMetric.executionId
 
-            console.log('metric: ', updatedMetric)
-
             metrics[metricIndex] = updatedMetric
         }
 
