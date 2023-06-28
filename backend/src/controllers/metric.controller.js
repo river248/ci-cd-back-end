@@ -1,5 +1,5 @@
 import { MetricService } from '~/services/metric.service'
-import { HttpStatusCode } from '~/utils/constants'
+import { HttpStatusCode, socketEvent } from '~/utils/constants'
 
 const pushMetric = async (req, res) => {
     try {
