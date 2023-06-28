@@ -33,7 +33,7 @@ function Pipeline({ stages, getFullPipeline }) {
                 <Title content={query.get('repo')} />
             </Stack>
 
-            <Stack direction={'row'} spacing={2}>
+            <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
                 {stages.map((stage) => (
                     <StageContainer key={stage.name} stage={stage} />
                 ))}

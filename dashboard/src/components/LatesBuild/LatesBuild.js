@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -15,7 +14,7 @@ function LatesBuild({ dataName, hasLink, toolTipContent, dataValue, onGoto }) {
             </Typography>
             <Tooltip arrow title={toolTipContent}>
                 {hasLink ? (
-                    <Box width={'70%'}>
+                    <Typography component={'div'} width={'70%'} noWrap>
                         <Typography
                             variant={'h6'}
                             component={'span'}
@@ -26,7 +25,7 @@ function LatesBuild({ dataName, hasLink, toolTipContent, dataValue, onGoto }) {
                         >
                             {dataValue}
                         </Typography>
-                    </Box>
+                    </Typography>
                 ) : (
                     <Typography
                         width={'70%'}

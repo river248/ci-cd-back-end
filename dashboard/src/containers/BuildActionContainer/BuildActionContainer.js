@@ -1,11 +1,16 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import { isEmpty } from 'lodash'
 
 import BuildAction from '~/components/BuildAction'
+import { processName } from '~/utils/constants'
+import { StageContext } from '~/contexts/StageContext'
 
 function BuildActionContainer() {
+    const { latesBuild } = useContext(StageContext)
+    const { status } = latesBuild
+
     const [branch, setBranch] = useState('')
-    const [disabled, setDisabled] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const handleSetBranch = useCallback(
         (event) => {
@@ -16,10 +21,10 @@ function BuildActionContainer() {
 
     const handleTrigger = useCallback(() => {
         if (!isEmpty(branch)) {
-            setDisabled(true)
+            setLoading(true)
             setTimeout(() => {
                 console.log('build')
-                setDisabled(false)
+                setLoading(false)
             }, 1000)
         }
     }, [branch])
@@ -28,10 +33,10 @@ function BuildActionContainer() {
         console.log('stop build')
     }, [branch])
 
-    console.log(disabled)
     return (
         <BuildAction
-            disabled={disabled}
+            disableTrigger={loading || isEmpty(branch)}
+            disableStop={status !== processName.IN_PROGRESS || loading || isEmpty(branch)}
             branch={branch}
             onSetBranch={handleSetBranch}
             onTrigger={handleTrigger}

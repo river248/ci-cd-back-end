@@ -7,7 +7,7 @@ import { useTheme } from '@mui/material/styles'
 
 import Button from '~/components/Button'
 
-function BuildAction({ disabled, branch, onSetBranch, onTrigger, onStop }) {
+function BuildAction({ disableTrigger, disableStop, branch, onSetBranch, onTrigger, onStop }) {
     const theme = useTheme()
 
     return (
@@ -22,7 +22,7 @@ function BuildAction({ disabled, branch, onSetBranch, onTrigger, onStop }) {
             />
             <Stack marginTop={1} direction={'row'} spacing={1}>
                 <Button
-                    disabled={disabled}
+                    disabled={disableTrigger}
                     sx={{ fontSize: 13 }}
                     variant={'contained'}
                     defaultText={false}
@@ -33,7 +33,7 @@ function BuildAction({ disabled, branch, onSetBranch, onTrigger, onStop }) {
                     trigger
                 </Button>
                 <Button
-                    disabled={disabled}
+                    disabled={disableStop}
                     sx={{ fontSize: 13 }}
                     variant={'contained'}
                     defaultText={false}
@@ -49,7 +49,8 @@ function BuildAction({ disabled, branch, onSetBranch, onTrigger, onStop }) {
 }
 
 BuildAction.propTypes = {
-    disabled: PropTypes.bool,
+    disableTrigger: PropTypes.bool,
+    disableStop: PropTypes.bool,
     branch: PropTypes.string,
     onSetBranch: PropTypes.func,
     onTrigger: PropTypes.func,
