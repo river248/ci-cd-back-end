@@ -99,6 +99,12 @@ const handlePushMetric = async (repository, stage, executionId, metricName, appM
         const metricIndex = metrics.findIndex((metric) => metric.name === updatedMetric.name)
 
         if (metricIndex >= 0) {
+            delete updatedMetric.repository
+            delete updatedMetric.stage
+            delete updatedMetric.executionId
+
+            console.log('metric: ', updatedMetric)
+
             metrics[metricIndex] = updatedMetric
         }
 
