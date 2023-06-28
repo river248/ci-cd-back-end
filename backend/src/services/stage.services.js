@@ -127,9 +127,11 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                         status: workflowStatus.QUEUED,
                         rank: index * 1 + 1,
                     })
+
                     delete metricRes.repository
                     delete metricRes.stage
                     delete metricRes.executionId
+
                     return metricRes
                 }),
             )
@@ -157,6 +159,11 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                         },
                         updateAction.SET,
                     )
+
+                    delete metricRes.repository
+                    delete metricRes.stage
+                    delete metricRes.executionId
+
                     return metricRes
                 }),
             )
