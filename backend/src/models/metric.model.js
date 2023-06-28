@@ -1,8 +1,9 @@
 import Joi from 'joi'
+import { isEmpty, isNil } from 'lodash'
 
 import { getDB } from '~/configs/mongodb'
 import NotFound from '~/errors/notfound.error'
-import { collection } from '~/utils/constants'
+import { collection, updateAction } from '~/utils/constants'
 
 const metricCollectionSchema = Joi.object({
     executionId: Joi.string().required().trim(),
@@ -48,7 +49,12 @@ const update = async (repository, stage, executionId, name, data, action) => {
             .collection(collection.METRIC)
             .findOneAndUpdate({ name, executionId, stage, repository }, { [key]: data }, { returnOriginal: false })
 
-        if (res.value) {
+        if (!isEmpty(res.value) && !isNil(res.value)) {
+            if (action === updateAction.PUSH) {
+                res.value.appMetrics.push(data.appMetrics)
+                return { ...res.value, _id: res.value._id.toString() }
+            }
+
             return { ...res.value, ...data, _id: res.value._id.toString() }
         }
 
