@@ -164,6 +164,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                     delete metricRes.stage
                     delete metricRes.executionId
 
+                    console.log('start stage: ', metricRes)
                     return metricRes
                 }),
             )
@@ -238,6 +239,8 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
             delete metric.repository
             delete metric.stage
             delete metric.executionId
+
+            console.log('finish stage: ', metric)
         })
 
         if (!isEmpty(stageData) && !isNil(stageData)) {
