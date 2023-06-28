@@ -163,13 +163,10 @@ const handlePipelineData = async (payload) => {
         if (!isStartStage && !isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
             await handleCompletedJob(repo, stage, executionId, jobName, { jobStatus, startDateTime, endDateTime })
 
-            const [stageData, metricData] = await Promise.all([
-                StageService.findStageByExecutionId(repo, stage, executionId),
-                MetricService.findMetrics(repo, stage, { executionId }),
-            ])
+            const stageData = await StageService.getStageData(repo, stage, executionId, true)
 
-            if (stageData) {
-                return { ...stageData, metrics: metricData }
+            if (!isEmpty(stageData) && !isNil(stageData)) {
+                return stageData
             }
         }
 
@@ -189,7 +186,7 @@ const getFullPipeline = async (repository) => {
         if (repo) {
             const pipeline = await Promise.all(
                 repo.stages.map(async (stage) => {
-                    const stageData = await StageModel.getFullStage(repository, stage)
+                    const stageData = await StageService.getStageData(repository, stage, null, true)
                     if (!stageData) {
                         return { name: stage, metrics: [] }
                     }

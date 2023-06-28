@@ -52,12 +52,18 @@ const update = async (repository, name, executionId, data) => {
     }
 }
 
-const getFullStage = async (repository, name) => {
+const findStage = async (repository, name, executionId) => {
+    let conditions = { repository, name }
+
+    if (executionId) {
+        conditions = { ...conditions, executionId }
+    }
+
     try {
         const res = await getDB()
             .collection(collection.STAGE)
             .aggregate([
-                { $match: { name, repository } },
+                { $match: conditions },
                 { $sort: { buildStartTime: -1 } },
                 { $limit: 1 },
                 {
@@ -88,15 +94,6 @@ const getFullStage = async (repository, name) => {
     }
 }
 
-const findStageByExecutionId = async (repository, name, executionId) => {
-    try {
-        const res = await getDB().collection(collection.STAGE).findOne({ repository, name, executionId })
-        return res
-    } catch (error) {
-        throw new Error(error)
-    }
-}
-
 /**
  *
  * @param {string} repository
@@ -120,7 +117,6 @@ const findStages = async (repository, name, condition, limit) => {
 export const StageModel = {
     createNew,
     update,
-    getFullStage,
+    findStage,
     findStages,
-    findStageByExecutionId,
 }

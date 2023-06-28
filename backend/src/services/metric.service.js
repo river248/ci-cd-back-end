@@ -1,4 +1,4 @@
-import { isEmpty, isNil } from 'lodash'
+import { cloneDeep, isEmpty, isNil } from 'lodash'
 
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
@@ -81,26 +81,28 @@ const update = async (repository, stage, executionId, name, data, action) => {
 
 const handlePushMetric = async (repository, stage, executionId, metricName, appMetricName, reportUrl, data) => {
     try {
-        const [stages, metrics, updatedMetric] = await Promise.all([
-            StageService.findStages(repository, stage, { executionId }, 1),
-            findMetrics(repository, stage, { executionId }),
+        const [stageData, updatedMetric] = await Promise.all([
+            StageService.getStageData(repository, stage, executionId, true),
             pushMetric(repository, stage, executionId, metricName, appMetricName, reportUrl, data),
         ])
 
-        if (isEmpty(stages) || isNil(stages)) {
+        if (isEmpty(stageData) || isNil(stageData)) {
             return null
         }
 
-        if (isEmpty(metrics) || isNil(metrics)) {
+        if (isEmpty(stageData.metrics) || isNil(stageData.metrics)) {
             return null
         }
 
-        const stageData = stages[0]
+        const metrics = cloneDeep(stageData.metrics)
+
         const metricIndex = metrics.findIndex((metric) => metric.name === updatedMetric.name)
 
         if (metricIndex >= 0) {
             metrics[metricIndex] = updatedMetric
         }
+
+        delete stageData.metrics
 
         return { ...stageData, metrics }
     } catch (error) {

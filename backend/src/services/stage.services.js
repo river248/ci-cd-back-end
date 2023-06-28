@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash'
+import { isEmpty, isNil } from 'lodash'
 
 import { MetricService } from './metric.service'
 import InternalServer from '~/errors/internalServer.error'
@@ -54,16 +54,6 @@ const findStages = async (repository, name, condition, limit) => {
     }
 }
 
-const findStageByExecutionId = async (repository, name, executionId) => {
-    try {
-        const stageData = await StageModel.findStageByExecutionId(repository, name, executionId)
-
-        return stageData
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
-
 const generateVersion = async (repository, stage) => {
     const DOT = '.'
     const BUILD = 'build'
@@ -84,6 +74,24 @@ const generateVersion = async (repository, stage) => {
         }
 
         return stageData.version
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
+const getStageData = async (repository, name, executionId, hasMetric) => {
+    try {
+        const stageData = await StageModel.findStage(repository, name, executionId)
+
+        if (isEmpty(stageData) || isNil(stageData)) {
+            return null
+        }
+
+        if (!hasMetric) {
+            delete stageData.metrics
+        }
+
+        return stageData
     } catch (error) {
         throw new InternalServer(error.message)
     }
@@ -123,7 +131,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                 }),
             )
 
-            return { stageData, metrics: metricData }
+            return { ...stageData, metrics: metricData }
         }
 
         if (status === workflowStatus.COMPLETED) {
@@ -239,7 +247,7 @@ export const StageService = {
     createNew,
     update,
     findStages,
-    findStageByExecutionId,
+    getStageData,
     startStage,
     finishStage,
 }
