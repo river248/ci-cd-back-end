@@ -21,3 +21,17 @@ export const fetchFullPipeline = async (repository) => {
         toast.error(resExceptionMessageHandler(error))
     }
 }
+
+export const triggerPipeline = async (repository, branchName) => {
+    try {
+        const res = await axios.post(`${API_ROOT}/v1/pipeline/trigger-pipeline`, {
+            branchName,
+            repository,
+        })
+
+        toast.success(res.data.message)
+    } catch (error) {
+        console.log(error)
+        toast.error(resExceptionMessageHandler(error))
+    }
+}

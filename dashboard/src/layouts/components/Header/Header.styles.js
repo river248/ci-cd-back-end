@@ -7,6 +7,7 @@ import Button from '~/components/Button'
 export const Wrapper = styled(Paper)(({ theme }) => ({
     borderRadius: 0,
     position: 'fixed',
+    zIndex: 100,
     top: 0,
     left: 0,
     width: '100%',

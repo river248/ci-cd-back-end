@@ -1,6 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
-
-import { LOADING, GET_FULL_PIPELINE } from '~/redux/types/pipelineType'
+import { LOADING, GET_FULL_PIPELINE, UPDATE_STAGE_DATA } from '~/redux/types/pipelineType'
 
 const initialState = {
     loading: false,
@@ -13,6 +12,13 @@ const pipelineReducer = createReducer(initialState, (builder) => {
     })
     builder.addCase(GET_FULL_PIPELINE, (state, action) => {
         state.stages = action.payload
+    })
+    builder.addCase(UPDATE_STAGE_DATA, (state, action) => {
+        const index = state.stages.findIndex((stage) => stage._id === action.payload._id)
+
+        if (index >= 0) {
+            state.stages[index] = action.payload
+        }
     })
 })
 

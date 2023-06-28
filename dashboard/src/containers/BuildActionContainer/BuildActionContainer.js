@@ -4,10 +4,16 @@ import { isEmpty } from 'lodash'
 import BuildAction from '~/components/BuildAction'
 import { processName } from '~/utils/constants'
 import { StageContext } from '~/contexts/StageContext'
+import { triggerPipeline } from '~/apis'
 
 function BuildActionContainer() {
     const { latesBuild } = useContext(StageContext)
-    const { status } = latesBuild
+
+    if (isEmpty(latesBuild)) {
+        return null
+    }
+
+    const { repository, status } = latesBuild
 
     const [branch, setBranch] = useState('')
     const [loading, setLoading] = useState(false)
@@ -21,11 +27,13 @@ function BuildActionContainer() {
 
     const handleTrigger = useCallback(() => {
         if (!isEmpty(branch)) {
-            setLoading(true)
-            setTimeout(() => {
-                console.log('build')
+            const callApi = async () => {
+                setLoading(true)
+                await triggerPipeline(repository, branch)
                 setLoading(false)
-            }, 1000)
+            }
+
+            callApi()
         }
     }, [branch])
 

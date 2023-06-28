@@ -12,16 +12,25 @@ import { useQueryHook } from '~/hooks'
 import Title from '~/components/Title'
 import routes from '~/configs/routes'
 import StageContainer from '~/containers/StageContainer'
-import { handleFetchFullPipeline } from '~/redux/async-logics/pipelineLogic'
-import { processName } from '~/utils/constants'
+import { handleFetchFullPipeline, handleUpdateStageData } from '~/redux/async-logics/pipelineLogic'
+import { processName, socket, socketEvent } from '~/utils/constants'
 
-function Pipeline({ stages, getFullPipeline }) {
+function Pipeline({ stages, getFullPipeline, updateStageData }) {
     const query = useQueryHook()
     const theme = useTheme()
     const navigate = useNavigate()
 
     useEffect(() => {
         getFullPipeline(query.get('repo'))
+        socket.emit(socketEvent.USING_PIPELINE, query.get('repo'))
+        socket.on(socketEvent.UPDATE_PIPELINE_DATA, (data) => {
+            updateStageData(data)
+        })
+
+        return () => {
+            socket.off(socketEvent.USING_PIPELINE)
+            socket.off(socketEvent.UPDATE_PIPELINE_DATA)
+        }
     }, [query.get('repo')])
 
     return (
@@ -93,6 +102,7 @@ Pipeline.propTypes = {
         }),
     ),
     getFullPipeline: PropTypes.func,
+    updateStageData: PropTypes.func,
 }
 
 const mapStateToProps = (state) => ({
@@ -102,6 +112,9 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     getFullPipeline: (repo) => {
         dispatch(handleFetchFullPipeline(repo))
+    },
+    updateStageData: (data) => {
+        dispatch(handleUpdateStageData(data))
     },
 })
 

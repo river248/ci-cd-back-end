@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react'
+import React, { useCallback, useContext, useState, useRef, useEffect } from 'react'
 import { format } from 'date-fns'
 import { isEmpty } from 'lodash'
 
@@ -22,6 +22,21 @@ function LatesBuildContainer() {
     const DURATION = 'Duration'
     const EMPTY_STRING = ''
 
+    const [duration, setDuration] = useState('0s')
+    const timer = useRef(null)
+
+    useEffect(() => {
+        if (endDateTime) {
+            setDuration(differenceInTime(startDateTime, endDateTime))
+        } else {
+            timer.current = setInterval(() => {
+                setDuration(differenceInTime(startDateTime, `${format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")}`))
+            }, 1000)
+        }
+
+        return () => clearInterval(timer.current)
+    }, [endDateTime])
+
     const convertToMetadata = () => [
         {
             dataName: BRANCH,
@@ -39,7 +54,7 @@ function LatesBuildContainer() {
         },
         {
             dataName: DURATION,
-            dataValue: differenceInTime(startDateTime, endDateTime),
+            dataValue: duration,
             toolTipContent: EMPTY_STRING,
             hasLink: false,
         },
