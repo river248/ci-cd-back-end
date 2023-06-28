@@ -1,37 +1,14 @@
+import { isEmpty, isNil } from 'lodash'
+
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { MetricModel } from '~/models/metric.model'
 import { updateAction } from '~/utils/constants'
+import { StageService } from './stage.services'
 
 //========================================================================================+
-//                                    PUBLIC FUNCTIONS                                    |
+//                                    PRIVATE FUNCTIONS                                   |
 //========================================================================================+
-
-const createNew = async (data) => {
-    try {
-        const res = await MetricModel.createNew(data)
-        return res
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
-
-const update = async (repository, stage, executionId, name, data, action) => {
-    try {
-        if (![updateAction.SET, updateAction.PUSH].includes(action)) {
-            throw new InternalServer('Invalid action. Action must be "set" or "push"')
-        }
-
-        const res = await MetricModel.update(repository, stage, executionId, name, data, action)
-        return res
-    } catch (error) {
-        if (error instanceof NotFound) {
-            throw new NotFound(error.message)
-        }
-
-        throw new InternalServer(error.message)
-    }
-}
 
 const pushMetric = async (repository, stage, executionId, metricName, appMetricName, reportUrl, data) => {
     try {
@@ -72,6 +49,69 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
     }
 }
 
+//========================================================================================+
+//                                    PUBLIC FUNCTIONS                                    |
+//========================================================================================+
+
+const createNew = async (data) => {
+    try {
+        const res = await MetricModel.createNew(data)
+        return res
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
+const update = async (repository, stage, executionId, name, data, action) => {
+    try {
+        if (![updateAction.SET, updateAction.PUSH].includes(action)) {
+            throw new InternalServer('Invalid action. Action must be "set" or "push"')
+        }
+
+        const res = await MetricModel.update(repository, stage, executionId, name, data, action)
+        return res
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
+const handlePushMetric = async (repository, stage, executionId, metricName, appMetricName, reportUrl, data) => {
+    try {
+        const [stages, metrics, updatedMetric] = await Promise.all([
+            StageService.findStages(repository, stage, { executionId }, 1),
+            findMetrics(repository, stage, { executionId }),
+            pushMetric(repository, stage, executionId, metricName, appMetricName, reportUrl, data),
+        ])
+
+        if (isEmpty(stages) || isNil(stages)) {
+            return null
+        }
+
+        if (isEmpty(metrics) || isNil(metrics)) {
+            return null
+        }
+
+        const stageData = stages[0]
+        const metricIndex = metrics.findIndex((metric) => metric.name === updatedMetric.name)
+
+        if (metricIndex >= 0) {
+            metrics[metricIndex] = updatedMetric
+        }
+
+        return { ...stageData, metrics }
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
 const findMetrics = async (repository, stage, conditions) => {
     try {
         const res = await MetricModel.findMetrics(repository, stage, conditions)
@@ -89,6 +129,6 @@ const findMetrics = async (repository, stage, conditions) => {
 export const MetricService = {
     createNew,
     update,
-    pushMetric,
+    handlePushMetric,
     findMetrics,
 }

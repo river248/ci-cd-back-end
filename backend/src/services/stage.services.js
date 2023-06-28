@@ -150,7 +150,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                 }),
             )
 
-            return { stageData, metrics: metricData }
+            return { ...stageData, metrics: metricData }
         }
 
         return null
