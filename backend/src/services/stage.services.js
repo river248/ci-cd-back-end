@@ -127,6 +127,9 @@ const startStage = async (repository, stage, executionId, initialJob) => {
                         status: workflowStatus.QUEUED,
                         rank: index * 1 + 1,
                     })
+                    delete metricRes.repository
+                    delete metricRes.stage
+                    delete metricRes.executionId
                     return metricRes
                 }),
             )
@@ -173,12 +176,12 @@ const startStage = async (repository, stage, executionId, initialJob) => {
 
 const finishStage = async (repository, stage, executionId, pipelineStatus, endDateTime) => {
     try {
-        let metricData = await MetricService.findMetrics(repository, stage, { executionId })
+        let metrics = await MetricService.findMetrics(repository, stage, { executionId })
         const inProgressMetrics = []
         const completedMetrics = []
         let isSuccess = true
 
-        metricData.forEach((metric) => {
+        metrics.forEach((metric) => {
             if (metric.status === workflowStatus.IN_PROGRESS) {
                 inProgressMetrics.push(metric)
             } else {
@@ -202,7 +205,7 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
             )
 
             isSuccess = workflowStatus.FAILURE
-            metricData = [
+            metrics = [
                 ...completedMetrics,
                 ...inProgressMetrics.map((inProgressMetric) => ({
                     ...inProgressMetric,
@@ -210,8 +213,8 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
                 })),
             ]
         } else {
-            metricData.forEach((item) => {
-                if (item.status !== workflowStatus.SUCCESS) {
+            metrics.forEach((metric) => {
+                if (metric.status !== workflowStatus.SUCCESS) {
                     isSuccess = false
                     return
                 }
@@ -224,9 +227,14 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
         }
 
         const stageData = await update(repository, stage, executionId, data)
+        metrics.forEach((metric) => {
+            delete metric.repository
+            delete metric.stage
+            delete metric.executionId
+        })
 
-        if (stageData) {
-            return { ...stageData, metrics: metricData }
+        if (!isEmpty(stageData) && !isNil(stageData)) {
+            return { ...stageData, metrics }
         }
 
         return null

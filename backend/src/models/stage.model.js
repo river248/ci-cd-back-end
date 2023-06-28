@@ -82,6 +82,7 @@ const findStage = async (repository, name, executionId) => {
                                     },
                                 },
                             },
+                            { $project: { executionId: false, repository: false, stage: false } },
                         ],
                         as: 'metrics',
                     },
