@@ -14,7 +14,7 @@ const pipelineReducer = createReducer(initialState, (builder) => {
         state.stages = action.payload
     })
     builder.addCase(UPDATE_STAGE_DATA, (state, action) => {
-        const index = state.stages.findIndex((stage) => stage._id === action.payload._id)
+        const index = state.stages.findIndex((stage) => stage.name === action.payload.name)
 
         if (index >= 0) {
             state.stages[index] = action.payload

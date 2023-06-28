@@ -8,6 +8,6 @@ export const handleFetchFullPipeline = (repo) => async (dispatch) => {
     dispatch(loading(false))
 }
 
-export const handleUpdateStageData = (data) => async (dispatch) => {
+export const handleUpdateStageData = (data) => (dispatch) => {
     dispatch(updateStageData(data))
 }

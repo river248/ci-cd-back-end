@@ -31,7 +31,6 @@ export const triggerPipeline = async (repository, branchName) => {
 
         toast.success(res.data.message)
     } catch (error) {
-        console.log(error)
         toast.error(resExceptionMessageHandler(error))
     }
 }
