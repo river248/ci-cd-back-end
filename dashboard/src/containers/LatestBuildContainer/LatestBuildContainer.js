@@ -48,13 +48,16 @@ function LatestBuildContainer() {
         },
     ]
 
-    const handleGoTo = useCallback((dataName, dataValue) => {
-        if (dataName === VERSION) {
-            navigate(`${routes.pipelineVerison}?version=${dataValue}`)
-        } else if (dataName === COMMIT) {
-            window.open(`https://github.com/river248/${repository}/commit/${commitId}`, '_blank')
-        }
-    }, [])
+    const handleGoTo = useCallback(
+        (dataName, dataValue) => {
+            if (dataName === VERSION) {
+                navigate(`${routes.pipelineVerison}?version=${dataValue}`)
+            } else if (dataName === COMMIT) {
+                window.open(`https://github.com/river248/${repository}/commit/${commitId}`, '_blank')
+            }
+        },
+        [repository, commitId],
+    )
 
     return convertToMetadata().map((item) => (
         <LatestBuild
