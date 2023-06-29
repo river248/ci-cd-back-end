@@ -5,13 +5,13 @@ import NotFound from '~/errors/notfound.error'
 import { collection } from '~/utils/constants'
 
 const stageCollectionSchema = Joi.object({
-    executionId: Joi.string().required().trim(),
-    name: Joi.string().required().trim(),
-    repository: Joi.string().required().trim(),
-    codePipelineBranch: Joi.string().required().trim(),
-    commitId: Joi.string().required().trim(),
-    status: Joi.string().required().trim(),
-    version: Joi.string().required().trim(),
+    executionId: Joi.string().trim().required(),
+    name: Joi.string().trim().required(),
+    repository: Joi.string().trim().required(),
+    codePipelineBranch: Joi.string().trim().required(),
+    commitId: Joi.string().trim().required(),
+    status: Joi.string().trim().required(),
+    version: Joi.string().trim().required(),
     deploymentId: Joi.string().default(null),
     buildStartTime: Joi.date().timestamp().default(null),
     startDateTime: Joi.date().timestamp().default(null),

@@ -6,11 +6,11 @@ import NotFound from '~/errors/notfound.error'
 import { collection, updateAction } from '~/utils/constants'
 
 const metricCollectionSchema = Joi.object({
-    executionId: Joi.string().required().trim(),
-    repository: Joi.string().required().trim(),
-    name: Joi.string().required().trim(),
-    stage: Joi.string().required().trim(),
-    status: Joi.string().required().trim(),
+    executionId: Joi.string().trim().required(),
+    repository: Joi.string().trim().required(),
+    name: Joi.string().trim().required(),
+    stage: Joi.string().trim().required(),
+    status: Joi.string().trim().required(),
     rank: Joi.number().required().min(1),
     actual: Joi.number().min(0).default(null),
     total: Joi.number().min(0).default(null),

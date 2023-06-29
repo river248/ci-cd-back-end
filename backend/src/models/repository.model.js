@@ -4,7 +4,13 @@ import { getDB } from '~/configs/mongodb'
 import { collection } from '~/utils/constants'
 
 const repositoryCollectionSchema = Joi.object({
-    name: Joi.string().required().trim(),
+    name: Joi.string().trim().required(),
+    thumbnail: Joi.string()
+        .pattern(/^(.+)\/([^\/]+)(.jpg)|(.png)|(.jpeg)$/i)
+
+        .trim()
+        .required(),
+    members: Joi.array().items(Joi.string().trim().required()).required(),
     stages: Joi.array().items(Joi.string().valid('build', 'test', 'production').required()).required(),
 })
 
