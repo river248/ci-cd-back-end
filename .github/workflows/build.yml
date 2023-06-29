@@ -111,11 +111,11 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: unit_test_coverage/backend
-              working-directory: ./backend
+            - name: Push metric
               run: |
-                  echo "Reporting unit tests coverage..."
-                  # npm run build --if-present
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"backend","data": "{\"actual\": 0, \"total\": 0}"}' \
+                    -H "Content-Type: application/json" \
+                    -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
     finish_stage:
         if: ${{ always() }}
         needs: [code_quality, unit_tests, unit_test_coverage]

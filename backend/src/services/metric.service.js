@@ -38,6 +38,13 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
             appMetricData.appMetrics.total = numTotalTests
         }
 
+        if (metricName === 'Unit Test Coverage') {
+            const { total, actual } = dataFromJSON
+
+            appMetricData.appMetrics.actual = total
+            appMetricData.appMetrics.total = actual
+        }
+
         const res = await update(repository, stage, executionId, metricName, appMetricData, updateAction.PUSH)
         return res
     } catch (error) {
