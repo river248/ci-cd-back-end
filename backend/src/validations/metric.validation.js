@@ -4,7 +4,7 @@ import { HttpStatusCode } from '~/utils/constants'
 
 const pushMetric = async (req, res, next) => {
     const condition = Joi.object({
-        repository: Joi.min(4).max(50).string().trim().required(),
+        repository: Joi.string().min(4).max(50).trim().required(),
         stage: Joi.string().min(4).max(10).trim().required(),
         executionId: Joi.string().trim().required(),
         metricName: Joi.string().min(4).max(20).trim().required(),

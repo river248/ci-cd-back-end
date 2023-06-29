@@ -4,7 +4,7 @@ import { HttpStatusCode } from '~/utils/constants'
 
 const triggerPipeline = async (req, res, next) => {
     const condition = Joi.object({
-        repository: Joi.min(4).max(50).string().trim().required(),
+        repository: Joi.string().min(4).max(50).trim().required(),
         branchName: Joi.string().min(6).max(50).trim().required(),
     })
     try {
