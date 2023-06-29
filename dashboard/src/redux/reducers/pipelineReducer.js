@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { LOADING, GET_FULL_PIPELINE, UPDATE_STAGE_DATA } from '~/redux/types/pipelineType'
+import { PIPELINE_LOADING, GET_FULL_PIPELINE, UPDATE_STAGE_DATA } from '~/redux/types/pipelineType'
 
 const initialState = {
     loading: false,
@@ -7,7 +7,7 @@ const initialState = {
 }
 
 const pipelineReducer = createReducer(initialState, (builder) => {
-    builder.addCase(LOADING, (state, action) => {
+    builder.addCase(PIPELINE_LOADING, (state, action) => {
         state.loading = action.payload
     })
     builder.addCase(GET_FULL_PIPELINE, (state, action) => {
