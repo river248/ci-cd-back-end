@@ -20,6 +20,8 @@ function MetricContainer() {
         return null
     }
 
+    const { stage, version } = latestBuild
+
     const boxStyles = useMemo(() => ({
         position: 'absolute',
         top: '50%',
@@ -35,19 +37,22 @@ function MetricContainer() {
     const sortedMetrics = cloneDeep(metrics)
     sortedMetrics.sort((metricA, metricB) => metricA.rank - metricB.rank)
 
-    const handleOpenAppMetric = useCallback((metricName) => {
-        const appMetricsData = metrics.find((metric) => metricName === metric.name)?.appMetrics ?? []
-        const newAppMetrics = appMetricsData.map((item) => ({
-            ...item,
-            metric: metricName,
-            stage: latestBuild.stage,
-            version: latestBuild.version,
-            deployment: null,
-        }))
+    const handleOpenAppMetric = useCallback(
+        (metricName) => {
+            const appMetricsData = metrics.find((metric) => metricName === metric.name)?.appMetrics ?? []
+            const newAppMetrics = appMetricsData.map((item) => ({
+                ...item,
+                metric: metricName,
+                stage,
+                version,
+                deployment: null,
+            }))
 
-        setAppMetrics(newAppMetrics)
-        setOpen(true)
-    }, [])
+            setAppMetrics(newAppMetrics)
+            setOpen(true)
+        },
+        [stage, version],
+    )
 
     const handleCloseAppMetric = useCallback(() => {
         setOpen(false)

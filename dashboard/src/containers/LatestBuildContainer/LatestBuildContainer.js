@@ -36,7 +36,7 @@ function LatestBuildContainer() {
         { dataName: COMMIT, dataValue: commitId.slice(0, 6), toolTipContent: EMPTY_STRING, hasLink: true },
         {
             dataName: START_TIME,
-            dataValue: format(new Date(startDateTime), 'dd/MM/yyyy HH:mm'),
+            dataValue: startDateTime ? format(new Date(startDateTime), 'dd/MM/yyyy HH:mm') : '-',
             toolTipContent: EMPTY_STRING,
             hasLink: false,
         },
