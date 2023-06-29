@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import BuildActionContainer from '~/containers/BuildActionContainer'
-import LatesBuildContainer from '~/containers/LatesBuildContainer'
+import LatestBuildContainer from '~/containers/LatestBuildContainer'
 import MetricContainer from '~/containers/MetricContainer'
 import StatusIcon from '~/components/StatusIcon'
 import { processName } from '~/utils/constants'
@@ -38,7 +38,7 @@ function Stage({ name, status }) {
                         </Typography>
                         <StatusIcon status={status} />
                     </Stack>
-                    <LatesBuildContainer />
+                    <LatestBuildContainer />
                 </Paper>
             </Box>
 

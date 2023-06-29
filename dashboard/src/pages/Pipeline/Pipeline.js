@@ -69,8 +69,6 @@ Pipeline.propTypes = {
             metrics: PropTypes.arrayOf(
                 PropTypes.shape({
                     _id: PropTypes.string,
-                    repository: PropTypes.string,
-                    stage: PropTypes.string,
                     name: PropTypes.string,
                     rank: PropTypes.number,
                     actual: PropTypes.number,

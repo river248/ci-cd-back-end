@@ -7,10 +7,11 @@ function StageContainer({ stage }) {
     const { repository, codePipelineBranch, commitId, version, status, startDateTime, endDateTime, name, metrics } =
         stage
 
-    let latesBuild = {}
+    let latestBuild = {}
 
     if (codePipelineBranch || version || commitId || startDateTime || endDateTime) {
-        latesBuild = {
+        latestBuild = {
+            stage: name,
             repository,
             codePipelineBranch,
             version,
@@ -21,7 +22,7 @@ function StageContainer({ stage }) {
     }
 
     const value = {
-        latesBuild,
+        latestBuild,
         metrics,
     }
 

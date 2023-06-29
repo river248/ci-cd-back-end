@@ -5,7 +5,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
-function LatesBuild({ dataName, hasLink, toolTipContent, dataValue, onGoto }) {
+function LatestBuild({ dataName, hasLink, toolTipContent, dataValue, onGoto }) {
     const theme = useTheme()
     return (
         <Stack marginTop={1} direction={'row'}>
@@ -43,7 +43,7 @@ function LatesBuild({ dataName, hasLink, toolTipContent, dataValue, onGoto }) {
     )
 }
 
-LatesBuild.propTypes = {
+LatestBuild.propTypes = {
     dataName: PropTypes.string,
     hasLink: PropTypes.bool,
     toolTipContent: PropTypes.string,
@@ -51,4 +51,4 @@ LatesBuild.propTypes = {
     onGoto: PropTypes.func,
 }
 
-export default React.memo(LatesBuild)
+export default React.memo(LatestBuild)

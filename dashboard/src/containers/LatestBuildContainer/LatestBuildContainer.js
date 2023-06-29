@@ -1,16 +1,16 @@
-import React, { useCallback, useContext, useState, useRef, useEffect } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { format } from 'date-fns'
 import { isEmpty } from 'lodash'
 
-import LatesBuild from '~/components/LatesBuild'
+import LatestBuild from '~/components/LatestBuild'
 import { StageContext } from '~/contexts/StageContext'
 import { differenceInTime } from '~/utils/helper'
 
-function LatesBuildContainer() {
-    const { latesBuild } = useContext(StageContext)
-    const { codePipelineBranch, version, commitId, startDateTime, endDateTime } = latesBuild
+function LatestBuildContainer() {
+    const { latestBuild } = useContext(StageContext)
+    const { codePipelineBranch, version, commitId, startDateTime, endDateTime } = latestBuild
 
-    if (isEmpty(latesBuild)) {
+    if (isEmpty(latestBuild)) {
         return null
     }
 
@@ -21,21 +21,6 @@ function LatesBuildContainer() {
     const START_TIME = 'Start time'
     const DURATION = 'Duration'
     const EMPTY_STRING = ''
-
-    const [duration, setDuration] = useState('0s')
-    const timer = useRef(null)
-
-    useEffect(() => {
-        if (endDateTime) {
-            setDuration(differenceInTime(startDateTime, endDateTime))
-        } else {
-            timer.current = setInterval(() => {
-                setDuration(differenceInTime(startDateTime, `${format(new Date(), "yyyy-MM-dd'T'HH:mm:ss")}`))
-            }, 1000)
-        }
-
-        return () => clearInterval(timer.current)
-    }, [endDateTime])
 
     const convertToMetadata = () => [
         {
@@ -54,7 +39,7 @@ function LatesBuildContainer() {
         },
         {
             dataName: DURATION,
-            dataValue: duration,
+            dataValue: endDateTime ? differenceInTime(startDateTime, endDateTime) : '-',
             toolTipContent: EMPTY_STRING,
             hasLink: false,
         },
@@ -65,7 +50,7 @@ function LatesBuildContainer() {
     }, [])
 
     return convertToMetadata().map((item) => (
-        <LatesBuild
+        <LatestBuild
             key={item.dataName}
             dataName={item.dataName}
             hasLink={item.hasLink}
@@ -76,4 +61,4 @@ function LatesBuildContainer() {
     ))
 }
 
-export default React.memo(LatesBuildContainer)
+export default React.memo(LatestBuildContainer)

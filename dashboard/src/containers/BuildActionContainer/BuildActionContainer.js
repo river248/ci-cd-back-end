@@ -7,13 +7,13 @@ import { StageContext } from '~/contexts/StageContext'
 import { triggerPipeline } from '~/apis'
 
 function BuildActionContainer() {
-    const { latesBuild } = useContext(StageContext)
+    const { latestBuild } = useContext(StageContext)
 
-    if (isEmpty(latesBuild)) {
+    if (isEmpty(latestBuild)) {
         return null
     }
 
-    const { repository, status } = latesBuild
+    const { repository, status } = latestBuild
 
     const [branch, setBranch] = useState('')
     const [loading, setLoading] = useState(false)
