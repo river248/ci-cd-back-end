@@ -1,14 +1,17 @@
 import React, { useCallback, useContext } from 'react'
 import { format } from 'date-fns'
 import { isEmpty } from 'lodash'
+import { useNavigate } from 'react-router-dom'
 
 import LatestBuild from '~/components/LatestBuild'
 import { StageContext } from '~/contexts/StageContext'
 import { differenceInTime } from '~/utils/helper'
+import routes from '~/configs/routes'
 
 function LatestBuildContainer() {
     const { latestBuild } = useContext(StageContext)
-    const { codePipelineBranch, version, commitId, startDateTime, endDateTime } = latestBuild
+    const navigate = useNavigate()
+    const { repository, codePipelineBranch, version, commitId, startDateTime, endDateTime } = latestBuild
 
     if (isEmpty(latestBuild)) {
         return null
@@ -46,7 +49,11 @@ function LatestBuildContainer() {
     ]
 
     const handleGoTo = useCallback((dataName, dataValue) => {
-        console.log(dataName, dataValue)
+        if (dataName === VERSION) {
+            navigate(`${routes.pipelineVerison}?version=${dataValue}`)
+        } else if (dataName === COMMIT) {
+            window.open(`https://github.com/river248/${repository}/commit/${commitId}`, '_blank')
+        }
     }, [])
 
     return convertToMetadata().map((item) => (

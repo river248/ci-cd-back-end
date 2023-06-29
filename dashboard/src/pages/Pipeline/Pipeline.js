@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { Fragment, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -14,8 +14,9 @@ import routes from '~/configs/routes'
 import StageContainer from '~/containers/StageContainer'
 import { handleFetchFullPipeline, handleUpdateStageData } from '~/redux/async-logics/pipelineLogic'
 import { processName, socket, socketEvent } from '~/utils/constants'
+import Stage from '~/components/Stage'
 
-function Pipeline({ stages, getFullPipeline, updateStageData }) {
+function Pipeline({ stages, loading, getFullPipeline, updateStageData }) {
     const query = useQueryHook()
     const theme = useTheme()
     const navigate = useNavigate()
@@ -43,9 +44,19 @@ function Pipeline({ stages, getFullPipeline, updateStageData }) {
             </Stack>
 
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
-                {stages.map((stage) => (
-                    <StageContainer key={stage.name} stage={stage} />
-                ))}
+                {loading ? (
+                    <Fragment>
+                        <Stage name={'build'} loading />
+                        <Stage name={'test'} loading />
+                        <Stage name={'prod'} loading />
+                    </Fragment>
+                ) : (
+                    <Fragment>
+                        {stages.map((stage) => (
+                            <StageContainer key={stage.name} stage={stage} />
+                        ))}
+                    </Fragment>
+                )}
             </Stack>
         </Box>
     )
@@ -99,11 +110,13 @@ Pipeline.propTypes = {
             startDateTime: PropTypes.string,
         }),
     ),
+    loading: PropTypes.bool,
     getFullPipeline: PropTypes.func,
     updateStageData: PropTypes.func,
 }
 
 const mapStateToProps = (state) => ({
+    loading: state.pipeline.loading,
     stages: state.pipeline.stages,
 })
 

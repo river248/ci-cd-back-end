@@ -8,6 +8,8 @@ import Title from '~/components/Title'
 import { handleFetchAllRepositories } from '~/redux/async-logics/repositoryLogic'
 
 function Dashboard({ loading, repositories, getAllRepositories }) {
+    const fakeRepositories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+
     useEffect(() => {
         getAllRepositories()
     }, [])
@@ -16,7 +18,15 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
         <Box padding={2}>
             <Title content={'Repositories'} />
             <Grid container spacing={2} marginTop={2}>
-                {loading ? null : (
+                {loading ? (
+                    <Fragment>
+                        {fakeRepositories.map((repo) => (
+                            <Grid key={repo} item xl={2} lg={2.4} md={3} sm={4} xs={6}>
+                                <Repository name={repo} loading />
+                            </Grid>
+                        ))}
+                    </Fragment>
+                ) : (
                     <Fragment>
                         {repositories.map((repository) => (
                             <Grid key={repository.name} item xl={2} lg={2.4} md={3} sm={4} xs={6}>
