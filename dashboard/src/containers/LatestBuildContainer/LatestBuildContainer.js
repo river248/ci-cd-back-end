@@ -1,15 +1,15 @@
-import React, { useCallback, useContext } from 'react'
+import React, { useCallback } from 'react'
 import { format } from 'date-fns'
 import { isEmpty } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 
 import LatestBuild from '~/components/LatestBuild'
-import { StageContext } from '~/contexts/StageContext'
 import { differenceInTime } from '~/utils/helper'
 import routes from '~/configs/routes'
+import { useStage } from '~/hooks'
 
 function LatestBuildContainer() {
-    const { latestBuild } = useContext(StageContext)
+    const { latestBuild } = useStage()
     const navigate = useNavigate()
     const { repository, codePipelineBranch, version, commitId, startDateTime, endDateTime } = latestBuild
 

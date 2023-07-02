@@ -1,15 +1,15 @@
-import React, { useContext, useState, Fragment, useMemo, useCallback } from 'react'
+import React, { useState, Fragment, useMemo, useCallback } from 'react'
 import { cloneDeep, isEmpty, isNil } from 'lodash'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import { useTheme } from '@mui/material/styles'
 
 import Metric from '~/components/Metric'
-import { StageContext } from '~/contexts/StageContext'
 import AppMetricsContainer from '~/containers/AppMetricsContainer'
+import { useStage } from '~/hooks'
 
 function MetricContainer() {
-    const { latestBuild, metrics } = useContext(StageContext)
+    const { latestBuild, metrics } = useStage()
 
     const [open, setOpen] = useState(false)
     const [appMetrics, setAppMetrics] = useState([])

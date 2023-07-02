@@ -1,13 +1,13 @@
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { isEmpty } from 'lodash'
 
 import BuildAction from '~/components/BuildAction'
 import { processName } from '~/utils/constants'
-import { StageContext } from '~/contexts/StageContext'
 import { triggerPipeline } from '~/apis'
+import { useStage } from '~/hooks'
 
 function BuildActionContainer() {
-    const { latestBuild } = useContext(StageContext)
+    const { latestBuild } = useStage()
 
     if (isEmpty(latestBuild)) {
         return null
