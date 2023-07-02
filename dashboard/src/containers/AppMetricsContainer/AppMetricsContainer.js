@@ -32,15 +32,18 @@ function AppMetricsContainer({ appMetrics }) {
         { value: item.reportUrl, width: 100 },
     ])
 
-    const linkStyles = {
-        fontSize: 14,
-        textDecoration: 'none',
-        padding: theme.spacing(0.5, 1),
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: theme.palette.primary.main,
-        borderRadius: 1,
-    }
+    const linkStyles = useMemo(
+        () => ({
+            fontSize: 14,
+            textDecoration: 'none',
+            padding: theme.spacing(0.5, 1),
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: theme.palette.primary.main,
+            borderRadius: 1,
+        }),
+        [],
+    )
 
     return (
         <Box>

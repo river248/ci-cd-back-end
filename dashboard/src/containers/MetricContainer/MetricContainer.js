@@ -22,20 +22,27 @@ function MetricContainer() {
 
     const { stage, version } = latestBuild
 
-    const boxStyles = useMemo(() => ({
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        bgcolor: theme.palette.common.white,
-        boxShadow: 24,
-        padding: theme.spacing(4),
-        borderRadius: 1,
-        outline: 'none',
-    }))
+    const boxStyles = useMemo(
+        () => ({
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: theme.palette.common.white,
+            boxShadow: 24,
+            padding: theme.spacing(4),
+            borderRadius: 1,
+            outline: 'none',
+        }),
+        [],
+    )
 
-    const sortedMetrics = cloneDeep(metrics)
-    sortedMetrics.sort((metricA, metricB) => metricA.rank - metricB.rank)
+    const sortedMetrics = useMemo(() => {
+        const cloneMetrics = cloneDeep(metrics)
+        cloneMetrics.sort((metricA, metricB) => metricA.rank - metricB.rank)
+
+        return cloneMetrics
+    }, [JSON.stringify(metrics)])
 
     const handleOpenAppMetric = useCallback(
         (metricName) => {
@@ -51,7 +58,7 @@ function MetricContainer() {
             setAppMetrics(newAppMetrics)
             setOpen(true)
         },
-        [stage, version],
+        [stage, version, JSON.stringify(metrics)],
     )
 
     const handleCloseAppMetric = useCallback(() => {
@@ -72,7 +79,12 @@ function MetricContainer() {
                     actual={metric.actual}
                     total={metric.total}
                     status={metric.status}
-                    hasPopup={!isEmpty(metric.appMetrics) && !isNil(metric.appMetrics)}
+                    hasPopup={
+                        !isEmpty(metric.appMetrics) &&
+                        !isNil(metric.appMetrics) &&
+                        !isNil(metric.actual) &&
+                        !isNil(metric.total)
+                    }
                     onOpen={handleOpenAppMetric}
                 />
             ))}

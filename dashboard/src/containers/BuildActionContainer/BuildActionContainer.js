@@ -18,12 +18,9 @@ function BuildActionContainer() {
     const [branch, setBranch] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const handleSetBranch = useCallback(
-        (event) => {
-            setBranch(event.target.value)
-        },
-        [branch],
-    )
+    const handleSetBranch = useCallback((event) => {
+        setBranch(event.target.value)
+    }, [])
 
     const handleTrigger = useCallback(() => {
         if (!isEmpty(branch)) {
@@ -35,11 +32,11 @@ function BuildActionContainer() {
 
             callApi()
         }
-    }, [branch])
+    }, [branch, repository])
 
     const handleStop = useCallback(() => {
         console.log('stop build')
-    }, [branch])
+    }, [branch, repository])
 
     return (
         <BuildAction
