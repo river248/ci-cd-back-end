@@ -220,7 +220,11 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
                 })),
             ]
         } else {
-            isSuccess = !Boolean(metrics.find((metric) => metric.status !== workflowStatus.SUCCESS))
+            const hasError = metrics.find((metric) => metric.status !== workflowStatus.SUCCESS)
+
+            if (hasError) {
+                isSuccess = false
+            }
         }
 
         const data = {

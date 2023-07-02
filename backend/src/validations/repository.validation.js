@@ -6,7 +6,7 @@ const createNew = async (req, res, next) => {
     const condition = Joi.object({
         name: Joi.string().min(4).max(50).trim().required(),
         thumbnail: Joi.string()
-            .pattern(/^(.+)\/([^\/]+)(.jpg)|(.png)|(.jpeg)$/i)
+            .pattern(/^(.+)\/([^/]+)(.jpg|.png|.jpeg)$/i)
             .trim()
             .required(),
         members: Joi.array().items(Joi.string().trim().required()).required(),
@@ -26,7 +26,7 @@ const update = async (req, res, next) => {
     const condition = Joi.object({
         name: Joi.string().min(4).max(50).trim(),
         thumbnail: Joi.string()
-            .pattern(/^(.+)\/([^\/]+)(.jpg)|(.png)|(.jpeg)$/i)
+            .pattern(/^(.+)\/([^/]+)(.jpg|.png|.jpeg)$/i)
             .trim(),
         members: Joi.array().items(Joi.string().trim()),
         stages: Joi.array().items(Joi.string().valid('build', 'test', 'production')),

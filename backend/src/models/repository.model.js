@@ -6,7 +6,7 @@ import { collection } from '~/utils/constants'
 const repositoryCollectionSchema = Joi.object({
     name: Joi.string().trim().required(),
     thumbnail: Joi.string()
-        .pattern(/^(.+)\/([^\/]+)(.jpg)|(.png)|(.jpeg)$/i)
+        .pattern(/^(.+)\/([^/]+)(.jpg|.png|.jpeg)$/i)
 
         .trim()
         .required(),
