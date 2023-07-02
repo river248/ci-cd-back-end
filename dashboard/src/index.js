@@ -10,8 +10,8 @@ import 'react-toastify/dist/ReactToastify.css'
 import App from './App'
 import GlobalStyles from './components/GlobalStyles'
 import theme from './configs/mui'
-// import AuthProvider from './context/AuthProvider'
 import store from './redux/store'
+import { AuthProvider } from './contexts/AuthContext'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
@@ -19,13 +19,13 @@ root.render(
         <CssVarsProvider theme={theme}>
             <CssBaseline />
             <Router>
-                {/* <AuthProvider> */}
-                <Provider store={store}>
-                    <GlobalStyles>
-                        <App />
-                    </GlobalStyles>
-                </Provider>
-                {/* </AuthProvider> */}
+                <AuthProvider>
+                    <Provider store={store}>
+                        <GlobalStyles>
+                            <App />
+                        </GlobalStyles>
+                    </Provider>
+                </AuthProvider>
                 <ToastContainer
                     position={'top-right'}
                     autoClose={5000}

@@ -3,11 +3,13 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import { useTheme } from '@mui/material'
 
 import Header from '~/layouts/components/Header'
+import { useAuth } from '~/hooks'
 
 function HeaderLayoutContainer() {
     const [popperAnchor, setPopperAnchor] = useState(null)
     const [openPopper, setOpenPopper] = useState(false)
     const [popperPlacement, setPopperPlacement] = useState()
+    const { signout } = useAuth()
 
     const theme = useTheme()
     const popperMenu = useMemo(
@@ -35,6 +37,12 @@ function HeaderLayoutContainer() {
         [popperPlacement],
     )
 
+    const handleSelectedItem = useCallback((item) => {
+        if (item === 'signout') {
+            signout()
+        }
+    }, [])
+
     return (
         <Header
             avatar={
@@ -45,6 +53,7 @@ function HeaderLayoutContainer() {
             popperPlacement={popperPlacement}
             onTogglePopper={handleTogglePopper}
             popperMenu={popperMenu}
+            onSelectItem={handleSelectedItem}
         />
     )
 }

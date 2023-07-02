@@ -12,7 +12,7 @@ import { useTheme } from '@mui/material/styles'
 import { isEmpty } from 'lodash'
 import { Dropdown, DropdownItem, Search, Wrapper } from './Header.styles.js'
 
-function Header({ avatar, popperPlacement, popperAnchor, openPopper, popperMenu = [], onTogglePopper }) {
+function Header({ avatar, popperPlacement, popperAnchor, openPopper, popperMenu = [], onTogglePopper, onSelectItem }) {
     const theme = useTheme()
 
     return (
@@ -52,6 +52,7 @@ function Header({ avatar, popperPlacement, popperAnchor, openPopper, popperMenu 
                                                     uppercase={false}
                                                     italic={true}
                                                     startIcon={item.icon}
+                                                    onClick={() => onSelectItem(item.id)}
                                                 >
                                                     {item.name}
                                                 </DropdownItem>
@@ -81,6 +82,7 @@ Header.propTypes = {
         }),
     ),
     onTogglePopper: PropTypes.func,
+    onSelectItem: PropTypes.func,
 }
 
 export default React.memo(Header)

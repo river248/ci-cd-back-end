@@ -10,12 +10,19 @@ import { useTheme } from '@mui/material/styles'
 
 import { processName } from '~/utils/constants'
 
-function StatusIcon({ status }) {
+function StatusIcon({ status, background }) {
     const theme = useTheme()
 
     switch (status) {
         case processName.QUEUED:
-            return <AccessTimeFilledIcon sx={{ color: theme.palette.warning.main }} />
+            return (
+                <AccessTimeFilledIcon
+                    sx={{
+                        color: theme.palette.warning.main,
+                        backgroundColor: background ? theme.palette.common.black : 'transparent',
+                    }}
+                />
+            )
         case processName.IN_PROGRESS:
             return (
                 <Box
@@ -41,9 +48,23 @@ function StatusIcon({ status }) {
                 </Box>
             )
         case processName.SUCCESS:
-            return <CheckCircleIcon sx={{ color: theme.palette.success.main }} />
+            return (
+                <CheckCircleIcon
+                    sx={{
+                        color: theme.palette.success.main,
+                        backgroundColor: background ? theme.palette.common.black : 'transparent',
+                    }}
+                />
+            )
         case processName.FAILURE:
-            return <RemoveCircleIcon sx={{ color: theme.palette.error.main }} />
+            return (
+                <RemoveCircleIcon
+                    sx={{
+                        color: theme.palette.error.main,
+                        backgroundColor: background ? theme.palette.common.black : 'transparent',
+                    }}
+                />
+            )
         default:
             return null
     }
@@ -51,6 +72,7 @@ function StatusIcon({ status }) {
 
 StatusIcon.propTypes = {
     status: PropTypes.oneOf([processName.QUEUED, processName.IN_PROGRESS, processName.FAILURE, processName.SUCCESS]),
+    background: PropTypes.bool,
 }
 
 export default React.memo(StatusIcon)
