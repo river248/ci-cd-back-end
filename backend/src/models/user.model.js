@@ -11,7 +11,7 @@ const userCollectionSchema = Joi.object({
     name: Joi.string().required().min(3).max(50).trim(),
     avatar: Joi.string()
         .uri({
-            scheme: [/\https?/],
+            scheme: [/https?/],
         })
         .required(),
     role: Joi.string().valid('developer', 'lead-developer', 'admin').default('developer'),

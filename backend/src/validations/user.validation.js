@@ -12,7 +12,7 @@ const signInWithGithub = async (req, res, next) => {
         avatar: Joi.string()
             .trim()
             .uri({
-                scheme: [/\https?/],
+                scheme: [/https?/],
             })
             .required(),
     })
