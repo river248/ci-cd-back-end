@@ -7,7 +7,7 @@ const createNew = async (req, res) => {
         res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
-            message: error.message,
+            error: error.message,
         })
     }
 }
@@ -18,7 +18,7 @@ const update = async (req, res) => {
         res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
-            message: error.message,
+            error: error.message,
         })
     }
 }
@@ -29,7 +29,7 @@ const findAllRepositories = async (req, res) => {
         res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
-            message: error.message,
+            error: error.message,
         })
     }
 }

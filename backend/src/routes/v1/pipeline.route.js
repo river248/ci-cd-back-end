@@ -1,6 +1,8 @@
 import express from 'express'
 
 import { PipeLineController } from '~/controllers/pipeline.controller'
+import { AuthMiddleware } from '~/middlewares/auth.middleware'
+import { RoleMiddleware } from '~/middlewares/role.middleware'
 import { PipelineValidation } from '~/validations/pipeline.validation'
 
 const router = express.Router()
@@ -10,7 +12,13 @@ const router = express.Router()
  */
 router.post('/data', PipeLineController.getWorkflowDataFromGithub)
 
-router.post('/trigger-pipeline', PipelineValidation.triggerPipeline, PipeLineController.triggerPipeline)
-router.get('/:repository', PipeLineController.getFullPipeline)
+router.post(
+    '/trigger-pipeline',
+    AuthMiddleware.isAuth,
+    PipelineValidation.triggerPipeline,
+    RoleMiddleware.isMember,
+    PipeLineController.triggerPipeline,
+)
+router.get('/:repository', AuthMiddleware.isAuth, PipeLineController.getFullPipeline)
 
 export const PipeLineRoute = router

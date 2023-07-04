@@ -28,8 +28,18 @@ const findAllRepositories = async () => {
     }
 }
 
+const findRepository = async (name) => {
+    try {
+        const res = await RepositoryModel.findRepository(name)
+        return res
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
 export const RepositoryService = {
     createNew,
     update,
     findAllRepositories,
+    findRepository,
 }
