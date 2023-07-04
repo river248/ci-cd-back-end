@@ -7,9 +7,9 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 import { toast } from 'react-toastify'
 import { useTheme } from '@mui/material/styles'
 
+import { BottomGlass, LeftGlass, RightGlass, SignInWithGithub } from './Authentication.styles'
 import { useAuth } from '~/hooks'
 import { errorCode } from '~/utils/constants'
-import Button from '~/components/Button'
 
 function Authentication() {
     const { signInWithGithub } = useAuth()
@@ -26,7 +26,16 @@ function Authentication() {
     }
 
     return (
-        <Stack alignItems={'center'} justifyContent={'center'} height={'100vh'}>
+        <Stack
+            alignItems={'center'}
+            justifyContent={'center'}
+            height={'100vh'}
+            overflow={'hidden'}
+            position={'relative'}
+        >
+            <LeftGlass />
+            <BottomGlass />
+            <RightGlass />
             <Paper
                 sx={{
                     width: '60vw',
@@ -48,13 +57,12 @@ function Authentication() {
                         Welcome to CI/CD !
                     </Typography>
                     <AllInclusiveIcon sx={{ color: theme.palette.common.white, fontSize: '4rem' }} />
-                    <Button
-                        startIcon={<GitHubIcon sx={{ color: theme.palette.common.white }} />}
-                        defaultText={false}
+                    <SignInWithGithub
+                        startIcon={<GitHubIcon sx={{ color: theme.palette.common.black }} />}
                         onClick={handleSignInWithGithub}
                     >
                         Sign in with Github
-                    </Button>
+                    </SignInWithGithub>
                 </Stack>
             </Paper>
         </Stack>
