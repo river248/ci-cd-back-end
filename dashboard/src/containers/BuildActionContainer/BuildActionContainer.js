@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash'
 
 import BuildAction from '~/components/BuildAction'
 import { processName } from '~/utils/constants'
-import { triggerPipeline } from '~/apis'
+import { triggerPipeline } from '~/apis/pipelineAPI'
 import { useStage } from '~/hooks'
 
 function BuildActionContainer() {

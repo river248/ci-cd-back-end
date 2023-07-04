@@ -1,8 +1,10 @@
 import React, { Fragment, createContext, useEffect, useState } from 'react'
-import { GithubAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
+import { GithubAuthProvider, deleteUser, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
+import { isNil } from 'lodash'
 
 import Authentication from '~/pages/Authentication'
 import firebaseAuth from '~/configs/firebase/auth'
+import { logInWithGithub } from '~/apis/userAPI'
 
 const AuthContext = createContext()
 
@@ -20,7 +22,17 @@ function AuthProvider({ children }) {
 
             const res = await signInWithPopup(firebaseAuth, provider)
             const { user } = res
-            console.log(user)
+
+            const response = await logInWithGithub({
+                _id: user.uid,
+                email: user.email,
+                name: user.displayName,
+                avatar: user.photoURL,
+            })
+
+            if (isNil(response)) {
+                await removeUser(firebaseAuth.currentUser)
+            }
         } catch (error) {
             const exception = { ...error }
             throw new Error(exception.code)
@@ -30,6 +42,15 @@ function AuthProvider({ children }) {
     const signout = async () => {
         try {
             await signOut(firebaseAuth)
+        } catch (error) {
+            const exception = { ...error }
+            throw new Error(exception.code)
+        }
+    }
+
+    const removeUser = async (user) => {
+        try {
+            await deleteUser(user)
         } catch (error) {
             const exception = { ...error }
             throw new Error(exception.code)

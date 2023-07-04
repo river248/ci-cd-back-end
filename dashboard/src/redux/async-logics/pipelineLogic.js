@@ -1,4 +1,4 @@
-import { fetchFullPipeline } from '~/apis'
+import { fetchFullPipeline } from '~/apis/pipelineAPI'
 import { getFullPipeline, loading, updateStageData } from '~/redux/actions/pipelineAction'
 
 export const handleFetchFullPipeline = (repo) => async (dispatch) => {

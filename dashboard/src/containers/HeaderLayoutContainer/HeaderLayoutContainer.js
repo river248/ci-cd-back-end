@@ -9,7 +9,7 @@ function HeaderLayoutContainer() {
     const [popperAnchor, setPopperAnchor] = useState(null)
     const [openPopper, setOpenPopper] = useState(false)
     const [popperPlacement, setPopperPlacement] = useState()
-    const { signout } = useAuth()
+    const { signout, user } = useAuth()
 
     const theme = useTheme()
     const popperMenu = useMemo(
@@ -45,9 +45,7 @@ function HeaderLayoutContainer() {
 
     return (
         <Header
-            avatar={
-                'https://congluan-cdn.congluan.vn/files/content/2022/05/26/doraemon-nobita-va-cuoc-chien-vu-tru-ti-hon-goi-tron-mua-he-trong-man-anh-183307801.jpg'
-            }
+            avatar={user.avatar}
             openPopper={openPopper}
             popperAnchor={popperAnchor}
             popperPlacement={popperPlacement}
