@@ -45,6 +45,7 @@ export const collection = {
     METRIC: 'metrics',
     STAGE: 'stages',
     REPOSITORY: 'repositories',
+    USER: 'users',
 }
 
 export const socketEvent = {

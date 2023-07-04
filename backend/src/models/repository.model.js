@@ -4,10 +4,9 @@ import { getDB } from '~/configs/mongodb'
 import { collection } from '~/utils/constants'
 
 const repositoryCollectionSchema = Joi.object({
-    name: Joi.string().trim().required(),
+    name: Joi.string().trim().min(4).max(50).required(),
     thumbnail: Joi.string()
         .pattern(/^(.+)\/([^/]+)(.jpg|.png|.jpeg)$/i)
-
         .trim()
         .required(),
     members: Joi.array().items(Joi.string().trim().required()).required(),

@@ -6,8 +6,8 @@ import { collection } from '~/utils/constants'
 
 const stageCollectionSchema = Joi.object({
     executionId: Joi.string().trim().required(),
-    name: Joi.string().trim().required(),
-    repository: Joi.string().trim().required(),
+    name: Joi.string().trim().min(4).max(10).required(),
+    repository: Joi.string().trim().min(4).max(50).required(),
     codePipelineBranch: Joi.string().trim().required(),
     commitId: Joi.string().trim().required(),
     status: Joi.string().trim().required(),

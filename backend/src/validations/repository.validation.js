@@ -4,10 +4,10 @@ import { HttpStatusCode } from '~/utils/constants'
 
 const createNew = async (req, res, next) => {
     const condition = Joi.object({
-        name: Joi.string().min(4).max(50).trim().required(),
+        name: Joi.string().trim().min(4).max(50).required(),
         thumbnail: Joi.string()
-            .pattern(/^(.+)\/([^/]+)(.jpg|.png|.jpeg)$/i)
             .trim()
+            .pattern(/^(.+)\/([^/]+)(.jpg|.png|.jpeg)$/i)
             .required(),
         members: Joi.array().items(Joi.string().trim().required()).required(),
         stages: Joi.array().items(Joi.string().valid('build', 'test', 'production').required()).required(),

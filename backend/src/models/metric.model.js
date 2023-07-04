@@ -7,9 +7,9 @@ import { collection, updateAction } from '~/utils/constants'
 
 const metricCollectionSchema = Joi.object({
     executionId: Joi.string().trim().required(),
-    repository: Joi.string().trim().required(),
-    name: Joi.string().trim().required(),
-    stage: Joi.string().trim().required(),
+    repository: Joi.string().trim().min(4).max(50).required(),
+    name: Joi.string().trim().min(4).max(20).required(),
+    stage: Joi.string().trim().min(4).max(10).required(),
     status: Joi.string().trim().required(),
     rank: Joi.number().required().min(1),
     actual: Joi.number().min(0).default(null),
@@ -17,7 +17,7 @@ const metricCollectionSchema = Joi.object({
     appMetrics: Joi.array()
         .items(
             Joi.object({
-                name: Joi.string().trim(),
+                name: Joi.string().trim().min(4).max(20),
                 reportUrl: Joi.string().trim(),
                 actual: Joi.number().min(0),
                 total: Joi.number().min(0),

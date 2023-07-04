@@ -4,8 +4,8 @@ import { HttpStatusCode } from '~/utils/constants'
 
 const triggerPipeline = async (req, res, next) => {
     const condition = Joi.object({
-        repository: Joi.string().min(4).max(50).trim().required(),
-        branchName: Joi.string().min(6).max(50).trim().required(),
+        repository: Joi.string().trim().min(4).max(50).required(),
+        branchName: Joi.string().trim().min(6).max(50).required(),
     })
     try {
         await condition.validateAsync(req.body, { abortEarly: false })
