@@ -1,4 +1,4 @@
-import React, { Fragment, createContext, useEffect, useState } from 'react'
+import React, { Fragment, createContext, useLayoutEffect, useState } from 'react'
 import { GithubAuthProvider, deleteUser, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
 import { isNil } from 'lodash'
 
@@ -57,7 +57,7 @@ function AuthProvider({ children }) {
         }
     }
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         setLoading(true)
         const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, async (currentUser) => {
             if (currentUser) {
