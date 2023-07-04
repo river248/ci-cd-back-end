@@ -3,15 +3,15 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import cors from 'cors'
 import { Octokit } from 'octokit'
-// import { credential } from 'firebase-admin'
-// import { initializeApp } from 'firebase-admin/app'
+import { credential } from 'firebase-admin'
+import { initializeApp } from 'firebase-admin/app'
 
 import { env } from './configs/environment'
 import { connectDB } from './configs/mongodb'
 import { apiV1 } from './routes/v1'
 import SocketServices from './services/socket.service'
 import { corsConfig } from './configs/cors'
-// import { firebaseCredentials } from './config/firebase'
+import { firebaseCredentials } from './configs/firebase'
 
 connectDB()
     .then(() => console.log('Connected successfully to database server!'))
@@ -41,9 +41,9 @@ const bootServer = async () => {
     app.use(express.urlencoded({ extended: true }))
     app.use(cors(corsConfig))
 
-    // initializeApp({
-    //     credential: credential.cert(firebaseCredentials),
-    // })
+    initializeApp({
+        credential: credential.cert(firebaseCredentials),
+    })
 
     app.use('/v1', apiV1)
 
