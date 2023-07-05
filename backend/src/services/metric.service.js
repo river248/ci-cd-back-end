@@ -45,7 +45,44 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
             appMetricData.appMetrics.total = actual
         }
 
-        const res = await update(repository, stage, executionId, metricName, appMetricData, updateAction.PUSH)
+        const [updatedAppMetric, updatedMetric] = await Promise.all([
+            update(repository, stage, executionId, metricName, appMetricData, updateAction.PUSH),
+            calculateMetric(repository, stage, executionId, metricName, appMetricData.appMetrics),
+        ])
+
+        return { ...updatedAppMetric, total: updatedMetric.total, actual: updatedAppMetric.actual }
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
+const calculateMetric = async (repository, stage, executionId, metricName, newAppMetric) => {
+    try {
+        const metrics = await findMetrics(repository, stage, { executionId, name: metricName })
+
+        if (isEmpty(metrics)) {
+            throw new NotFound(
+                `Not found metric ${metricName} with executionId ${executionId} for stage ${stage} at repo ${repository}`,
+            )
+        }
+
+        const { appMetrics } = metrics[0]
+        let actual = newAppMetric.actual
+        let total = newAppMetric.total
+
+        if (!isEmpty(appMetrics)) {
+            appMetrics.forEach((appMetric) => {
+                actual += appMetric.actual
+                total += appMetric.total
+            })
+        }
+
+        const res = await update(repository, stage, executionId, metricName, { actual, total }, updateAction.SET)
+
         return res
     } catch (error) {
         if (error instanceof NotFound) {

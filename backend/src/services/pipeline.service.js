@@ -37,8 +37,6 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
     try {
         const { jobStatus, startDateTime, endDateTime } = data
         const metricName = toTitleCase(metricKey.replaceAll('_', ' '))
-        let actual = 0
-        let total = 0
 
         const metrics = await MetricService.findMetrics(repository, stage, { executionId, name: metricName })
         if (isEmpty(metrics)) {
@@ -47,18 +45,7 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
             )
         }
 
-        const { appMetrics } = metrics[0]
-
-        if (isEmpty(appMetrics)) {
-            actual = null
-            total = null
-        } else {
-            appMetrics.forEach((appMetric) => {
-                actual += appMetric.actual
-                total += appMetric.total
-            })
-        }
-
+        const { total, actual } = metrics[0]
         const isFailed = isNil(total) || isNil(actual) || actual !== total || jobStatus === workflowStatus.FAILURE
         const status = isFailed ? workflowStatus.FAILURE : workflowStatus.SUCCESS
 
@@ -67,7 +54,7 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
             stage,
             executionId,
             metricName,
-            { actual, total, status, startedAt: new Date(startDateTime), completedAt: new Date(endDateTime) },
+            { status, startedAt: new Date(startDateTime), completedAt: new Date(endDateTime) },
             updateAction.SET,
         )
 
