@@ -73,7 +73,6 @@ jobs:
                   projectBaseDir: ./dashboard/src
                   args: >
                       -Dsonar.projectKey=ci-cd-github-actions-dashboard
-                      -Dsonar.branch.name=master
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
