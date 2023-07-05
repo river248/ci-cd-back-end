@@ -50,7 +50,7 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
             calculateMetric(repository, stage, executionId, metricName, appMetricData.appMetrics),
         ])
 
-        return { ...updatedAppMetric, total: updatedMetric.total, actual: updatedAppMetric.actual }
+        return { ...updatedAppMetric, total: updatedMetric.total, actual: updatedMetric.actual }
     } catch (error) {
         if (error instanceof NotFound) {
             throw new NotFound(error.message)
