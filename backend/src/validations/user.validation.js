@@ -26,6 +26,28 @@ const signInWithGithub = async (req, res, next) => {
     }
 }
 
+const update = async (req, res, next) => {
+    const condition = Joi.object({
+        userId: Joi.string().trim().required(),
+        email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com'] } }),
+        name: Joi.string().trim().min(3).max(50),
+        avatar: Joi.string().uri({
+            scheme: [/https?/],
+        }),
+        role: Joi.string().valid('developer', 'lead-developer', 'admin'),
+    })
+
+    try {
+        await condition.validateAsync(req.body, { abortEarly: false })
+        next()
+    } catch (error) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({
+            error: error.message,
+        })
+    }
+}
+
 export const UserValidation = {
     signInWithGithub,
+    update,
 }

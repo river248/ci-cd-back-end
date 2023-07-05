@@ -15,10 +15,21 @@ const signInWithGithub = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const { user_id } = req.firebaseDecode
-        const result = await UserService.update(user_id, req.body)
+        const result = await UserService.update(req.body)
 
         res.status(HttpStatusCode.CREATED).json(result)
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            error: error.message,
+        })
+    }
+}
+
+const getAllUsers = async (_req, res) => {
+    try {
+        const result = await UserService.getAllUsers()
+
+        res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
             error: error.message,
@@ -29,4 +40,5 @@ const update = async (req, res) => {
 export const UserController = {
     signInWithGithub,
     update,
+    getAllUsers,
 }

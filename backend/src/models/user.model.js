@@ -8,7 +8,7 @@ const userCollectionSchema = Joi.object({
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com'] } })
         .required(),
-    name: Joi.string().required().min(3).max(50).trim(),
+    name: Joi.string().trim().min(3).max(50).required(),
     avatar: Joi.string()
         .uri({
             scheme: [/https?/],
@@ -56,7 +56,19 @@ const update = async (id, data) => {
 
 const getUser = async (id) => {
     try {
-        return await getDB().collection(collection.USER).findOne({ _id: id })
+        const result = await getDB().collection(collection.USER).findOne({ _id: id })
+
+        return result
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+const getAllUsers = async () => {
+    try {
+        const result = await getDB().collection(collection.USER).find({}).toArray()
+
+        return result
     } catch (error) {
         throw new Error(error)
     }
@@ -66,4 +78,5 @@ export const UserModel = {
     createNew,
     update,
     getUser,
+    getAllUsers,
 }

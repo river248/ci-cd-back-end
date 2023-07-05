@@ -19,12 +19,16 @@ const signInWithGithub = async (data) => {
     }
 }
 
-const update = async (userId, data) => {
+const update = async (data) => {
     try {
+        const { userId } = data
+
         const updatedData = {
             ...data,
             updatedAt: Date.now(),
         }
+
+        delete updatedData.userId
 
         return await UserModel.update(userId, updatedData)
     } catch (error) {
@@ -49,8 +53,19 @@ const getUser = async (userId) => {
     }
 }
 
+const getAllUsers = async () => {
+    try {
+        const result = await UserModel.getAllUsers()
+
+        return result
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
 export const UserService = {
     signInWithGithub,
     update,
     getUser,
+    getAllUsers,
 }
