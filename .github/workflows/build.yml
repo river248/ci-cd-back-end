@@ -73,7 +73,6 @@ jobs:
                   projectBaseDir: ./dashboard/src
                   args: >
                       -Dsonar.projectKey=ci-cd-github-actions-dashboard
-                      -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
@@ -82,15 +81,15 @@ jobs:
                       -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2
                       -Dsonar.pli.marginRight=0
                       -Dsonar.organization=river248
-            - name: Get sonar report dashboard
-              id: sonar_report_dashboard
-              run: |
-                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-dashboard&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
-            - name: Push metric
-              run: |
-                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"dashboard","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.branch-names.outputs.ref_branch }}&id=ci-cd-github-actions-dashboard","data":${{ toJSON(steps.sonar_report_dashboard.outputs.report) }}}' \
-                    -H "Content-Type: application/json" \
-                    -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
+            # - name: Get sonar report dashboard
+            #   id: sonar_report_dashboard
+            #   run: |
+            #       echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-dashboard&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
+            # - name: Push metric
+            #   run: |
+            #       curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"dashboard","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.branch-names.outputs.ref_branch }}&id=ci-cd-github-actions-dashboard","data":${{ toJSON(steps.sonar_report_dashboard.outputs.report) }}}' \
+            #         -H "Content-Type: application/json" \
+            #         -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
     unit_tests:
         needs: start_stage
         runs-on: ubuntu-latest
