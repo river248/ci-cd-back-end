@@ -16,10 +16,6 @@ function MetricContainer() {
 
     const theme = useTheme()
 
-    if (isEmpty(metrics) || isNil(metrics)) {
-        return null
-    }
-
     const { stage, version } = latestBuild
 
     const boxStyles = useMemo(
@@ -64,6 +60,10 @@ function MetricContainer() {
     const handleCloseAppMetric = useCallback(() => {
         setOpen(false)
     }, [])
+
+    if (isEmpty(metrics) || isNil(metrics)) {
+        return null
+    }
 
     return (
         <Fragment>

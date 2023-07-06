@@ -18,7 +18,7 @@ Button.propTypes = {
     children: PropTypes.string.isRequired,
     uppercase: PropTypes.bool,
     italic: PropTypes.bool,
-    italic: PropTypes.bool,
+    defaultText: PropTypes.bool,
 }
 
 export default React.memo(Button)

@@ -11,12 +11,8 @@ import { useStage } from '~/hooks'
 function LatestBuildContainer() {
     const { latestBuild } = useStage()
     const navigate = useNavigate()
+
     const { repository, codePipelineBranch, version, commitId, startDateTime, endDateTime } = latestBuild
-
-    if (isEmpty(latestBuild)) {
-        return null
-    }
-
     const BRANCH_MAX_LENGTH = 21
     const BRANCH = 'Branch'
     const VERSION = 'Version'
@@ -58,6 +54,10 @@ function LatestBuildContainer() {
         },
         [repository, commitId],
     )
+
+    if (isEmpty(latestBuild)) {
+        return null
+    }
 
     return convertToMetadata().map((item) => (
         <LatestBuild

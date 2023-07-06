@@ -9,14 +9,10 @@ import { useStage } from '~/hooks'
 function BuildActionContainer() {
     const { latestBuild } = useStage()
 
-    if (isEmpty(latestBuild)) {
-        return null
-    }
-
-    const { repository, status } = latestBuild
-
     const [branch, setBranch] = useState('')
     const [loading, setLoading] = useState(false)
+
+    const { repository, status } = latestBuild
 
     const handleSetBranch = useCallback((event) => {
         setBranch(event.target.value)
@@ -37,6 +33,10 @@ function BuildActionContainer() {
     const handleStop = useCallback(() => {
         console.log('stop build')
     }, [branch, repository])
+
+    if (isEmpty(latestBuild)) {
+        return null
+    }
 
     return (
         <BuildAction
