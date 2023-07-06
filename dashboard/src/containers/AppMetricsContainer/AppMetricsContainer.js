@@ -47,7 +47,7 @@ function AppMetricsContainer({ appMetrics }) {
 
     return (
         <Box>
-            <Stack direction={'row'} spacing={1} marginBottom={1}>
+            <Stack direction={'row'} spacing={1}>
                 {header.map((item) => (
                     <Typography
                         key={item.title}
@@ -59,7 +59,7 @@ function AppMetricsContainer({ appMetrics }) {
                 ))}
             </Stack>
             {listAppMetrics.map((appMetric, index) => (
-                <Stack key={index} direction={'row'} alignItems={'center'} spacing={1}>
+                <Stack key={index} direction={'row'} alignItems={'center'} spacing={1} marginTop={1}>
                     {appMetric.map((item, idx) => (
                         <Fragment key={idx}>
                             {idx !== appMetric.length - 1 ? (
