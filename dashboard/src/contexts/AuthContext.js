@@ -1,10 +1,12 @@
 import React, { Fragment, createContext, useLayoutEffect, useState, useCallback, useMemo } from 'react'
 import { GithubAuthProvider, deleteUser, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth'
 import { isNil } from 'lodash'
+import { toast } from 'react-toastify'
 
 import Authentication from '~/pages/Authentication'
 import firebaseAuth from '~/configs/firebase/auth'
 import { logInWithGithub } from '~/apis/userAPI'
+import { errorCode } from '~/utils/constants'
 
 const AuthContext = createContext()
 
@@ -32,11 +34,15 @@ function AuthProvider({ children }) {
                 })
 
                 if (isNil(response)) {
-                    await removeUser(firebaseAuth.currentUser)
+                    removeUser(firebaseAuth.currentUser)
                 }
             } catch (error) {
                 const exception = { ...error }
-                throw new Error(exception.code)
+                if (exception.code === 'auth/popup-closed-by-user') {
+                    console.log(errorCode[exception.code])
+                } else {
+                    toast.error(errorCode[exception.code])
+                }
             }
         }
 
@@ -49,7 +55,7 @@ function AuthProvider({ children }) {
                 await signOut(firebaseAuth)
             } catch (error) {
                 const exception = { ...error }
-                throw new Error(exception.code)
+                toast.error(errorCode[exception.code])
             }
         }
 
@@ -62,7 +68,7 @@ function AuthProvider({ children }) {
                 await deleteUser(user)
             } catch (error) {
                 const exception = { ...error }
-                throw new Error(exception.code)
+                toast.error(errorCode[exception.code])
             }
         }
 

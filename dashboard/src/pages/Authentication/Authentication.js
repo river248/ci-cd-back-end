@@ -4,26 +4,14 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import GitHubIcon from '@mui/icons-material/GitHub'
-import { toast } from 'react-toastify'
 import { useTheme } from '@mui/material/styles'
 
 import { BottomGlass, LeftGlass, RightGlass, SignInWithGithub } from './Authentication.styles'
 import { useAuth } from '~/hooks'
-import { errorCode } from '~/utils/constants'
 
 function Authentication() {
     const { signInWithGithub } = useAuth()
     const theme = useTheme()
-
-    const handleSignInWithGithub = () => {
-        signInWithGithub().catch((error) => {
-            if (error.message === 'auth/popup-closed-by-user') {
-                console.log(errorCode[error.message])
-            } else {
-                toast.error(errorCode[error.message])
-            }
-        })
-    }
 
     return (
         <Stack
@@ -59,7 +47,7 @@ function Authentication() {
                     <AllInclusiveIcon sx={{ color: theme.palette.common.white, fontSize: '4rem' }} />
                     <SignInWithGithub
                         startIcon={<GitHubIcon sx={{ color: theme.palette.common.black }} />}
-                        onClick={handleSignInWithGithub}
+                        onClick={signInWithGithub}
                     >
                         Sign in with Github
                     </SignInWithGithub>
