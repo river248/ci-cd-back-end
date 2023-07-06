@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import Card from '@mui/material/Card'
 import CardMedia from '@mui/material/CardMedia'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -11,12 +12,15 @@ import Skeleton from '@mui/material/Skeleton'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import { useNavigate } from 'react-router-dom'
+import { useTheme } from '@mui/material/styles'
 
-import { CardContent, CardActions } from './Repository.styles'
+import { CardContent, CardActions, CardOverflow, AspectRatio } from './Repository.styles'
 import routes from '~/configs/routes'
+import Button from '~/components/Button'
 
-function Repository({ name, imageUrl, loading }) {
+function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
     const navigate = useNavigate()
+    const theme = useTheme()
 
     const handleGoToPipeline = (event) => {
         event.preventDefault()
@@ -38,24 +42,48 @@ function Repository({ name, imageUrl, loading }) {
 
     return (
         <Card>
-            <CardMedia sx={{ height: 140 }} image={imageUrl} title={name} />
-            <CardContent>
-                <Tooltip arrow title={name}>
-                    <Typography variant={'h5'} component={'div'} fontSize={20} noWrap>
-                        {name}
-                    </Typography>
-                </Tooltip>
+            {newItem ? (
+                <CardOverflow>
+                    <AspectRatio alignItems={'center'} justifyContent={'center'}>
+                        <AllInclusiveIcon sx={{ color: theme.palette.secondary.dark, fontSize: '4rem' }} />
+                    </AspectRatio>
+                </CardOverflow>
+            ) : (
+                <CardMedia sx={{ height: 140 }} image={imageUrl} title={name} />
+            )}
+            <CardContent sx={{ textAlign: newItem ? 'center' : 'left' }}>
+                {newItem ? (
+                    <Button
+                        defaultText={false}
+                        uppercase={false}
+                        sx={{
+                            backgroundColor: theme.palette.secondary.dark,
+                            ':hover': { backgroundColor: theme.palette.secondary.dark },
+                        }}
+                        onClick={onAddNew}
+                    >
+                        Add new repository
+                    </Button>
+                ) : (
+                    <Tooltip arrow title={name}>
+                        <Typography variant={'h5'} component={'div'} fontSize={20} noWrap>
+                            {name}
+                        </Typography>
+                    </Tooltip>
+                )}
             </CardContent>
-            <CardActions>
-                <Link href={`${routes.pipeline}?repo=${name}`} fontSize={15} onClick={handleGoToPipeline}>
-                    Go to pipeline
-                </Link>
-                <Tooltip arrow title={'Delete'}>
-                    <IconButton>
-                        <DeleteIcon sx={{ color: 'red' }} />
-                    </IconButton>
-                </Tooltip>
-            </CardActions>
+            {!newItem && (
+                <CardActions>
+                    <Link href={`${routes.pipeline}?repo=${name}`} fontSize={15} onClick={handleGoToPipeline}>
+                        Go to pipeline
+                    </Link>
+                    <Tooltip arrow title={'Delete'}>
+                        <IconButton>
+                            <DeleteIcon sx={{ color: 'red' }} />
+                        </IconButton>
+                    </Tooltip>
+                </CardActions>
+            )}
         </Card>
     )
 }
@@ -64,6 +92,8 @@ Repository.propTypes = {
     name: PropTypes.string.isRequired,
     imageUrl: PropTypes.string,
     loading: PropTypes.bool,
+    newItem: PropTypes.bool,
+    onAddNew: PropTypes.func,
 }
 
 export default React.memo(Repository)

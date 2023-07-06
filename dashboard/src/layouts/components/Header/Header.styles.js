@@ -1,8 +1,8 @@
 import { styled } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
-import TextField from '@mui/material/TextField'
 
 import Button from '~/components/Button'
+import Input from '~/components/Input'
 
 export const Wrapper = styled(Paper)(({ theme }) => ({
     borderRadius: 0,
@@ -15,18 +15,8 @@ export const Wrapper = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.secondary.dark,
 }))
 
-export const Search = styled(TextField)(({ theme }) => ({
-    borderRadius: 4,
-    background: theme.palette.common.white,
+export const Search = styled(Input)(({ theme }) => ({
     width: 250,
-
-    ' .MuiInputBase-input': {
-        color: theme.palette.common.black,
-    },
-
-    ' .MuiOutlinedInput-notchedOutline': {
-        border: 0,
-    },
 
     [theme.breakpoints.down('sm')]: {
         width: 200,

@@ -1,15 +1,18 @@
-import React, { Fragment, useEffect } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
+import Modal from '@mui/material/Modal'
 import { connect } from 'react-redux'
 import { isEmpty, isNil } from 'lodash'
 
 import Repository from '~/components/Repository'
 import Title from '~/components/Title'
 import { handleFetchAllRepositories } from '~/redux/async-logics/repositoryLogic'
+import AddNewRepositoryContainer from '~/containers/AddNewRepositoryContainer'
 
 function Dashboard({ loading, repositories, getAllRepositories }) {
     const fakeRepositories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+    const [open, setOpen] = useState(false)
 
     useEffect(() => {
         getAllRepositories()
@@ -41,9 +44,17 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
                                     />
                                 </Grid>
                             ))}
+                        <Grid item xl={2} lg={2.4} md={3} sm={4} xs={6}>
+                            <Repository name={'Add new repository'} newItem onAddNew={() => setOpen(true)} />
+                        </Grid>
                     </Fragment>
                 )}
             </Grid>
+            <Modal open={open} onClose={() => setOpen(false)}>
+                <Box>
+                    <AddNewRepositoryContainer />
+                </Box>
+            </Modal>
         </Box>
     )
 }

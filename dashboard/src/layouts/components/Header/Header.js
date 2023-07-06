@@ -32,7 +32,7 @@ function Header({ avatar, popperPlacement, popperAnchor, openPopper, popperMenu 
                         CI/CD
                     </Typography>
                 </Stack>
-                <Search size={'small'} placeholder={'Search...'} />
+                <Search placeholder={'Search...'} />
                 <ClickAwayListener onClickAway={() => onTogglePopper('bottom-end', null)}>
                     <Box>
                         <Avatar
