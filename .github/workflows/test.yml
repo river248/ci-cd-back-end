@@ -36,15 +36,15 @@ jobs:
             - name: Get commit id
               id: commit_id
               run: |
-                  echo "$GITHUB_SHA"
-            # - name: Trigger a deployment
-            #   id: backend_deployment
-            #   run: |
-            #       echo deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET ${{ secrets.RENDER_DEPLOYMENT_URL }}&ref=${{ GITHUB_SHA }}) >> "$GITHUB_OUTPUT"
-            # - name: Push metric
-            #   run: |
-            #       echo "deploymentId: ${{ fromJSON(steps.backend_deployment.outputs.deploymentId).deploy.id }}"
-            #       sleep 120s
+                  echo "value=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+            - name: Trigger a deployment
+              id: backend_deployment
+              run: |
+                  echo deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET ${{ secrets.RENDER_DEPLOYMENT_URL }}&ref=${{ steps.commit_id.outputs.value }}) >> "$GITHUB_OUTPUT"
+            - name: Push metric
+              run: |
+                  echo "deploymentId: ${{ fromJSON(steps.backend_deployment.outputs.deploymentId).deploy.id }}"
+                  sleep 120s
     finish_stage:
         if: ${{ always() }}
         needs: deployment_check
