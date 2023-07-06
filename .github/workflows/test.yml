@@ -33,14 +33,18 @@ jobs:
             - name: Get branch names.
               id: branch-names
               uses: tj-actions/branch-names@v7
-            - name: Trigger a deployment
-              id: backend_deployment
+            - name: Get commit id
+              id: commit_id
               run: |
-                  echo deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET ${{ secrets.RENDER_DEPLOYMENT_URL }}&ref=${{ github.event.pull_request.head.sha }}) >> "$GITHUB_OUTPUT"
-            - name: Push metric
-              run: |
-                  echo "deploymentId: ${{ fromJSON(steps.backend_deployment.outputs.deploymentId).deploy.id }}"
-                  sleep 150s
+                  echo "$GITHUB_SHA"
+            # - name: Trigger a deployment
+            #   id: backend_deployment
+            #   run: |
+            #       echo deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET ${{ secrets.RENDER_DEPLOYMENT_URL }}&ref=${{ GITHUB_SHA }}) >> "$GITHUB_OUTPUT"
+            # - name: Push metric
+            #   run: |
+            #       echo "deploymentId: ${{ fromJSON(steps.backend_deployment.outputs.deploymentId).deploy.id }}"
+            #       sleep 120s
     finish_stage:
         if: ${{ always() }}
         needs: deployment_check
