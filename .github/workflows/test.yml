@@ -36,7 +36,7 @@ jobs:
             - name: Trigger a deployment
               id: backend_deployment
               run: |
-                  echo deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET ${{ secrets.RENDER_DEPLOYMENT_URL }}&ref=${ GITHUB_SHA }) >> "$GITHUB_OUTPUT"
+                  echo deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET ${{ secrets.RENDER_DEPLOYMENT_URL }}&ref="$GITHUB_SHA" }) >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
                   echo "deploymentId: ${{ fromJSON(steps.backend_deployment.outputs.deploymentId).deploy.id }}"
