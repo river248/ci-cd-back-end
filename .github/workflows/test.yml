@@ -33,9 +33,12 @@ jobs:
             - name: Get branch names.
               id: branch-names
               uses: tj-actions/branch-names@v7
-            - name: Generate build folder...
-              working-directory: ./backend
-              run: npm run build --if-present
+            - name: Trigger a deployment
+              id: backend_deployment
+              run: |
+                  curl -X GET ${{ secrets.RENDER_DEPLOYMENT_URL }}&ref=${{ GITHUB_SHA }} \
+                    -H "Content-Type: application/json" \
+                    -H "Authorization: ${{ secrets.RENDER_TOKEN }}"
     finish_stage:
         if: ${{ always() }}
         needs: deployment_check
@@ -46,4 +49,3 @@ jobs:
               uses: tj-actions/branch-names@v7
             - name: Send greeting
               run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm fisnishing test stage"
-    
