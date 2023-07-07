@@ -46,7 +46,7 @@ jobs:
             - name: Trigger a deployment
               id: backend_deployment
               run: |
-                  echo "deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET https://api.render.com/deploy/${{ secrets.RENDER_SERVER_TEST_ID }}?key=${{ secrets.RENDER_SERVER_TEST_KEY }}&ref=${{ github.sha }})" >> "$GITHUB_OUTPUT"
+                  echo "deploymentId=$(curl -X GET https://api.render.com/deploy/${{ secrets.RENDER_SERVER_TEST_ID }}?key=${{ secrets.RENDER_SERVER_TEST_KEY }}&ref=${{ github.sha }})" >> "$GITHUB_OUTPUT"
             - name: Get deployment status
               id: deployment_status
               run: |
