@@ -46,7 +46,6 @@ jobs:
                   projectBaseDir: ./backend/src
                   args: >
                       -Dsonar.projectKey=ci-cd-github-actions-backend
-                      -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
