@@ -21,23 +21,28 @@ jobs:
     start_stage:
         runs-on: ubuntu-latest
         steps:
-            - name: Get branch names.
-              id: branch-names
-              run: |
-                  echo ref_branch=$("${{ github.ref_name }}" | cut -d"@" -f1) >> "$GITHUB_OUTPUT"
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
             - name: Send greeting
-              run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm in build stage"
+              run: echo "Hello ${{ steps.split.outputs._0 }}, I'm in build stage"
     code_quality:
         needs: start_stage
         runs-on: ubuntu-latest
         steps:
-            - name: Get branch names.
-              id: branch-names
-              uses: tj-actions/branch-names@v7
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
             - name: Checkout branch
               uses: actions/checkout@v3
               with:
-                  ref: ${{ steps.branch-names.outputs.ref_branch }}
+                  ref: ${{ steps.split.outputs._0 }}
             - name: Sonar scanner backend
               uses: SonarSource/sonarcloud-github-action@master
               env:
@@ -47,7 +52,7 @@ jobs:
                   projectBaseDir: ./backend/src
                   args: >
                       -Dsonar.projectKey=ci-cd-github-actions-backend
-                      -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
+                      -Dsonar.branch.name=${{ steps.split.outputs._0 }}
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
@@ -59,10 +64,10 @@ jobs:
             - name: Get sonar report backend
               id: sonar_report_backend
               run: |
-                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
+                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.split.outputs._0 }})" >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
-                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.branch-names.outputs.ref_branch }}&id=ci-cd-github-actions-backend","data":${{ toJSON(steps.sonar_report_backend.outputs.report) }}}' \
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.split.outputs._0 }}&id=ci-cd-github-actions-backend","data":${{ toJSON(steps.sonar_report_backend.outputs.report) }}}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
             - name: Sonar scanner dashboard
@@ -74,7 +79,7 @@ jobs:
                   projectBaseDir: ./dashboard/src
                   args: >
                       -Dsonar.projectKey=ci-cd-github-actions-dashboard
-                      -Dsonar.branch.name=${{ steps.branch-names.outputs.ref_branch }}
+                      -Dsonar.branch.name=${{ steps.split.outputs._0 }}
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
@@ -86,23 +91,26 @@ jobs:
             - name: Get sonar report dashboard
               id: sonar_report_dashboard
               run: |
-                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-dashboard&branch=${{ steps.branch-names.outputs.ref_branch }})" >> "$GITHUB_OUTPUT"
+                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-dashboard&branch=${{ steps.split.outputs._0 }})" >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
-                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"dashboard","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.branch-names.outputs.ref_branch }}&id=ci-cd-github-actions-dashboard","data":${{ toJSON(steps.sonar_report_dashboard.outputs.report) }}}' \
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"dashboard","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.split.outputs._0 }}&id=ci-cd-github-actions-dashboard","data":${{ toJSON(steps.sonar_report_dashboard.outputs.report) }}}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
     unit_tests:
         needs: start_stage
         runs-on: ubuntu-latest
         steps:
-            - name: Get branch names.
-              id: branch-names
-              uses: tj-actions/branch-names@v7
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
             - name: Checkout branch
               uses: actions/checkout@v3
               with:
-                  ref: ${{ steps.branch-names.outputs.ref_branch }}
+                  ref: ${{ steps.split.outputs._0 }}
             - name: Use Node.js 18
               uses: actions/setup-node@v3
               with:
@@ -128,13 +136,16 @@ jobs:
         needs: unit_tests
         runs-on: ubuntu-latest
         steps:
-            - name: Get branch names.
-              id: branch-names
-              uses: tj-actions/branch-names@v7
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
             - name: Checkout branch
               uses: actions/checkout@v3
               with:
-                  ref: ${{ steps.branch-names.outputs.ref_branch }}
+                  ref: ${{ steps.split.outputs._0 }}
             - name: Use Node.js 18
               uses: actions/setup-node@v3
               with:
@@ -149,19 +160,22 @@ jobs:
         needs: [code_quality, unit_tests, unit_test_coverage]
         runs-on: ubuntu-latest
         steps:
-            - name: Get branch names.
-              id: branch-names
-              uses: tj-actions/branch-names@v7
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
             - name: Checkout branch
               uses: actions/checkout@v3
               with:
-                  ref: ${{ steps.branch-names.outputs.ref_branch }}
-            - name: Trigger Test
-              run: |
-                  curl -L \
-                    -X POST \
-                    -H "Accept: application/vnd.github+json" \
-                    -H "Authorization: ${{ secrets.BEARER_TOKEN }}" \
-                    -H "X-GitHub-Api-Version: 2022-11-28" \
-                    https://api.github.com/repos/river248/ci-cd-github-actions/actions/workflows/test.yml/dispatches \
-                    -d '{"ref":"${{ steps.branch-names.outputs.ref_branch }}","inputs":{"name":"Test"}}'
+                  ref: ${{ steps.split.outputs._0 }}
+            # - name: Trigger Test
+            #   run: |
+            #       curl -L \
+            #         -X POST \
+            #         -H "Accept: application/vnd.github+json" \
+            #         -H "Authorization: ${{ secrets.BEARER_TOKEN }}" \
+            #         -H "X-GitHub-Api-Version: 2022-11-28" \
+            #         https://api.github.com/repos/river248/ci-cd-github-actions/actions/workflows/test.yml/dispatches \
+            #         -d '{"ref":"${{ steps.split.outputs._0 }}","inputs":{"name":"Test"}}'
