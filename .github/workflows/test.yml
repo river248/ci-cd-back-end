@@ -21,26 +21,32 @@ jobs:
     start_stage:
         runs-on: ubuntu-latest
         steps:
-            - name: Get branch names.
-              id: branch-names
-              uses: tj-actions/branch-names@v7
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
             - name: Send greeting
-              run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm in test stage"
+              run: echo "Hello ${{ steps.split.outputs._0 }}, I'm in test stage"
     deployment_check:
         needs: start_stage
         runs-on: ubuntu-latest
         steps:
-            - name: Get branch names.
-              id: branch-names
-              uses: tj-actions/branch-names@v7
-            - name: Get commit id
-              id: commit_id
-              run: |
-                  echo "value=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
+            - name: Checkout branch
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ steps.split.outputs._0 }}
             - name: Trigger a deployment
               id: backend_deployment
               run: |
-                  echo deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET ${{ secrets.RENDER_DEPLOYMENT_TEST_URL }}&ref=${{ steps.commit_id.outputs.value }}) >> "$GITHUB_OUTPUT"
+                  echo deploymentId=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET ${{ secrets.RENDER_DEPLOYMENT_TEST_URL }}&ref=${{ github.sha }}) >> "$GITHUB_OUTPUT"
             - name: Get deployment status
               id: deployment_status
               run: |
@@ -57,8 +63,11 @@ jobs:
         needs: deployment_check
         runs-on: ubuntu-latest
         steps:
-            - name: Get branch names.
-              id: branch-names
-              uses: tj-actions/branch-names@v7
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
             - name: Send greeting
-              run: echo "Hello ${{ steps.branch-names.outputs.ref_branch }}, I'm fisnishing test stage"
+              run: echo "Hello ${{ steps.split.outputs._0 }}, I'm fisnishing test stage"
