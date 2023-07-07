@@ -1,5 +1,4 @@
 import InternalServer from '~/errors/internalServer.error'
-import NotFound from '~/errors/notfound.error'
 import { RepositoryModel } from '~/models/repository.model'
 import { githubAPI } from '~/utils/constants'
 
