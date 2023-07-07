@@ -83,8 +83,10 @@ const calculateMetric = async (repository, stage, executionId, metricName, newAp
 
         if (!isEmpty(appMetrics)) {
             appMetrics.forEach((appMetric) => {
-                actual += appMetric.actual
-                total += appMetric.total
+                if (appMetric.name !== newAppMetric.name) {
+                    actual += appMetric.actual
+                    total += appMetric.total
+                }
             })
         }
 
