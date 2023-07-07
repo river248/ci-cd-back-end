@@ -12,6 +12,8 @@ export const githubAPI = {
     HEADERS: {
         'X-GitHub-Api-Version': '2022-11-28',
     },
+    GET_COMMIT: 'GET /repos/{owner}/{repo}/commits/{ref}',
+    CREATE_TAG: 'POST /repos/{owner}/{repo}/git/refs',
     GET_BRANCHES_ROUTE: 'GET /repos/{owner}/{repo}/branches',
     WORKFLOW_DISPATCH_ROUTE: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
 }
