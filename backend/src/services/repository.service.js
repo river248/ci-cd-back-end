@@ -1,4 +1,3 @@
-import { env } from '~/configs/environment'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { RepositoryModel } from '~/models/repository.model'
