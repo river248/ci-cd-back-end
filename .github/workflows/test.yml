@@ -48,7 +48,7 @@ jobs:
                   echo report=$(curl -H "Authorization: ${{ secrets.RENDER_TOKEN }}" -X GET https://api.render.com/v1/services/${{ secrets.RENDER_SERVER_TEST_ID }}/deploys/${{ fromJSON(steps.backend_deployment.outputs.deploymentId).deploy.id }}) >> "$GITHUB_OUTPUT"
             - name: Push metric backend
               run: |
-                  curl -d '{"repository":"ci-cd-github-actions","stage":"test","executionId":"${{ github.run_id }}","metricName":"Deployment Check","appMetricName":"backend","reportUrl":"https://dashboard.render.com/web/${{ secrets.RENDER_DEPLOYMENT_TEST_URL }}/events","data":${{ toJSON(steps.deployment_status.outputs.report) }}}' \
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"test","executionId":"${{ github.run_id }}","metricName":"Deployment Check","appMetricName":"backend","reportUrl":"https://dashboard.render.com/web/${{ secrets.RENDER_SERVER_TEST_ID }}/events","data":${{ toJSON(steps.deployment_status.outputs.report) }}}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
 
