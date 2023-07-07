@@ -8,28 +8,27 @@ import { MetricService } from './metric.service'
 import { RepositoryModel } from '~/models/repository.model'
 import { StageService } from './stage.services'
 import { toTitleCase } from '~/utils/helpers'
-import { RepositoryService } from './repository.service'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
 
-const generateVersion = async (repository) => {
-    const DOT = '.'
-    const BUILD = 'build'
-    const FIRST_VERION = '0.0.1'
-    const ELEMENT_TO_GET_VERSION = 2
-
+const validateBranch = async (repo, branchName) => {
     try {
-        const stages = await StageService.findStages(repository, BUILD, {}, 1)
+        const res = await _octokit.request(githubAPI.GET_BRANCHES_ROUTE, {
+            owner: env.GITHUB_OWNER,
+            repo,
+            headers: githubAPI.HEADERS,
+        })
 
-        if (isEmpty(stages)) {
-            return FIRST_VERION
+        const branches = res.data.map((branch) => branch.name)
+
+        if (!branches.includes(branchName)) {
+            throw new NotFound(`Not found branch '${branchName}' in repo '${repo}'`)
         }
-
-        const stageData = stages[0]
-
-        return `0.0.${stageData.version.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
     } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
         throw new InternalServer(error.message)
     }
 }
@@ -75,14 +74,12 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
 
 const triggerPipeline = async (repo, branchName) => {
     try {
-        const validatedBranch = await RepositoryService.validateBranch(repo, branchName)
-        const version = await generateVersion(repo)
-        const tagName = await RepositoryService.createTag(repo, validatedBranch, version)
+        await validateBranch(repo, branchName)
         await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
             owner: env.GITHUB_OWNER,
             repo,
             workflow_id: 'build.yml',
-            ref: tagName,
+            ref: branchName,
             inputs: {
                 name: 'Build',
             },
