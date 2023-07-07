@@ -45,6 +45,13 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
             appMetricData.appMetrics.total = actual
         }
 
+        if (metricName === 'Deployment Check') {
+            const { status } = dataFromJSON
+
+            appMetricData.appMetrics.actual = status === 'live' ? 1 : 0
+            appMetricData.appMetrics.total = 1
+        }
+
         const [updatedAppMetric, updatedMetric] = await Promise.all([
             update(repository, stage, executionId, metricName, appMetricData, updateAction.PUSH),
             calculateMetric(repository, stage, executionId, metricName, appMetricData.appMetrics),
