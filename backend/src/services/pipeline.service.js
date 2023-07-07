@@ -1,9 +1,8 @@
 import { isEmpty, isNil } from 'lodash'
 
-import { env } from '~/configs/environment'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
-import { githubAPI, updateAction, workflowStatus } from '~/utils/constants'
+import { updateAction, workflowStatus } from '~/utils/constants'
 import { MetricService } from './metric.service'
 import { RepositoryModel } from '~/models/repository.model'
 import { StageService } from './stage.services'
@@ -54,12 +53,17 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
 
 const triggerPipeline = async (repo, branchName) => {
     try {
-        const validatedBranch = await RepositoryService.validateBranch(repo, branchName)
+        const [validatedBranch, version] = await Promise.all([
+            RepositoryService.validateBranch(repo, branchName),
+            generateVersion(repo),
+        ])
+        const tagName = await RepositoryService.createTag(repo, validatedBranch, version)
+
         await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
             owner: env.GITHUB_OWNER,
             repo,
             workflow_id: 'build.yml',
-            ref: validatedBranch,
+            ref: tagName,
             inputs: {
                 name: 'Build',
             },
@@ -74,7 +78,7 @@ const triggerPipeline = async (repo, branchName) => {
     }
 }
 
-const generateVersion = async (repository, stage) => {
+const generateVersion = async (repository) => {
     const DOT = '.'
     const BUILD = 'build'
     const FIRST_VERION = '0.0.1'
@@ -89,11 +93,7 @@ const generateVersion = async (repository, stage) => {
 
         const stageData = stages[0]
 
-        if (stage === BUILD) {
-            return `0.0.${stageData.version.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
-        }
-
-        return stageData.version
+        return `0.0.${stageData.version.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
     } catch (error) {
         throw new InternalServer(error.message)
     }
@@ -107,7 +107,7 @@ const handlePipelineData = async (payload) => {
         const jobName = workflow_job.name
         const jobStatus = workflow_job.conclusion
         const pipelineStatus = workflow_job.status
-        const codePipelineBranch = workflow_job.head_branch
+        const headBranch = workflow_job.head_branch
         const commitId = workflow_job.head_sha
         const buildStartTime = workflow_job.created_at
         const startDateTime = workflow_job.started_at
@@ -121,12 +121,14 @@ const handlePipelineData = async (payload) => {
          * This block create new stage and metric
          */
         if (isStartStage) {
+            const [codePipelineBranch, version] = headBranch.split('@')
             const initialJob = {
                 codePipelineBranch,
                 commitId,
                 buildStartTime,
                 startDateTime,
                 status: pipelineStatus,
+                version,
             }
             const res = await StageService.startStage(repo, stage, executionId, initialJob)
 

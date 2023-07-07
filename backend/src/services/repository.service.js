@@ -63,10 +63,36 @@ const validateBranch = async (repo, branchName) => {
     }
 }
 
+const createTag = async (repo, branchName, tagName) => {
+    try {
+        const res = await _octokit.request(githubAPI.GET_COMMIT, {
+            owner: env.GITHUB_OWNER,
+            repo,
+            ref: branchName,
+            headers: githubAPI.HEADERS,
+        })
+
+        const tag = `${branchName}@${tagName}`
+
+        await _octokit.request(githubAPI.CREATE_TAG, {
+            owner: env.GITHUB_OWNER,
+            repo,
+            ref: `refs/tags/${tag}`,
+            sha: res.data.sha,
+            headers: githubAPI.HEADERS,
+        })
+
+        return tag
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
 export const RepositoryService = {
     createNew,
     update,
     findAllRepositories,
     findRepository,
     validateBranch,
+    createTag,
 }

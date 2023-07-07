@@ -75,11 +75,9 @@ const getStageData = async (repository, name, executionId, hasMetric) => {
 
 const startStage = async (repository, stage, executionId, initialJob) => {
     try {
-        const { codePipelineBranch, commitId, buildStartTime, startDateTime, status } = initialJob
+        const { codePipelineBranch, commitId, buildStartTime, startDateTime, status, version } = initialJob
 
         if (status === workflowStatus.QUEUED) {
-            const version = await PipeLineService.generateVersion(repository, stage)
-
             const data = {
                 executionId,
                 name: stage,
