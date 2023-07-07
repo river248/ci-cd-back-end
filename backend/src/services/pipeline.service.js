@@ -8,30 +8,10 @@ import { MetricService } from './metric.service'
 import { RepositoryModel } from '~/models/repository.model'
 import { StageService } from './stage.services'
 import { toTitleCase } from '~/utils/helpers'
+import { RepositoryService } from './repository.service'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
-
-const validateBranch = async (repo, branchName) => {
-    try {
-        const res = await _octokit.request(githubAPI.GET_BRANCHES_ROUTE, {
-            owner: env.GITHUB_OWNER,
-            repo,
-            headers: githubAPI.HEADERS,
-        })
-
-        const branches = res.data.map((branch) => branch.name)
-
-        if (!branches.includes(branchName)) {
-            throw new NotFound(`Not found branch '${branchName}' in repo '${repo}'`)
-        }
-    } catch (error) {
-        if (error instanceof NotFound) {
-            throw new NotFound(error.message)
-        }
-        throw new InternalServer(error.message)
-    }
-}
 
 const handleCompletedJob = async (repository, stage, executionId, metricKey, data) => {
     try {
@@ -74,12 +54,12 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
 
 const triggerPipeline = async (repo, branchName) => {
     try {
-        await validateBranch(repo, branchName)
+        const validatedBranch = await RepositoryService.validateBranch(repo, branchName)
         await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
             owner: env.GITHUB_OWNER,
             repo,
             workflow_id: 'build.yml',
-            ref: branchName,
+            ref: validatedBranch,
             inputs: {
                 name: 'Build',
             },
@@ -90,6 +70,31 @@ const triggerPipeline = async (repo, branchName) => {
             throw new NotFound(error.message)
         }
 
+        throw new InternalServer(error.message)
+    }
+}
+
+const generateVersion = async (repository, stage) => {
+    const DOT = '.'
+    const BUILD = 'build'
+    const FIRST_VERION = '0.0.1'
+    const ELEMENT_TO_GET_VERSION = 2
+
+    try {
+        const stages = await StageService.findStages(repository, BUILD, {}, 1)
+
+        if (isEmpty(stages)) {
+            return FIRST_VERION
+        }
+
+        const stageData = stages[0]
+
+        if (stage === BUILD) {
+            return `0.0.${stageData.version.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
+        }
+
+        return stageData.version
+    } catch (error) {
         throw new InternalServer(error.message)
     }
 }
@@ -196,4 +201,5 @@ export const PipeLineService = {
     triggerPipeline,
     handlePipelineData,
     getFullPipeline,
+    generateVersion,
 }

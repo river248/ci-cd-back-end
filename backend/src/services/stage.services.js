@@ -5,6 +5,7 @@ import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
 import { stageMetrics, updateAction, workflowStatus } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
+import { PipeLineService } from './pipeline.service'
 
 const createNew = async (data) => {
     try {
@@ -54,31 +55,6 @@ const findStages = async (repository, name, condition, limit) => {
     }
 }
 
-const generateVersion = async (repository, stage) => {
-    const DOT = '.'
-    const BUILD = 'build'
-    const FIRST_VERION = '0.0.1'
-    const ELEMENT_TO_GET_VERSION = 2
-
-    try {
-        const stages = await findStages(repository, BUILD, {}, 1)
-
-        if (isEmpty(stages)) {
-            return FIRST_VERION
-        }
-
-        const stageData = stages[0]
-
-        if (stage === BUILD) {
-            return `0.0.${stageData.version.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
-        }
-
-        return stageData.version
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
-
 const getStageData = async (repository, name, executionId, hasMetric) => {
     try {
         const stageData = await StageModel.findStage(repository, name, executionId)
@@ -102,7 +78,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
         const { codePipelineBranch, commitId, buildStartTime, startDateTime, status } = initialJob
 
         if (status === workflowStatus.QUEUED) {
-            const version = await generateVersion(repository, stage)
+            const version = await PipeLineService.generateVersion(repository, stage)
 
             const data = {
                 executionId,
