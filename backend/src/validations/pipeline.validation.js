@@ -8,7 +8,10 @@ const triggerPipeline = async (req, res, next) => {
         branchName: Joi.string().trim().min(6).max(50).required(),
     })
     try {
-        await condition.validateAsync(req.body, { abortEarly: false })
+        const validatedValue = await condition.validateAsync(req.body, { abortEarly: false })
+        if (validatedValue.branchName.includes('@')) {
+            throw new Error('branch name must not contain character @')
+        }
         next()
     } catch (error) {
         res.status(HttpStatusCode.BAD_REQUEST).json({
