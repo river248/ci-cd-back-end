@@ -38,18 +38,11 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
             appMetricData.appMetrics.total = numTotalTests
         }
 
-        if (metricName === 'Unit Test Coverage') {
+        if (metricName === 'Unit Test Coverage' || metricName === 'Deployment Check') {
             const { total, actual } = dataFromJSON
 
             appMetricData.appMetrics.actual = total
             appMetricData.appMetrics.total = actual
-        }
-
-        if (metricName === 'Deployment Check') {
-            const { status } = dataFromJSON
-
-            appMetricData.appMetrics.actual = status === 'live' ? 1 : 0
-            appMetricData.appMetrics.total = 1
         }
 
         const [updatedAppMetric, updatedMetric] = await Promise.all([
