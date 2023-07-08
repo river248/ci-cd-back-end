@@ -49,9 +49,10 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
               with:
-                  projectBaseDir: ./backend/src2
+                  projectBaseDir: ./backend/src
                   args: >
                       -Dsonar.projectKey=ci-cd-github-actions-backend
+                      -Dsonar.branch.name=${{ steps.split.outputs._0 }}
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
@@ -75,9 +76,10 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
               with:
-                  projectBaseDir: ./dashboard/src2
+                  projectBaseDir: ./dashboard/src
                   args: >
                       -Dsonar.projectKey=ci-cd-github-actions-dashboard
+                      -Dsonar.branch.name=${{ steps.split.outputs._0 }}
                       -Dsonar.sourceEncoding=UTF-8
                       -Dsonar.cobol.copy.directories=copybooks
                       -Dsonar.cobol.file.suffixes=cbl,cpy
