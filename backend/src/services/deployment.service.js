@@ -3,6 +3,8 @@ import axios from 'axios'
 import InternalServer from '~/errors/internalServer.error'
 import { asyncTimeout } from '~/utils/helpers'
 import { MetricService } from './metric.service'
+import { workflowStatus } from '~/utils/constants'
+import { env } from '~/configs/environment'
 
 const deploymentCheck = async (repostory, stage, executionId, appMetricName, deploymentInfo) => {
     try {
@@ -17,12 +19,13 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
             await asyncTimeout(5000)
 
             const deployment = await axios.get(
-                `https://api.render.com/v1/services/${deploymentEnvId}/deploys/${deploymentRes.deploy.id}`,
+                `https://api.render.com/v1/services/${deploymentEnvId}/deploys/${deploymentRes.data.deploy.id}`,
+                { headers: { Authorization: env.RENDER_BEARER_TOKEN } },
             )
 
-            const { status } = deployment
+            const { status } = deployment.data
 
-            if (status !== 'build_in_progress') {
+            if (!status.includes(workflowStatus.IN_PROGRESS)) {
                 if (status !== 'live') {
                     actual = 0
                     deploymentMessage = 'Deployment failed!'
