@@ -52,8 +52,8 @@ function Stage({ name, status, loading }) {
                         <Skeleton variant={'text'} width={120} sx={{ fontSize: '1.5rem' }} />
                         <Skeleton variant={'circular'} width={20} height={20} />
                     </Stack>
-                    {fakeLatestBuild.map((item, index) => (
-                        <Stack key={index} marginTop={1} direction={'row'}>
+                    {fakeLatestBuild.map((item) => (
+                        <Stack key={item.titleWidth} marginTop={1} direction={'row'}>
                             <Box width={100}>
                                 <Skeleton variant={'rounded'} height={15} width={item.titleWidth} />
                             </Box>
@@ -63,8 +63,8 @@ function Stage({ name, status, loading }) {
                 </Paper>
                 <Paper sx={{ marginTop: 1, padding: 1 }}>
                     <Skeleton variant={'text'} width={90} sx={{ fontSize: '1.5rem' }} />
-                    {fakeMetrics.map((item, index) => (
-                        <Stack key={index} marginTop={2} direction={'row'}>
+                    {fakeMetrics.map((item) => (
+                        <Stack key={item.titleWidth} marginTop={2} direction={'row'}>
                             <Box flexGrow={1}>
                                 <Skeleton
                                     variant={'rounded'}

@@ -41,8 +41,8 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
         if (metricName === 'Unit Test Coverage' || metricName === 'Deployment Check') {
             const { total, actual } = dataFromJSON
 
-            appMetricData.appMetrics.actual = total
-            appMetricData.appMetrics.total = actual
+            appMetricData.appMetrics.actual = actual
+            appMetricData.appMetrics.total = total
         }
 
         const [updatedAppMetric, updatedMetric] = await Promise.all([
