@@ -19,7 +19,7 @@ const getWorkflowDataFromGithub = async (req, res) => {
 
         if (result) {
             const { repository } = result
-            _io.in(repository).emit(socketEvent.UPDATE_PIPELINE_DATA, result)
+            _io.to(repository).emit(socketEvent.UPDATE_PIPELINE_DATA, result)
         }
 
         res.status(HttpStatusCode.OK).json(result)

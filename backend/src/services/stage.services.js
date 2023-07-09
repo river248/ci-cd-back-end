@@ -5,7 +5,6 @@ import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
 import { stageMetrics, updateAction, workflowStatus } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
-import { PipeLineService } from './pipeline.service'
 
 const createNew = async (data) => {
     try {
