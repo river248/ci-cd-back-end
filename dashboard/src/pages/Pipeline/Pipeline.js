@@ -22,15 +22,23 @@ function Pipeline({ stages, loading, getFullPipeline, updateStageData }) {
     const navigate = useNavigate()
 
     useEffect(() => {
-        getFullPipeline(query.get('repo'))
-        socket.emit(socketEvent.USING_PIPELINE, query.get('repo'))
+        socket.connect()
         socket.on(socketEvent.UPDATE_PIPELINE_DATA, (data) => {
             updateStageData(data)
         })
 
         return () => {
-            socket.off(socketEvent.USING_PIPELINE)
+            socket.disconnect()
             socket.off(socketEvent.UPDATE_PIPELINE_DATA)
+        }
+    }, [])
+
+    useEffect(() => {
+        getFullPipeline(query.get('repo'))
+        socket.emit(socketEvent.USING_PIPELINE, query.get('repo'))
+
+        return () => {
+            socket.off(socketEvent.USING_PIPELINE)
         }
     }, [query.get('repo')])
 
