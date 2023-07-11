@@ -1,3 +1,4 @@
+import { env } from '~/configs/environment'
 import { firebaseHelper } from '~/helpers/firebase.helper'
 import { HttpStatusCode } from '~/utils/constants'
 
@@ -23,4 +24,16 @@ const isAuth = async (req, res, next) => {
     }
 }
 
-export const AuthMiddleware = { isAuth }
+const isAuthForDeployment = async (req, res, next) => {
+    const tokenFromClient = req.headers['Authorization']
+
+    if (tokenFromClient === env.RENDER_BEARER_TOKEN) {
+        next()
+    } else {
+        return res.status(HttpStatusCode.FORBIDDEN).json({
+            error: 'No token provided.',
+        })
+    }
+}
+
+export const AuthMiddleware = { isAuth, isAuthForDeployment }
