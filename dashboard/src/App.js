@@ -6,7 +6,7 @@ import { privateRoutes } from './routes'
 function App() {
     return (
         <Routes>
-            {privateRoutes.map((route, index) => {
+            {privateRoutes.map((route) => {
                 const Page = route.component
 
                 let Layout = Fragment
@@ -17,7 +17,7 @@ function App() {
 
                 return (
                     <Route
-                        key={index}
+                        key={route.path}
                         path={route.path}
                         element={
                             <Layout>
