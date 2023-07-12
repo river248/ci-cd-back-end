@@ -85,7 +85,8 @@ jobs:
                       -Dsonar.cobol.file.suffixes=cbl,cpy
                       -Dsonar.cobol.copy.suffixes=cpy
                       -Dsonar.flex.cobertura.reportPath=coverage-report/coverage-cobertua-flex.xml
-                      -Dsonar.exclusions=**/__tests__/**,**/mocks/** -Dsonar.pli.marginLeft=2,**/firebase/initializeApp.js
+                      -Dsonar.exclusions=**/__tests__/**,**/mocks/**,**/firebase/initializeApp.js
+                      -Dsonar.pli.marginLeft=2
                       -Dsonar.pli.marginRight=0
                       -Dsonar.organization=river248
             - name: Get sonar report dashboard
