@@ -64,7 +64,7 @@ jobs:
             - name: Get sonar report backend
               id: sonar_report_backend
               run: |
-                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend&branch=${{ steps.split.outputs._0 }})" >> "$GITHUB_OUTPUT"
+                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-backend\&branch=${{ steps.split.outputs._0 }})" >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
                   curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"backend","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.split.outputs._0 }}&id=ci-cd-github-actions-backend","data":${{ toJSON(steps.sonar_report_backend.outputs.report) }}}' \
@@ -91,7 +91,7 @@ jobs:
             - name: Get sonar report dashboard
               id: sonar_report_dashboard
               run: |
-                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-dashboard&branch=${{ steps.split.outputs._0 }})" >> "$GITHUB_OUTPUT"
+                  echo "report=$(curl https://sonarcloud.io/api/qualitygates/project_status?projectKey=ci-cd-github-actions-dashboard\&branch=${{ steps.split.outputs._0 }})" >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
                   curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Code Quality","appMetricName":"dashboard","reportUrl":"https://sonarcloud.io/summary/new_code?branch=${{ steps.split.outputs._0 }}&id=ci-cd-github-actions-dashboard","data":${{ toJSON(steps.sonar_report_dashboard.outputs.report) }}}' \
