@@ -11,9 +11,9 @@ const beautifySecond = (timeDiff) => {
     timeDiff = (timeDiff - minutes) / 60
     const hours = timeDiff
 
-    hours ? (duration += `${hours}h `) : (duration += '')
-    minutes ? (duration += `${minutes}m `) : (duration += '')
-    seconds ? (duration += `${seconds}s`) : (duration += '')
+    hours ? (duration = duration + `${hours}h `) : (duration = duration + '')
+    minutes ? (duration = duration + `${minutes}m `) : (duration = duration + '')
+    seconds ? (duration = duration + `${seconds}s`) : (duration = duration + '')
     return duration
 }
 
