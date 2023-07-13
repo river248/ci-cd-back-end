@@ -25,8 +25,7 @@ const isAuth = async (req, res, next) => {
 }
 
 const isAuthForDeployment = async (req, res, next) => {
-    const tokenFromClient = req.headers['Authorization']
-    console.log(req.headers)
+    const tokenFromClient = req.headers['authorization']
 
     if (tokenFromClient === env.RENDER_BEARER_TOKEN) {
         next()
