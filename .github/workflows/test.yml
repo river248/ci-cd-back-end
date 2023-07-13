@@ -63,6 +63,13 @@ jobs:
               with:
                   name: build
                   path: ./dashboard/build
+            - name: Overwrite deployment environment
+              uses: DamianReeves/write-file-action@master
+              with:
+                  path: ${{ env.home }}/dashboard/.firebaserc
+                  contents: |
+                      {"projects": {"default": "ci-cd-github-actions-test"}}
+                  write-mode: overwrite
             - name: Deploy dashboard to Firebase
               uses: w9jds/firebase-action@master
               with:
