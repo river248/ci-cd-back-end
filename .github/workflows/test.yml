@@ -73,7 +73,7 @@ jobs:
             - name: Deploy dashboard to Firebase
               uses: w9jds/firebase-action@master
               with:
-                  args: firebase deploy --only hosting
+                  args: firebase deploy
               env:
                   FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
             - name: Trigger a deployment for backend
