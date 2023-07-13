@@ -57,23 +57,23 @@ jobs:
               uses: actions/upload-artifact@v3
               with:
                   name: build
-                  path: build
+                  path: ./dashboard/build
             - name: Download artifact
               uses: actions/download-artifact@v3
               with:
                   name: build
-                  path: build
+                  path: ./dashboard/build
             - name: Overwrite deployment environment
               uses: DamianReeves/write-file-action@master
               with:
-                  path: .firebaserc
+                  path: ./dashboard/.firebaserc
                   contents: |
                       {"projects": {"default": "ci-cd-github-actions-test"}}
                   write-mode: overwrite
             - name: Deploy dashboard to Firebase
               uses: w9jds/firebase-action@master
               with:
-                  args: deploy --only hosting
+                  args: firebase deploy --only hosting
               env:
                   FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
             - name: Trigger a deployment for backend
