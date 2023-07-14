@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify'
 
 import axios from './axiosConfig'
-import { API_ROOT } from '~/utils/constants'
+import API_ROOT from '~/utils/serverURL'
 import { resExceptionMessageHandler } from '~/utils/helper'
 
 export const logInWithGithub = async (data) => {

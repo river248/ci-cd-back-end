@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import firebaseAuth from '~/configs/firebase/auth'
-import { API_ROOT } from '~/utils/constants'
+import API_ROOT from '~/utils/serverURL'
 
 const axiosInstance = axios.create({
     baseURL: API_ROOT,
