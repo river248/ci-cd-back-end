@@ -1,4 +1,4 @@
-import { fetchAllRepositories } from '~/apis/pipelineAPI'
+import { fetchAllRepositories } from '~/apis/repositoryAPI'
 import { getAllRepositories, loading } from '~/redux/actions/repositoryAction'
 
 export const handleFetchAllRepositories = () => async (dispatch) => {

@@ -36,12 +36,7 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
                             !isNil(repositories) &&
                             repositories.map((repository) => (
                                 <Grid key={repository.name} item xl={2} lg={2.4} md={3} sm={4} xs={6}>
-                                    <Repository
-                                        name={repository.name}
-                                        imageUrl={
-                                            'https://congluan-cdn.congluan.vn/files/content/2022/05/26/doraemon-nobita-va-cuoc-chien-vu-tru-ti-hon-goi-tron-mua-he-trong-man-anh-183307801.jpg'
-                                        }
-                                    />
+                                    <Repository name={repository.name} imageUrl={repository.thumbnail} />
                                 </Grid>
                             ))}
                         <Grid item xl={2} lg={2.4} md={3} sm={4} xs={6}>
@@ -52,7 +47,7 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
             </Grid>
             <Modal open={open} onClose={() => setOpen(false)}>
                 <Box>
-                    <AddNewRepositoryContainer />
+                    <AddNewRepositoryContainer onSubmit={() => setOpen(false)} />
                 </Box>
             </Modal>
         </Box>
