@@ -55,6 +55,14 @@ export const socketEvent = {
     UPDATE_PIPELINE_DATA: 'update-pipeline-data',
 }
 
-export const clientHost = ['http://localhost:3000', 'https://ci-cd-github-actions.web.app']
+export const clientHost = [
+    'http://localhost:3000',
+    'https://ci-cd-github-actions.web.app',
+    'https://ci-cd-github-actions-test.web.app',
+]
 
-export const serverHost = ['http://localhost:8080', 'https://ci-cd-github-actions.onrender.com']
+export const serverHost = [
+    'http://localhost:8080',
+    'https://ci-cd-github-actions.onrender.com',
+    'https://ci-cd-github-actions-test.onrender.com',
+]
