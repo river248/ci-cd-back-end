@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { isEmpty, isNil } from 'lodash'
 
 import AddNewRepository from '~/components/AddNewRepository'
+import { createNewRepo } from '~/apis/repositoryAPI'
 
 function AddNewRepositoryContainer() {
     const [selectedMembers, setSetSelectedMembers] = useState([])
@@ -69,9 +70,13 @@ function AddNewRepositoryContainer() {
             !repoNameError &&
             !selectedMembersError
         ) {
-            setLoading(true)
-            console.log(repoName, selectedMembers, previewImage)
-            setLoading(false)
+            const callApi = async () => {
+                setLoading(true)
+                await createNewRepo(repoName, previewImage, selectedMembers)
+                setLoading(false)
+            }
+
+            callApi()
         }
     }, [repoName, selectedMembers, previewImage, repoNameError, selectedMembersError])
 

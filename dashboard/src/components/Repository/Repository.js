@@ -17,10 +17,12 @@ import { useTheme } from '@mui/material/styles'
 import { CardContent, CardActions, CardOverflow, AspectRatio } from './Repository.styles'
 import routes from '~/configs/routes'
 import Button from '~/components/Button'
+import { useFirebaseImage } from '~/hooks'
 
 function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
     const navigate = useNavigate()
     const theme = useTheme()
+    const thumbnail = useFirebaseImage(imageUrl)
 
     const handleGoToPipeline = (event) => {
         event.preventDefault()
@@ -49,7 +51,7 @@ function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
                     </AspectRatio>
                 </CardOverflow>
             ) : (
-                <CardMedia sx={{ height: 140 }} image={imageUrl} title={name} />
+                <CardMedia sx={{ height: 140 }} image={thumbnail} title={name} />
             )}
             <CardContent sx={{ textAlign: newItem ? 'center' : 'left' }}>
                 {newItem ? (
