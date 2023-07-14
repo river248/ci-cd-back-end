@@ -75,7 +75,7 @@ jobs:
               working-directory: ./dashboard
               run: |
                   npm ci
-                  npm run build
+                  npm build
               continue-on-error: true
             - name: Archive production artifact
               id: upload-artifact
