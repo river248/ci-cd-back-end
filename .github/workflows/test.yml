@@ -50,7 +50,7 @@ jobs:
                   path: ./dashboard/src/configs/firebase/initializeApp.js
                   contents: |
                       import { initializeApp } from 'firebase/app'
-                      const testConfig = ${{ FIREBASE_TEST_CONFIG }}
+                      const testConfig = ${{ secrets.FIREBASE_TEST_CONFIG }}
                       const firebase = initializeApp(testConfig)
                       export default firebase
                   write-mode: overwrite
