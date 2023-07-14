@@ -62,7 +62,8 @@ jobs:
               with:
                   path: ./dashboard/src/utils/serverURL.js
                   contents: |
-                      export default API_ROOT = 'https://ci-cd-github-actions-test.onrender.com'
+                      const API_ROOT = 'https://ci-cd-github-actions-test.onrender.com'
+                      export default API_ROOT
                   write-mode: overwrite
               continue-on-error: true
             - name: Use Node.js 18
