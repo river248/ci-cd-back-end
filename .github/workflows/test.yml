@@ -56,6 +56,15 @@ jobs:
                       export default firebase
                   write-mode: overwrite
               continue-on-error: true
+            - name: Overwrite server url
+              id: modify-server-url
+              uses: DamianReeves/write-file-action@master
+              with:
+                  path: ./dashboard/src/utils/serverURL.js
+                  contents: |
+                      export default API_ROOT = 'https://ci-cd-github-actions-test.onrender.com'
+                  write-mode: overwrite
+              continue-on-error: true
             - name: Use Node.js 18
               uses: actions/setup-node@v3
               with:
@@ -98,13 +107,13 @@ jobs:
                   firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}"
               continue-on-error: true
             - name: Dashboard deployment check failed
-              if: steps.modify-firebase-var.outcome != 'success' || steps.run-build.outcome != 'success' || steps.upload-artifact.outcome != 'success' || steps.download-artifact.outcome != 'success' || steps.modify-deploy-env.outcome != 'success' || steps.deployment.outcome != 'success'
+              if: steps.modify-firebase-var.outcome != 'success' || steps.modify-server-url.outcome != 'success' || steps.run-build.outcome != 'success' || steps.upload-artifact.outcome != 'success' || steps.download-artifact.outcome != 'success' || steps.modify-deploy-env.outcome != 'success' || steps.deployment.outcome != 'success'
               run: |
                   curl -d '{"repository":"ci-cd-github-actions","stage":"test","executionId":"${{ github.run_id }}","metricName":"Deployment Check","appMetricName":"dashboard","data":"{\"actual\":0,\"total\":1}"}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
             - name: Dashboard deployment check successfully
-              if: steps.modify-firebase-var.outcome == 'success' && steps.run-build.outcome == 'success' && steps.upload-artifact.outcome == 'success' && steps.download-artifact.outcome == 'success' && steps.modify-deploy-env.outcome == 'success' && steps.deployment.outcome == 'success'
+              if: steps.modify-firebase-var.outcome == 'success' && steps.modify-server-url.outcome == 'success' && steps.run-build.outcome == 'success' && steps.upload-artifact.outcome == 'success' && steps.download-artifact.outcome == 'success' && steps.modify-deploy-env.outcome == 'success' && steps.deployment.outcome == 'success'
               run: |
                   curl -d '{"repository":"ci-cd-github-actions","stage":"test","executionId":"${{ github.run_id }}","metricName":"Deployment Check","appMetricName":"dashboard","data":"{\"actual\":1,\"total\":1}"}' \
                     -H "Content-Type: application/json" \
