@@ -44,6 +44,16 @@ jobs:
               uses: actions/checkout@v3
               with:
                   ref: ${{ steps.split.outputs._0 }}
+            - name: Overwrite dashboard environment variables
+              uses: DamianReeves/write-file-action@master
+              with:
+                  path: ./dashboard/src/configs/firebase/initializeApp.js
+                  contents: |
+                      import { initializeApp } from 'firebase/app'
+                      const testConfig = ${{ secrets.FIREBASE_TEST_CONFIG }}
+                      const firebase = initializeApp(testConfig)
+                      export default firebase
+                  write-mode: overwrite
             - name: Use Node.js 18
               uses: actions/setup-node@v3
               with:
