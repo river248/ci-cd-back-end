@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { isEmpty, isNil } from 'lodash'
+import { connect } from 'react-redux'
 
 import AddNewRepository from '~/components/AddNewRepository'
 import { createNewRepo } from '~/apis/repositoryAPI'
+import { handleAddNewRepository } from '~/redux/async-logics/repositoryLogic'
 
-function AddNewRepositoryContainer({ onSubmit }) {
+function AddNewRepositoryContainer({ onSubmit, addNewRepository }) {
     const [selectedMembers, setSetSelectedMembers] = useState([])
     const [repoName, setRepoName] = useState('')
     const [loading, setLoading] = useState(false)
@@ -73,7 +75,8 @@ function AddNewRepositoryContainer({ onSubmit }) {
         ) {
             const callApi = async () => {
                 setLoading(true)
-                await createNewRepo(repoName, previewImage, selectedMembers)
+                const res = await createNewRepo(repoName, previewImage, selectedMembers)
+                addNewRepository(res)
                 setLoading(false)
                 onSubmit()
             }
@@ -100,6 +103,13 @@ function AddNewRepositoryContainer({ onSubmit }) {
 
 AddNewRepository.propTypes = {
     onSubmit: PropTypes.func,
+    addNewRepository: PropTypes.func,
 }
 
-export default React.memo(AddNewRepositoryContainer)
+const mapDispatchToProps = (dispatch) => ({
+    addNewRepository: (data) => {
+        dispatch(handleAddNewRepository(data))
+    },
+})
+
+export default connect(null, mapDispatchToProps)(React.memo(AddNewRepositoryContainer))

@@ -22,7 +22,6 @@ export const createNewRepo = async (name, image, members) => {
         toast.success('Create a new repository successfully!')
         return res.data
     } catch (error) {
-        console.log(error)
         if (!isEmpty(thumbnail)) {
             removeImage(thumbnail)
         }

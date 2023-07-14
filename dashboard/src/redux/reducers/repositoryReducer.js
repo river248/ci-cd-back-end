@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { REPOSITORY_LOADING, GET_ALL_REPOSITORIES } from '~/redux/types/repositoryType'
+import { REPOSITORY_LOADING, GET_ALL_REPOSITORIES, ADD_NEW_REPOSITORY } from '~/redux/types/repositoryType'
 
 const initialState = {
     loading: false,
@@ -12,6 +12,9 @@ const repositoryReducer = createReducer(initialState, (builder) => {
     })
     builder.addCase(GET_ALL_REPOSITORIES, (state, action) => {
         state.repositories = action.payload
+    })
+    builder.addCase(ADD_NEW_REPOSITORY, (state, action) => {
+        state.repositories.unshift(action.payload)
     })
 })
 
