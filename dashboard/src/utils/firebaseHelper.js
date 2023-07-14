@@ -1,4 +1,4 @@
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 import { toast } from 'react-toastify'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -9,11 +9,19 @@ export const uploadImage = async (file, prefix) => {
     const newImageName = `${uuidv4()}.${fileExt}`
     const newPath = `/${prefix}/${newImageName}`
 
-    const storeRef = ref(firebaseStorage, newPath)
-
     try {
+        const storeRef = ref(firebaseStorage, newPath)
         await uploadBytes(storeRef, file)
         return newPath
+    } catch (error) {
+        toast.error(`Failed: ${error.message}`)
+    }
+}
+
+export const removeImage = async (relativePath) => {
+    try {
+        const storeRef = ref(firebaseStorage, relativePath)
+        await deleteObject(storeRef)
     } catch (error) {
         toast.error(`Failed: ${error.message}`)
     }

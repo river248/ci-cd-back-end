@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import PropTypes from 'prop-types'
 import { isEmpty, isNil } from 'lodash'
 
 import AddNewRepository from '~/components/AddNewRepository'
 import { createNewRepo } from '~/apis/repositoryAPI'
 
-function AddNewRepositoryContainer() {
+function AddNewRepositoryContainer({ onSubmit }) {
     const [selectedMembers, setSetSelectedMembers] = useState([])
     const [repoName, setRepoName] = useState('')
     const [loading, setLoading] = useState(false)
@@ -74,6 +75,7 @@ function AddNewRepositoryContainer() {
                 setLoading(true)
                 await createNewRepo(repoName, previewImage, selectedMembers)
                 setLoading(false)
+                onSubmit()
             }
 
             callApi()
@@ -94,6 +96,10 @@ function AddNewRepositoryContainer() {
             onSubmit={handleSubmit}
         />
     )
+}
+
+AddNewRepository.propTypes = {
+    onSubmit: PropTypes.func,
 }
 
 export default React.memo(AddNewRepositoryContainer)

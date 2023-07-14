@@ -1,22 +1,31 @@
 import { toast } from 'react-toastify'
+import { isEmpty } from 'lodash'
 
 import axios from './axiosConfig'
 import API_ROOT from '~/utils/serverURL'
 import { resExceptionMessageHandler } from '~/utils/helper'
+import { removeImage, uploadImage } from '~/utils/firebaseHelper'
 
 export const createNewRepo = async (name, image, members) => {
-    try {
-        const thumbnail = await uploadImage(image, 'repository')
+    let thumbnail = ''
 
-        const res = await axios.post(`${API_ROOT}/v1/reposity`, {
+    try {
+        thumbnail = await uploadImage(image, 'repository')
+
+        const res = await axios.post(`${API_ROOT}/v1/repository`, {
             name,
             members,
             thumbnail,
             stages: ['build', 'test', 'production'],
         })
 
+        toast.success('Create a new repository successfully!')
         return res.data
     } catch (error) {
+        console.log(error)
+        if (!isEmpty(thumbnail)) {
+            removeImage(thumbnail)
+        }
         toast.error(resExceptionMessageHandler(error))
     }
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import AllInclusiveIcon from '@mui/icons-material/AllInclusive'
 import Card from '@mui/material/Card'
@@ -13,8 +13,9 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
+import { isNil } from 'lodash'
 
-import { CardContent, CardActions, CardOverflow, AspectRatio } from './Repository.styles'
+import { CardContent, CardActions, CardOverflow, AspectRatio, NoImage } from './Repository.styles'
 import routes from '~/configs/routes'
 import Button from '~/components/Button'
 import { useFirebaseImage } from '~/hooks'
@@ -24,10 +25,21 @@ function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
     const theme = useTheme()
     const thumbnail = useFirebaseImage(imageUrl)
 
-    const handleGoToPipeline = (event) => {
-        event.preventDefault()
-        navigate(`${routes.pipeline}?repo=${name}`)
-    }
+    const handleGoToPipeline = useCallback(
+        (event) => {
+            event.preventDefault()
+            navigate(`${routes.pipeline}?repo=${name}`)
+        },
+        [name],
+    )
+
+    const renderImage = useMemo(() => {
+        if (!isNil(thumbnail)) {
+            return <CardMedia sx={{ height: 140 }} image={thumbnail} title={name} />
+        }
+
+        return <NoImage />
+    }, [thumbnail])
 
     if (loading) {
         return (
@@ -51,7 +63,7 @@ function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
                     </AspectRatio>
                 </CardOverflow>
             ) : (
-                <CardMedia sx={{ height: 140 }} image={thumbnail} title={name} />
+                renderImage
             )}
             <CardContent sx={{ textAlign: newItem ? 'center' : 'left' }}>
                 {newItem ? (
