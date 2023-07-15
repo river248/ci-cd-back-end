@@ -12,3 +12,12 @@ export const logInWithGithub = async (data) => {
         toast.error(resExceptionMessageHandler(error))
     }
 }
+
+export const fetchAllUser = async () => {
+    try {
+        const res = await axios.get(`${API_ROOT}/v1/user`)
+        return res.data
+    } catch (error) {
+        toast.error(resExceptionMessageHandler(error))
+    }
+}

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { isEmpty, isNil } from 'lodash'
 import { connect } from 'react-redux'
@@ -6,9 +6,11 @@ import { connect } from 'react-redux'
 import AddNewRepository from '~/components/AddNewRepository'
 import { createNewRepo } from '~/apis/repositoryAPI'
 import { handleAddNewRepository } from '~/redux/async-logics/repositoryLogic'
+import { fetchAllUser } from '~/apis/userAPI'
 
 function AddNewRepositoryContainer({ onSubmit, addNewRepository }) {
     const [selectedMembers, setSetSelectedMembers] = useState([])
+    const [members, setMembers] = useState([])
     const [repoName, setRepoName] = useState('')
     const [loading, setLoading] = useState(false)
     const [previewImage, setPreviewImage] = useState(null)
@@ -16,14 +18,13 @@ function AddNewRepositoryContainer({ onSubmit, addNewRepository }) {
     const [repoNameError, setRepoNameError] = useState(false)
     const [fileError, setFileError] = useState(false)
 
-    const members = useMemo(
-        () => [
-            { _id: '1', name: 'river1' },
-            { _id: '2', name: 'river2' },
-            { _id: '3', name: 'river3' },
-        ],
-        [],
-    )
+    useEffect(() => {
+        fetchAllUser().then((res) => {
+            if (!isNil(res)) {
+                setMembers(res.map((member) => ({ _id: member._id, name: member.name })))
+            }
+        })
+    }, [])
 
     useEffect(() => {
         return () => {
