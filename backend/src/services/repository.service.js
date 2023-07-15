@@ -10,13 +10,13 @@ import { githubAPI } from '~/utils/constants'
 const createNew = async (data) => {
     try {
         const { name } = data
-        const [_githubRes, repoData] = await Promise.all([
+        const [repoData] = await Promise.all([
+            findRepository(name),
             _octokit.request(githubAPI.GET_REPOSITORY, {
                 owner: env.GITHUB_OWNER,
                 repo: name,
                 headers: githubAPI.HEADERS,
             }),
-            findRepository(name),
         ])
 
         if (!isEmpty(repoData)) {

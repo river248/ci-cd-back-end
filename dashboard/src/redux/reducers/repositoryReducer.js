@@ -14,7 +14,7 @@ const repositoryReducer = createReducer(initialState, (builder) => {
         state.repositories = action.payload
     })
     builder.addCase(ADD_NEW_REPOSITORY, (state, action) => {
-        state.repositories.unshift(action.payload)
+        state.repositories.push(action.payload)
     })
 })
 
