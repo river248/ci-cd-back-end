@@ -1,4 +1,7 @@
+import { isEmpty } from 'lodash'
+
 import { env } from '~/configs/environment'
+import BadRequest from '~/errors/badRequest.error'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { RepositoryModel } from '~/models/repository.model'
@@ -6,9 +9,27 @@ import { githubAPI } from '~/utils/constants'
 
 const createNew = async (data) => {
     try {
+        const { name } = data
+        const [_githubRes, repoData] = await Promise.all([
+            _octokit.request(githubAPI.GET_REPOSITORY, {
+                owner: env.GITHUB_OWNER,
+                repo: name,
+                headers: githubAPI.HEADERS,
+            }),
+            findRepository(name),
+        ])
+
+        if (!isEmpty(repoData)) {
+            throw new BadRequest('This repo name is existed!')
+        }
+
         const res = await RepositoryModel.createNew(data)
+
         return res
     } catch (error) {
+        if (error instanceof BadRequest) {
+            throw new BadRequest(error.message)
+        }
         throw new InternalServer(error.message)
     }
 }

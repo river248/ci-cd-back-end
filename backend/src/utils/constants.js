@@ -16,6 +16,7 @@ export const githubAPI = {
     CREATE_TAG: 'POST /repos/{owner}/{repo}/git/refs',
     GET_BRANCHES_ROUTE: 'GET /repos/{owner}/{repo}/branches',
     WORKFLOW_DISPATCH_ROUTE: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
+    GET_REPOSITORY: 'GET /repos/{owner}/{repo}',
 }
 
 export const workflowStatus = {
