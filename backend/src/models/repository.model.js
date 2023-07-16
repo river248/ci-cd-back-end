@@ -55,9 +55,20 @@ const findRepository = async (name) => {
     }
 }
 
+const removeRepository = async (name) => {
+    try {
+        const res = await getDB().collection(collection.REPOSITORY).deleteOne({ name })
+
+        return res
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 export const RepositoryModel = {
     createNew,
     update,
     findAllRepositories,
     findRepository,
+    removeRepository,
 }

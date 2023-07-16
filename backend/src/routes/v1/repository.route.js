@@ -17,5 +17,6 @@ router
     )
     .put('/', AuthMiddleware.isAuth, RoleMiddleware.isAdmin, RepositoryValidation.update, RepositoryController.update)
     .get('/', AuthMiddleware.isAuth, RepositoryController.findAllRepositories)
+    .delete('/:name', RepositoryController.removeRepository)
 
 export const RepositoryRoute = router

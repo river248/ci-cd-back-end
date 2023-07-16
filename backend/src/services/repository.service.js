@@ -109,6 +109,25 @@ const createTag = async (repo, branchName, tagName) => {
     }
 }
 
+const removeRepository = async (name) => {
+    try {
+        const res = await RepositoryModel.removeRepository(name)
+        const { deletedCount } = res
+
+        if (deletedCount === 0) {
+            throw new NotFound(`Not found repository: ${name}`)
+        }
+
+        return res
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
 export const RepositoryService = {
     createNew,
     update,
@@ -116,4 +135,5 @@ export const RepositoryService = {
     findRepository,
     validateBranch,
     createTag,
+    removeRepository,
 }

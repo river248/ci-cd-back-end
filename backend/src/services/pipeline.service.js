@@ -176,7 +176,7 @@ const handlePipelineData = async (payload) => {
 
 const getFullPipeline = async (repository) => {
     try {
-        const repo = await RepositoryModel.findRepository(repository)
+        const repo = await RepositoryService.findRepository(repository)
         if (repo) {
             const pipeline = await Promise.all(
                 repo.stages.map(async (stage) => {
