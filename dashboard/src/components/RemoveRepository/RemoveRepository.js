@@ -9,7 +9,7 @@ import CardMedia from '@mui/material/CardMedia'
 import CloseIcon from '@mui/icons-material/Close'
 
 import { ModalWrapper, MuiInput, NoImage } from '~/components/GlobalStyles/GlobalStyles.mui'
-import Button from '~/components/Button/Button'
+import Button from '~/components/Button'
 import { useFirebaseImage } from '~/hooks'
 
 function RemoveRepository({ name, imageUrl, disabled, onRemove, onChange, onClose }) {
