@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState, useCallback } from 'react'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Modal from '@mui/material/Modal'
@@ -9,13 +9,20 @@ import Repository from '~/components/Repository'
 import Title from '~/components/Title'
 import { handleFetchAllRepositories } from '~/redux/async-logics/repositoryLogic'
 import AddNewRepositoryContainer from '~/containers/AddNewRepositoryContainer'
+import RemoveRepositoryContainer from '~/containers/RemoveRepositoryContainer'
 
 function Dashboard({ loading, repositories, getAllRepositories }) {
     const fakeRepositories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
     const [open, setOpen] = useState(false)
+    const [removedRepo, setRemovedRepo] = useState('')
 
     useEffect(() => {
         getAllRepositories()
+    }, [])
+
+    const handleCloseModal = useCallback(() => {
+        setOpen(false)
+        setRemovedRepo('')
     }, [])
 
     return (
@@ -36,7 +43,11 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
                             !isNil(repositories) &&
                             repositories.map((repository) => (
                                 <Grid key={repository.name} item xl={2} lg={2.4} md={3} sm={4} xs={6}>
-                                    <Repository name={repository.name} imageUrl={repository.thumbnail} />
+                                    <Repository
+                                        name={repository.name}
+                                        imageUrl={repository.thumbnail}
+                                        onRemove={() => setRemovedRepo(repository.name)}
+                                    />
                                 </Grid>
                             ))}
                         <Grid item xl={2} lg={2.4} md={3} sm={4} xs={6}>
@@ -45,9 +56,12 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
                     </Fragment>
                 )}
             </Grid>
-            <Modal open={open} onClose={() => setOpen(false)}>
+            <Modal open={open || !isEmpty(removedRepo)} onClose={handleCloseModal}>
                 <Box>
-                    <AddNewRepositoryContainer onSubmit={() => setOpen(false)} />
+                    {open && <AddNewRepositoryContainer onSubmit={() => setOpen(false)} />}
+                    {!isEmpty(removedRepo) && (
+                        <RemoveRepositoryContainer name={removedRepo} onRemove={() => setRemovedRepo('')} />
+                    )}
                 </Box>
             </Modal>
         </Box>
