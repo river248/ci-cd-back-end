@@ -77,9 +77,11 @@ function AddNewRepositoryContainer({ onSubmit, addNewRepository }) {
             const callApi = async () => {
                 setLoading(true)
                 const res = await createNewRepo(repoName, previewImage, selectedMembers)
-                addNewRepository(res)
+                if (!isEmpty(res)) {
+                    addNewRepository(res)
+                    onSubmit()
+                }
                 setLoading(false)
-                onSubmit()
             }
 
             callApi()

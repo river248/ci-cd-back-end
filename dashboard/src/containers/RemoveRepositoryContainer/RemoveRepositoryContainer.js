@@ -18,10 +18,12 @@ function RemoveRepositoryContainer({ name, removeRepository, onRemove }) {
     const handleRemove = useCallback(() => {
         const callApi = async () => {
             setLoading(true)
-            await removeRepo(name)
-            removeRepository(name)
+            const res = await removeRepo(name)
+            if (!isEmpty(res)) {
+                removeRepository(name)
+                onRemove()
+            }
             setLoading(false)
-            onRemove()
         }
 
         callApi()
