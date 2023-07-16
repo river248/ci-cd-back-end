@@ -15,10 +15,11 @@ import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
 import { isNil } from 'lodash'
 
-import { CardContent, CardActions, CardOverflow, AspectRatio, NoImage } from './Repository.styles'
+import { CardContent, CardActions, CardOverflow, AspectRatio } from './Repository.styles'
 import routes from '~/configs/routes'
 import Button from '~/components/Button'
 import { useFirebaseImage } from '~/hooks'
+import { NoImage } from '~/components/GlobalStyles/GlobalStyles.mui'
 
 function Repository({ name, imageUrl, loading, newItem, onAddNew, onRemove }) {
     const navigate = useNavigate()

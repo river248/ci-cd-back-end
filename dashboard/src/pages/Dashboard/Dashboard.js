@@ -14,7 +14,7 @@ import RemoveRepositoryContainer from '~/containers/RemoveRepositoryContainer'
 function Dashboard({ loading, repositories, getAllRepositories }) {
     const fakeRepositories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
     const [open, setOpen] = useState(false)
-    const [removedRepo, setRemovedRepo] = useState('')
+    const [removedRepo, setRemovedRepo] = useState({})
 
     useEffect(() => {
         getAllRepositories()
@@ -22,7 +22,7 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
 
     const handleCloseModal = useCallback(() => {
         setOpen(false)
-        setRemovedRepo('')
+        setRemovedRepo({})
     }, [])
 
     return (
@@ -46,7 +46,9 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
                                     <Repository
                                         name={repository.name}
                                         imageUrl={repository.thumbnail}
-                                        onRemove={() => setRemovedRepo(repository.name)}
+                                        onRemove={() =>
+                                            setRemovedRepo({ name: repository.name, imageUrl: repository.thumbnail })
+                                        }
                                     />
                                 </Grid>
                             ))}
@@ -60,7 +62,7 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
                 <Box>
                     {open && <AddNewRepositoryContainer onSubmit={() => setOpen(false)} />}
                     {!isEmpty(removedRepo) && (
-                        <RemoveRepositoryContainer name={removedRepo} onRemove={() => setRemovedRepo('')} />
+                        <RemoveRepositoryContainer removedRepo={removedRepo} onRemove={() => setRemovedRepo({})} />
                     )}
                 </Box>
             </Modal>

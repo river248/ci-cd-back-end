@@ -19,3 +19,9 @@ export const MuiInput = styled(Input)(({ theme }) => ({
         borderColor: theme.palette.text.secondary,
     },
 }))
+
+export const NoImage = styled('div')(({ theme }) => ({
+    width: '100%',
+    height: 140,
+    backgroundColor: theme.palette.grey[100],
+}))

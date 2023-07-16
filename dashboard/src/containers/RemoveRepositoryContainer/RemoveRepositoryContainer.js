@@ -7,9 +7,11 @@ import { removeRepo } from '~/apis/repositoryAPI'
 import RemoveRepository from '~/components/RemoveRepository'
 import { handleRemoveRepository } from '~/redux/async-logics/repositoryLogic'
 
-function RemoveRepositoryContainer({ name, removeRepository, onRemove }) {
+function RemoveRepositoryContainer({ removedRepo, removeRepository, onRemove }) {
     const [repoName, setRepoName] = useState('')
     const [loading, setLoading] = useState(false)
+
+    const { name, imageUrl } = removedRepo
 
     const handleOnChange = useCallback((event) => {
         setRepoName(event.target.value)
@@ -18,7 +20,7 @@ function RemoveRepositoryContainer({ name, removeRepository, onRemove }) {
     const handleRemove = useCallback(() => {
         const callApi = async () => {
             setLoading(true)
-            const res = await removeRepo(name)
+            const res = await removeRepo(name, imageUrl)
             if (!isEmpty(res)) {
                 removeRepository(name)
                 onRemove()
@@ -27,11 +29,12 @@ function RemoveRepositoryContainer({ name, removeRepository, onRemove }) {
         }
 
         callApi()
-    }, [name])
+    }, [name, imageUrl])
 
     return (
         <RemoveRepository
             name={name}
+            imageUrl={imageUrl}
             disabled={isEmpty(repoName) || repoName !== name || loading}
             onChange={handleOnChange}
             onRemove={handleRemove}
@@ -41,7 +44,10 @@ function RemoveRepositoryContainer({ name, removeRepository, onRemove }) {
 }
 
 RemoveRepositoryContainer.propTypes = {
-    name: PropTypes.string.isRequired,
+    removedRepo: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        imageUrl: PropTypes.string.isRequired,
+    }),
     removeRepository: PropTypes.func,
     onRemove: PropTypes.func,
 }

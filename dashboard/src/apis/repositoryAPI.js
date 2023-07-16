@@ -38,9 +38,10 @@ export const fetchAllRepositories = async () => {
     }
 }
 
-export const removeRepo = async (name) => {
+export const removeRepo = async (name, image) => {
     try {
         const res = await axios.delete(`${API_ROOT}/v1/repository/${name}`)
+        await removeImage(image)
 
         toast.success(`Repo ${name} has been removed`)
         return res.data

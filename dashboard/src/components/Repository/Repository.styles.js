@@ -31,9 +31,3 @@ export const AspectRatio = styled(MuiStack)(({ theme }) => ({
     borderRadius: '50%',
     backgroundColor: theme.palette.common.white,
 }))
-
-export const NoImage = styled('div')(({ theme }) => ({
-    width: '100%',
-    height: 140,
-    backgroundColor: theme.palette.grey[100],
-}))
