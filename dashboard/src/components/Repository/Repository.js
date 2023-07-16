@@ -20,7 +20,7 @@ import routes from '~/configs/routes'
 import Button from '~/components/Button'
 import { useFirebaseImage } from '~/hooks'
 
-function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
+function Repository({ name, imageUrl, loading, newItem, onAddNew, onRemove }) {
     const navigate = useNavigate()
     const theme = useTheme()
     const thumbnail = useFirebaseImage(imageUrl)
@@ -92,7 +92,7 @@ function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
                         Go to pipeline
                     </Link>
                     <Tooltip arrow title={'Delete'}>
-                        <IconButton>
+                        <IconButton onClick={onRemove}>
                             <DeleteIcon sx={{ color: 'red' }} />
                         </IconButton>
                     </Tooltip>
@@ -108,6 +108,7 @@ Repository.propTypes = {
     loading: PropTypes.bool,
     newItem: PropTypes.bool,
     onAddNew: PropTypes.func,
+    onRemove: PropTypes.func,
 }
 
 export default React.memo(Repository)

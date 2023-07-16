@@ -1,5 +1,5 @@
 import { fetchAllRepositories } from '~/apis/repositoryAPI'
-import { addNewRepository, getAllRepositories, loading } from '~/redux/actions/repositoryAction'
+import { addNewRepository, getAllRepositories, loading, removeRepository } from '~/redux/actions/repositoryAction'
 
 export const handleFetchAllRepositories = () => async (dispatch) => {
     dispatch(loading(true))
@@ -8,6 +8,10 @@ export const handleFetchAllRepositories = () => async (dispatch) => {
     dispatch(loading(false))
 }
 
-export const handleAddNewRepository = (data) => async (dispatch) => {
+export const handleAddNewRepository = (data) => (dispatch) => {
     dispatch(addNewRepository(data))
+}
+
+export const handleRemoveRepository = (name) => (dispatch) => {
+    dispatch(removeRepository(name))
 }

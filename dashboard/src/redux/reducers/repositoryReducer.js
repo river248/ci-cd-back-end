@@ -1,5 +1,11 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { REPOSITORY_LOADING, GET_ALL_REPOSITORIES, ADD_NEW_REPOSITORY } from '~/redux/types/repositoryType'
+import { cloneDeep } from 'lodash'
+import {
+    REPOSITORY_LOADING,
+    GET_ALL_REPOSITORIES,
+    ADD_NEW_REPOSITORY,
+    REMOVE_REPOSITORY,
+} from '~/redux/types/repositoryType'
 
 const initialState = {
     loading: false,
@@ -15,6 +21,17 @@ const repositoryReducer = createReducer(initialState, (builder) => {
     })
     builder.addCase(ADD_NEW_REPOSITORY, (state, action) => {
         state.repositories.push(action.payload)
+    })
+    builder.addCase(REMOVE_REPOSITORY, (state, action) => {
+        const cloneRepos = cloneDeep(state.repositories)
+        const index = cloneRepos.findIndex((repo) => repo.name === action.payload)
+
+        if (index < 0) {
+            throw new Error(`Not found repository: ${action.payload}`)
+        }
+
+        cloneRepos.splice(index, 1)
+        state.repositories = cloneRepos
     })
 })
 

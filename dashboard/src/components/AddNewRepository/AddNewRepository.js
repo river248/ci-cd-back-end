@@ -7,7 +7,8 @@ import FormGroup from '@mui/material/FormGroup'
 import CardMedia from '@mui/material/CardMedia'
 import { useTheme } from '@mui/material/styles'
 
-import { MuiInput, MuiLabel, Wrapper } from './AddNewRepository.styles'
+import { MuiLabel } from './AddNewRepository.styles'
+import { MuiInput, ModalWrapper } from '~/components/GlobalStyles/GlobalStyles.mui'
 import Button from '~/components/Button'
 
 function AddNewRepository({
@@ -25,7 +26,7 @@ function AddNewRepository({
     const theme = useTheme()
 
     return (
-        <Wrapper>
+        <ModalWrapper>
             <Typography variant={'h2'} component={'h2'} fontSize={21} fontWeight={600}>
                 Add new repository
             </Typography>
@@ -107,7 +108,7 @@ function AddNewRepository({
             >
                 Add
             </Button>
-        </Wrapper>
+        </ModalWrapper>
     )
 }
 

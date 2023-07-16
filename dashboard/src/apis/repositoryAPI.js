@@ -37,3 +37,13 @@ export const fetchAllRepositories = async () => {
         toast.error(resExceptionMessageHandler(error))
     }
 }
+
+export const removeRepo = async (name) => {
+    try {
+        await axios.delete(`${API_ROOT}/v1/repository/${name}`)
+
+        toast.success(`Repo ${name} has been removed`)
+    } catch (error) {
+        toast.error(resExceptionMessageHandler(error))
+    }
+}
