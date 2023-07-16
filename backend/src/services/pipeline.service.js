@@ -4,7 +4,6 @@ import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { githubAPI, updateAction, workflowStatus } from '~/utils/constants'
 import { MetricService } from './metric.service'
-import { RepositoryModel } from '~/models/repository.model'
 import { StageService } from './stage.services'
 import { toTitleCase } from '~/utils/helpers'
 import { RepositoryService } from './repository.service'
@@ -176,7 +175,7 @@ const handlePipelineData = async (payload) => {
 
 const getFullPipeline = async (repository) => {
     try {
-        const repo = await RepositoryModel.findRepository(repository)
+        const repo = await RepositoryService.findRepository(repository)
         if (repo) {
             const pipeline = await Promise.all(
                 repo.stages.map(async (stage) => {

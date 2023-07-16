@@ -20,7 +20,8 @@ const validateSchema = async (data) => {
 const createNew = async (data) => {
     try {
         const value = await validateSchema(data)
-        await getDB().collection(collection.REPOSITORY).insertOne(value)
+        const res = await getDB().collection(collection.REPOSITORY).insertOne(value)
+        return { ...value, _id: res.insertedId.toString() }
     } catch (error) {
         throw new Error(error)
     }
@@ -54,9 +55,20 @@ const findRepository = async (name) => {
     }
 }
 
+const removeRepository = async (name) => {
+    try {
+        const res = await getDB().collection(collection.REPOSITORY).deleteOne({ name })
+
+        return res
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 export const RepositoryModel = {
     createNew,
     update,
     findAllRepositories,
     findRepository,
+    removeRepository,
 }

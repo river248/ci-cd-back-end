@@ -22,7 +22,6 @@ export const createNewRepo = async (name, image, members) => {
         toast.success('Create a new repository successfully!')
         return res.data
     } catch (error) {
-        console.log(error)
         if (!isEmpty(thumbnail)) {
             removeImage(thumbnail)
         }
@@ -33,6 +32,18 @@ export const createNewRepo = async (name, image, members) => {
 export const fetchAllRepositories = async () => {
     try {
         const res = await axios.get(`${API_ROOT}/v1/repository`)
+        return res.data
+    } catch (error) {
+        toast.error(resExceptionMessageHandler(error))
+    }
+}
+
+export const removeRepo = async (name, image) => {
+    try {
+        const res = await axios.delete(`${API_ROOT}/v1/repository/${name}`)
+        await removeImage(image)
+
+        toast.success(`Repo ${name} has been removed`)
         return res.data
     } catch (error) {
         toast.error(resExceptionMessageHandler(error))

@@ -1,4 +1,7 @@
+import { isEmpty } from 'lodash'
+
 import { env } from '~/configs/environment'
+import BadRequest from '~/errors/badRequest.error'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { RepositoryModel } from '~/models/repository.model'
@@ -6,9 +9,27 @@ import { githubAPI } from '~/utils/constants'
 
 const createNew = async (data) => {
     try {
+        const { name } = data
+        const [repoData] = await Promise.all([
+            findRepository(name),
+            _octokit.request(githubAPI.GET_REPOSITORY, {
+                owner: env.GITHUB_OWNER,
+                repo: name,
+                headers: githubAPI.HEADERS,
+            }),
+        ])
+
+        if (!isEmpty(repoData)) {
+            throw new BadRequest('This repo name is existed!')
+        }
+
         const res = await RepositoryModel.createNew(data)
+
         return res
     } catch (error) {
+        if (error instanceof BadRequest) {
+            throw new BadRequest(error.message)
+        }
         throw new InternalServer(error.message)
     }
 }
@@ -88,6 +109,25 @@ const createTag = async (repo, branchName, tagName) => {
     }
 }
 
+const removeRepository = async (name) => {
+    try {
+        const res = await RepositoryModel.removeRepository(name)
+        const { deletedCount } = res
+
+        if (deletedCount === 0) {
+            throw new NotFound(`Not found repository: ${name}`)
+        }
+
+        return res
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
 export const RepositoryService = {
     createNew,
     update,
@@ -95,4 +135,5 @@ export const RepositoryService = {
     findRepository,
     validateBranch,
     createTag,
+    removeRepository,
 }

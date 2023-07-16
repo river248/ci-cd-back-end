@@ -34,8 +34,22 @@ const findAllRepositories = async (req, res) => {
     }
 }
 
+const removeRepository = async (req, res) => {
+    try {
+        const { name } = req.params
+        const result = await RepositoryService.removeRepository(name)
+
+        res.status(HttpStatusCode.OK).json(result)
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            error: error.message,
+        })
+    }
+}
+
 export const RepositoryController = {
     createNew,
     update,
     findAllRepositories,
+    removeRepository,
 }

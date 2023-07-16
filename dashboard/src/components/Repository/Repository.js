@@ -15,12 +15,13 @@ import { useNavigate } from 'react-router-dom'
 import { useTheme } from '@mui/material/styles'
 import { isNil } from 'lodash'
 
-import { CardContent, CardActions, CardOverflow, AspectRatio, NoImage } from './Repository.styles'
+import { CardContent, CardActions, CardOverflow, AspectRatio } from './Repository.styles'
 import routes from '~/configs/routes'
 import Button from '~/components/Button'
 import { useFirebaseImage } from '~/hooks'
+import { NoImage } from '~/components/GlobalStyles/GlobalStyles.mui'
 
-function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
+function Repository({ name, imageUrl, loading, newItem, onAddNew, onRemove }) {
     const navigate = useNavigate()
     const theme = useTheme()
     const thumbnail = useFirebaseImage(imageUrl)
@@ -92,7 +93,7 @@ function Repository({ name, imageUrl, loading, newItem, onAddNew }) {
                         Go to pipeline
                     </Link>
                     <Tooltip arrow title={'Delete'}>
-                        <IconButton>
+                        <IconButton onClick={onRemove}>
                             <DeleteIcon sx={{ color: 'red' }} />
                         </IconButton>
                     </Tooltip>
@@ -108,6 +109,7 @@ Repository.propTypes = {
     loading: PropTypes.bool,
     newItem: PropTypes.bool,
     onAddNew: PropTypes.func,
+    onRemove: PropTypes.func,
 }
 
 export default React.memo(Repository)
