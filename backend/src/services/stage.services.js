@@ -21,7 +21,11 @@ const update = async (repository, name, executionId, data) => {
         const { status, startDateTime, endDateTime } = data
 
         let updatedData = {
-            status,
+            ...data,
+        }
+
+        if (status) {
+            updatedData = { ...updatedData, status }
         }
 
         if (startDateTime) {
