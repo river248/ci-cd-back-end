@@ -154,7 +154,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
     }
 }
 
-const finishStage = async (repository, stage, executionId, pipelineStatus, endDateTime) => {
+const finishStage = async (repository, stage, executionId, codePipelineBranch, pipelineStatus, endDateTime) => {
     try {
         let metrics = await MetricService.findMetrics(repository, stage, { executionId })
         const inProgressMetrics = []
@@ -202,7 +202,11 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
 
         const data = {
             status: isSuccess ? pipelineStatus : workflowStatus.FAILURE,
-            requireManualApproval: isSuccess && pipelineStatus === workflowStatus.SUCCESS && stage === 'test',
+            requireManualApproval:
+                isSuccess &&
+                pipelineStatus === workflowStatus.SUCCESS &&
+                stage === 'test' &&
+                codePipelineBranch === 'master',
             endDateTime,
         }
 
