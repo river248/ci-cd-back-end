@@ -1,0 +1,142 @@
+# This is a basic workflow that is manually triggered
+
+name: Production
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+    workflow_dispatch:
+        # Inputs the workflow accepts.
+        inputs:
+            name:
+                # Friendly description to be shown in the UI instead of 'name'
+                description: 'CI/CD to greet'
+                # Default value if no value is explicitly provided
+                default: 'Production'
+                # Input has to be provided for the workflow to run
+                required: true
+                # The data type of the input
+                type: string
+jobs:
+    start_stage:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
+            - name: Send greeting
+              run: echo "Hello ${{ steps.split.outputs._0 }}, I'm in prodction stage"
+
+    deployment_check:
+        needs: start_stage
+        runs-on: ubuntu-latest
+        steps:
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
+            - name: Checkout branch
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ steps.split.outputs._0 }}
+            - name: Overwrite dashboard environment variables
+              id: modify-firebase-var
+              uses: DamianReeves/write-file-action@master
+              with:
+                  path: ./dashboard/src/configs/firebase/initializeApp.js
+                  contents: |
+                      import { initializeApp } from 'firebase/app'
+                      const productionConfig = ${{ secrets.FIREBASE_PRODUCTION_CONFIG }}
+                      const firebase = initializeApp(productionConfig)
+                      export default firebase
+                  write-mode: overwrite
+              continue-on-error: true
+            - name: Overwrite server url
+              id: modify-server-url
+              uses: DamianReeves/write-file-action@master
+              with:
+                  path: ./dashboard/src/utils/serverURL.js
+                  contents: |
+                      const API_ROOT = 'https://ci-cd-github-actions.onrender.com'
+                      export default API_ROOT
+                  write-mode: overwrite
+              continue-on-error: true
+            - name: Use Node.js 18
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+            - name: Install dependencies and run build dashboard'
+              id: run-build
+              working-directory: ./dashboard
+              run: |
+                  npm ci
+                  npm run build
+              continue-on-error: true
+            - name: Archive production artifact
+              id: upload-artifact
+              uses: actions/upload-artifact@v3
+              with:
+                  name: build
+                  path: ./dashboard/build
+              continue-on-error: true
+            - name: Download artifact
+              id: download-artifact
+              uses: actions/download-artifact@v3
+              with:
+                  name: build
+                  path: ./dashboard/build
+              continue-on-error: true
+            - name: Overwrite deployment environment
+              id: modify-deploy-env
+              uses: DamianReeves/write-file-action@master
+              with:
+                  path: ./dashboard/.firebaserc
+                  contents: |
+                      {"projects": {"default": "ci-cd-github-actions"}}
+                  write-mode: overwrite
+              continue-on-error: true
+            - name: Deploy dashboard to Firebase
+              id: deployment
+              working-directory: ./dashboard
+              run: |
+                  npm install -g firebase-tools
+                  firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}"
+              continue-on-error: true
+            - name: Dashboard deployment check failed
+              if: steps.modify-firebase-var.outcome != 'success' || steps.modify-server-url.outcome != 'success' || steps.run-build.outcome != 'success' || steps.upload-artifact.outcome != 'success' || steps.download-artifact.outcome != 'success' || steps.modify-deploy-env.outcome != 'success' || steps.deployment.outcome != 'success'
+              run: |
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"production","executionId":"${{ github.run_id }}","metricName":"Deployment Check","appMetricName":"dashboard","data":"{\"actual\":0,\"total\":1}"}' \
+                    -H "Content-Type: application/json" \
+                    -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
+            - name: Dashboard deployment check successfully
+              if: steps.modify-firebase-var.outcome == 'success' && steps.modify-server-url.outcome == 'success' && steps.run-build.outcome == 'success' && steps.upload-artifact.outcome == 'success' && steps.download-artifact.outcome == 'success' && steps.modify-deploy-env.outcome == 'success' && steps.deployment.outcome == 'success'
+              run: |
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"production","executionId":"${{ github.run_id }}","metricName":"Deployment Check","appMetricName":"dashboard","data":"{\"actual\":1,\"total\":1}"}' \
+                    -H "Content-Type: application/json" \
+                    -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
+            - name: Trigger a deployment for backend
+              if: ${{ always() }}
+              run: |
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"production","executionId":"${{ github.run_id }}","appMetricName":"backend","deploymentInfo":{"deploymentEnvId":"${{secrets.RENDER_SERVER_PRODUCTION_ID}}","deploymentEnvKey":"${{secrets.RENDER_SERVER_PRODUCTION_KEY}}","commitId":"${{github.sha}}"}}' \
+                    -H "Authorization: ${{ secrets.RENDER_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    -X POST https://ci-cd-github-actions.onrender.com/v1/deployment
+
+    finish_stage:
+        if: ${{ always() }}
+        needs: deployment_check
+        runs-on: ubuntu-latest
+        steps:
+            - name: Slit ref to array.
+              id: split
+              uses: jungwinter/split@v2
+              with:
+                  msg: ${{ github.ref_name }}
+                  separator: '@'
+            - name: Send greeting
+              run: echo "Hello ${{ steps.split.outputs._0 }}, I'm fisnishing production stage"
