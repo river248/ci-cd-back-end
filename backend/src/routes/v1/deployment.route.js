@@ -13,12 +13,6 @@ router.post(
     DeploymentController.deployToProd,
 )
 router.post(
-    '/deployable-production',
-    AuthMiddleware.isAuthForDeployment,
-    DeploymentValidation.deployableProduction,
-    DeploymentController.deployableProduction,
-)
-router.post(
     '/',
     AuthMiddleware.isAuthForDeployment,
     DeploymentValidation.deploymentCheck,

@@ -202,6 +202,7 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
 
         const data = {
             status: isSuccess ? pipelineStatus : workflowStatus.FAILURE,
+            requireManualApproval: isSuccess && pipelineStatus === workflowStatus.SUCCESS && stage === 'test',
             endDateTime,
         }
 
