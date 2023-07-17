@@ -12,6 +12,7 @@ import LatestBuildContainer from '~/containers/LatestBuildContainer'
 import MetricContainer from '~/containers/MetricContainer'
 import StatusIcon from '~/components/StatusIcon'
 import { processName } from '~/utils/constants'
+import { StageName, StageWrapper } from '~/components/GlobalStyles/GlobalStyles.mui'
 
 function Stage({ name, status, loading }) {
     const theme = useTheme()
@@ -38,7 +39,7 @@ function Stage({ name, status, loading }) {
 
     if (loading) {
         return (
-            <Paper sx={{ padding: theme.spacing(1), backgroundColor: theme.palette.grey[300], width: 270 }}>
+            <StageWrapper>
                 <Skeleton variant={'text'} width={100} sx={{ margin: '0 auto', fontSize: '1.8rem' }} />
                 <Paper sx={{ padding: 1 }}>
                     <Skeleton variant={'rounded'} height={40} />
@@ -78,22 +79,15 @@ function Stage({ name, status, loading }) {
                         </Stack>
                     ))}
                 </Paper>
-            </Paper>
+            </StageWrapper>
         )
     }
 
     return (
-        <Paper sx={{ padding: theme.spacing(1), backgroundColor: theme.palette.grey[300], width: 270 }}>
-            <Typography
-                padding={1}
-                marginBottom={1}
-                variant={'h6'}
-                component={'div'}
-                fontSize={16}
-                textAlign={'center'}
-            >
+        <StageWrapper>
+            <StageName variant={'h6'} component={'div'}>
                 {name.toUpperCase()}
-            </Typography>
+            </StageName>
 
             {name.toUpperCase() === 'BUILD' && <BuildActionContainer />}
 
@@ -117,7 +111,7 @@ function Stage({ name, status, loading }) {
                     <MetricContainer />
                 </Paper>
             </Box>
-        </Paper>
+        </StageWrapper>
     )
 }
 

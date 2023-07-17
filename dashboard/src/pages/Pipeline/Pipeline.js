@@ -15,6 +15,7 @@ import StageContainer from '~/containers/StageContainer'
 import { handleFetchFullPipeline, handleUpdateStageData } from '~/redux/async-logics/pipelineLogic'
 import { processName, socket, socketEvent } from '~/utils/constants'
 import Stage from '~/components/Stage'
+import ProceedToProdContainer from '~/containers/ProceedToProdContainer'
 
 function Pipeline({ stages, loading, getFullPipeline, updateStageData }) {
     const query = useQueryHook()
@@ -63,6 +64,7 @@ function Pipeline({ stages, loading, getFullPipeline, updateStageData }) {
                         {stages.map((stage) => (
                             <StageContainer key={stage.name} stage={stage} />
                         ))}
+                        <ProceedToProdContainer />
                     </Fragment>
                 )}
             </Stack>
