@@ -115,13 +115,13 @@ const handlePipelineData = async (payload) => {
         const stage = workflow_job.workflow_name.toLowerCase()
         const isStartStage = jobName === 'start_stage'
         const isFinishStage = jobName === 'finish_stage'
+        const [codePipelineBranch, version] = headBranch.split('@')
 
         /**
          * When stage starts build
          * This block create new stage and metric
          */
         if (isStartStage) {
-            const [codePipelineBranch, version] = headBranch.split('@')
             const initialJob = {
                 codePipelineBranch,
                 commitId,
@@ -143,7 +143,14 @@ const handlePipelineData = async (payload) => {
          */
 
         if (isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
-            const res = await StageService.finishStage(repo, stage, executionId, jobStatus, endDateTime)
+            const res = await StageService.finishStage(
+                repo,
+                stage,
+                executionId,
+                codePipelineBranch,
+                jobStatus,
+                endDateTime,
+            )
 
             if (res) {
                 return res
