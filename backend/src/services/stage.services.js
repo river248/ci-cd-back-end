@@ -226,6 +226,24 @@ const finishStage = async (repository, stage, executionId, pipelineStatus, endDa
     }
 }
 
+const findInstallableProdVersions = async (repository) => {
+    const STAGE = 'test'
+    const CODE_PIPELINE_BRANCH = 'master'
+
+    try {
+        const stages = await findStages(
+            repository,
+            STAGE,
+            { requireManualApproval: true, codePipelineBranch: CODE_PIPELINE_BRANCH },
+            0,
+        )
+
+        return stages
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
 //========================================================================================+
 //                                 EXPORT PUBLIC FUNCTIONS                                |
 //========================================================================================+
@@ -237,4 +255,5 @@ export const StageService = {
     getStageData,
     startStage,
     finishStage,
+    findInstallableProdVersions,
 }
