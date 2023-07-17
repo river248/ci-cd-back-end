@@ -8,6 +8,7 @@ import { githubAPI, workflowStatus } from '~/utils/constants'
 import { env } from '~/configs/environment'
 import { StageService } from './stage.services'
 import BadRequest from '~/errors/badRequest.error'
+import NotFound from '~/errors/notfound.error'
 
 const deploymentCheck = async (repostory, stage, executionId, appMetricName, deploymentInfo) => {
     try {
@@ -53,6 +54,22 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
     }
 }
 
+const deployableProduction = async (repository, executionId) => {
+    const STAGE = 'test'
+
+    try {
+        await StageService.update(repository, STAGE, executionId, { requireManualApproval: true })
+
+        return 'Update success fully!'
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
 const deployToProd = async (repository, version) => {
     const STAGE = 'test'
 
@@ -91,4 +108,5 @@ const deployToProd = async (repository, version) => {
 export const DeploymentService = {
     deploymentCheck,
     deployToProd,
+    deployableProduction,
 }
