@@ -22,9 +22,9 @@ const deploymentCheck = async (req, res) => {
 
 const deployToProd = async (req, res) => {
     try {
-        const { repository, version } = req.body
+        const { repository, version, approve } = req.body
 
-        const result = await DeploymentService.deployToProd(repository, version)
+        const result = await DeploymentService.deployToProd(repository, version, approve)
         res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({

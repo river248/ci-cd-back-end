@@ -28,6 +28,7 @@ const deployToProd = async (req, res, next) => {
     const condition = Joi.object({
         repository: Joi.string().trim().min(4).max(50).required(),
         version: Joi.string().trim().required(),
+        approve: Joi.boolean().required(),
     })
     try {
         await condition.validateAsync(req.body, { abortEarly: false })

@@ -53,7 +53,7 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
     }
 }
 
-const deployToProd = async (repository, version) => {
+const deployToProd = async (repository, version, approve) => {
     const STAGE = 'test'
 
     try {
@@ -65,16 +65,18 @@ const deployToProd = async (repository, version) => {
             throw new BadRequest('There is a previous version need moving first')
         }
 
-        await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
-            owner: env.GITHUB_OWNER,
-            repo: repository,
-            workflow_id: 'production.yml',
-            ref: `master@${version}`,
-            inputs: {
-                name: 'Production',
-            },
-            headers: githubAPI.HEADERS,
-        })
+        if (approve) {
+            await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
+                owner: env.GITHUB_OWNER,
+                repo: repository,
+                workflow_id: 'production.yml',
+                ref: `master@${version}`,
+                inputs: {
+                    name: 'Production',
+                },
+                headers: githubAPI.HEADERS,
+            })
+        }
 
         const res = await StageService.update(repository, STAGE, executionId, { requireManualApproval: false })
 
