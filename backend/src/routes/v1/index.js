@@ -5,6 +5,7 @@ import { RepositoryRoute } from './repository.route'
 import { MetricRoute } from './metric.route'
 import { UserRoute } from './user.route'
 import { DeploymentRoute } from './deployment.route'
+import { StageRoute } from './stage.route'
 
 const router = express.Router()
 
@@ -14,5 +15,6 @@ router.use('/repository', RepositoryRoute)
 router.use('/metric', MetricRoute)
 router.use('/user', UserRoute)
 router.use('/deployment', DeploymentRoute)
+router.use('/stage', StageRoute)
 
 export const apiV1 = router

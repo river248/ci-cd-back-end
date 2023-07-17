@@ -12,7 +12,20 @@ const deploymentCheck = async (req, res) => {
             appMetricName,
             deploymentInfo,
         )
-        res.status(HttpStatusCode.OK).json({ message: result })
+        res.status(HttpStatusCode.OK).json(result)
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            error: error.message,
+        })
+    }
+}
+
+const deployToProd = async (req, res) => {
+    try {
+        const { repository, version, approve } = req.body
+
+        const result = await DeploymentService.deployToProd(repository, version, approve)
+        res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
             error: error.message,
@@ -22,4 +35,5 @@ const deploymentCheck = async (req, res) => {
 
 export const DeploymentController = {
     deploymentCheck,
+    deployToProd,
 }

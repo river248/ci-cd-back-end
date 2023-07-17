@@ -37,6 +37,7 @@ export const workflowStatus = {
 export const stageMetrics = {
     BUILD: ['Code Quality', 'Unit Tests', 'Unit Test Coverage'],
     TEST: ['Deployment Check'],
+    PRODUCTION: ['Deployment Check'],
 }
 
 export const updateAction = {

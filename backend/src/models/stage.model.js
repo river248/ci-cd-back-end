@@ -12,6 +12,7 @@ const stageCollectionSchema = Joi.object({
     commitId: Joi.string().trim().required(),
     status: Joi.string().trim().required(),
     version: Joi.string().trim().required(),
+    requireManualApproval: Joi.boolean().default(false),
     deploymentId: Joi.string().default(null),
     buildStartTime: Joi.date().timestamp().default(null),
     startDateTime: Joi.date().timestamp().default(null),

@@ -1,10 +1,13 @@
 import axios from 'axios'
+import { last } from 'lodash'
 
 import InternalServer from '~/errors/internalServer.error'
 import { asyncTimeout } from '~/utils/helpers'
 import { MetricService } from './metric.service'
-import { workflowStatus } from '~/utils/constants'
+import { githubAPI, workflowStatus } from '~/utils/constants'
 import { env } from '~/configs/environment'
+import { StageService } from './stage.services'
+import BadRequest from '~/errors/badRequest.error'
 
 const deploymentCheck = async (repostory, stage, executionId, appMetricName, deploymentInfo) => {
     try {
@@ -50,6 +53,44 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
     }
 }
 
+const deployToProd = async (repository, version, approve) => {
+    const STAGE = 'test'
+
+    try {
+        const stages = await StageService.findInstallableProdVersions(repository)
+        const lastInstallableVerion = last(stages)
+        const { executionId } = lastInstallableVerion
+
+        if (lastInstallableVerion.version !== version) {
+            throw new BadRequest('There is a previous version need moving first')
+        }
+
+        if (approve) {
+            await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
+                owner: env.GITHUB_OWNER,
+                repo: repository,
+                workflow_id: 'production.yml',
+                ref: `master@${version}`,
+                inputs: {
+                    name: 'Production',
+                },
+                headers: githubAPI.HEADERS,
+            })
+        }
+
+        const res = await StageService.update(repository, STAGE, executionId, { requireManualApproval: false })
+
+        return res
+    } catch (error) {
+        if (error instanceof BadRequest) {
+            throw new BadRequest(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
 export const DeploymentService = {
     deploymentCheck,
+    deployToProd,
 }
