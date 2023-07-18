@@ -1,15 +1,39 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { isEmpty, last } from 'lodash'
+import { toast } from 'react-toastify'
 
 import ProceedToProd from '~/components/ProceedToProd'
-import { useQueryHook } from '~/hooks'
+import { useAuth, useQueryHook } from '~/hooks'
 import { fetchInstallableProdVerions } from '~/apis/stageAPI'
 import { deployToProd } from '~/apis/deploymentAPI'
+import { socket, socketEvent } from '~/utils/constants'
+import ImageToastify from '~/components/ImageToastify'
 
 function ProceedToProdContainer() {
     const [loading, setLoading] = useState(false)
     const [deployVersion, setDeployVersion] = useState('')
     const query = useQueryHook()
+    const { user } = useAuth
+
+    useEffect(() => {
+        socket.on(socketEvent.DEPLOY_TO_PRODUCTION, (res) => {
+            const { userData, stageData, approve } = res
+
+            if (userData.userId !== user.userId) {
+                toast.info(
+                    <ImageToastify
+                        image={userData.avatar}
+                        content={`<strong>${userData.name}</strong> has just ${
+                            approve ? 'deployed' : 'rejected'
+                        } version <strong>${stageData.version}</strong> !`}
+                    />,
+                    { icon: false },
+                )
+            }
+        })
+
+        return () => socket.off(socketEvent.DEPLOY_TO_PRODUCTION)
+    }, [])
 
     useEffect(() => {
         setLoading(true)

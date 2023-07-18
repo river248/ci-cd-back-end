@@ -56,6 +56,7 @@ export const socketEvent = {
     USING_PIPELINE: 'using-pipeline',
     UPDATE_PIPELINE_DATA: 'update-pipeline-data',
     TRIGGER_PIPELINE: 'trigger-pipeline',
+    DEPLOY_TO_PRODUCTION: 'deploy-to-production',
 }
 
 export const clientHost = [
