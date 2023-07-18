@@ -34,7 +34,14 @@ function ProceedToProdContainer() {
             setVerisons(deployableVerions)
         })
 
-        return () => socket.off(socketEvent.DEPLOY_TO_PRODUCTION)
+        socket.on(socketEvent.UPDATE_DEPLOYABLED_PRODUCTION, (deployableVerions) => {
+            setVerisons(deployableVerions)
+        })
+
+        return () => {
+            socket.off(socketEvent.DEPLOY_TO_PRODUCTION)
+            socket.off(socketEvent.UPDATE_DEPLOYABLED_PRODUCTION)
+        }
     }, [])
 
     useEffect(() => {
