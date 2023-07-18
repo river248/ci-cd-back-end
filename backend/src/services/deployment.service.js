@@ -78,7 +78,14 @@ const deployToProd = async (repository, version, approve) => {
             })
         }
 
-        const res = await StageService.update(repository, STAGE, executionId, { requireManualApproval: false })
+        const [deployableVerions, deployedVersion] = await Promise.all([
+            StageService.findInstallableProdVersions(repository),
+            StageService.update(repository, STAGE, executionId, { requireManualApproval: false }),
+        ])
+
+        const res = deployableVerions
+            .filter((deployableVerion) => deployableVerion.version !== deployedVersion.version)
+            .map((deployableVerion) => deployableVerion.version)
 
         return res
     } catch (error) {

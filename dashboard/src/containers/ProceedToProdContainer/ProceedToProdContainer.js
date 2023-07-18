@@ -1,30 +1,48 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { isEmpty, last } from 'lodash'
+import { toast } from 'react-toastify'
 
 import ProceedToProd from '~/components/ProceedToProd'
-import { useQueryHook } from '~/hooks'
+import { useAuth, useQueryHook } from '~/hooks'
 import { fetchInstallableProdVerions } from '~/apis/stageAPI'
 import { deployToProd } from '~/apis/deploymentAPI'
+import { socket, socketEvent } from '~/utils/constants'
+import ImageToastify from '~/components/ImageToastify'
 
 function ProceedToProdContainer() {
     const [loading, setLoading] = useState(false)
-    const [deployVersion, setDeployVersion] = useState('')
+    const [versions, setVerisons] = useState([])
     const query = useQueryHook()
+    const { user } = useAuth()
 
     useEffect(() => {
-        setLoading(true)
-        getInstallableProdVerions()
-    }, [query.get('repo')])
+        socket.on(socketEvent.DEPLOY_TO_PRODUCTION, (res) => {
+            const { userData, deployableVerions, deployedVerion, approve } = res
 
-    const getInstallableProdVerions = useCallback(() => {
-        const callApi = async () => {
-            const installableProdVersions = await fetchInstallableProdVerions(query.get('repo'))
-
-            if (!isEmpty(installableProdVersions)) {
-                const deployVersion = last(installableProdVersions).version
-                setDeployVersion(deployVersion)
+            if (userData.userId !== user.userId) {
+                toast.info(
+                    <ImageToastify
+                        image={userData.avatar}
+                        content={`<strong>${userData.name}</strong> has just ${
+                            approve ? 'deployed' : 'rejected'
+                        } version <strong>${deployedVerion}</strong> !`}
+                    />,
+                    { icon: false },
+                )
             }
 
+            setVerisons(deployableVerions)
+        })
+
+        return () => socket.off(socketEvent.DEPLOY_TO_PRODUCTION)
+    }, [])
+
+    useEffect(() => {
+        const callApi = async () => {
+            setLoading(true)
+            const deployableVersions = await fetchInstallableProdVerions(query.get('repo'))
+            const mapToVersions = deployableVersions.map((deployableVersion) => deployableVersion.version)
+            setVerisons(mapToVersions)
             setLoading(false)
         }
 
@@ -36,7 +54,7 @@ function ProceedToProdContainer() {
             const callApi = async () => {
                 setLoading(true)
                 await deployToProd(query.get('repo'), deployVersion, approve)
-                getInstallableProdVerions()
+                setLoading(false)
             }
 
             callApi()
@@ -46,8 +64,8 @@ function ProceedToProdContainer() {
 
     return (
         <ProceedToProd
-            version={deployVersion}
-            disabled={loading || isEmpty(deployVersion)}
+            version={last(versions) ?? ''}
+            disabled={loading || isEmpty(versions)}
             onApproveOrReject={handleApproveOrRejectDeploy}
         />
     )
