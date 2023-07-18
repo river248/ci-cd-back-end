@@ -7,6 +7,7 @@ import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import { useTheme } from '@mui/material/styles'
+import { toast } from 'react-toastify'
 
 import { useQueryHook } from '~/hooks'
 import Title from '~/components/Title'
@@ -27,10 +28,14 @@ function Pipeline({ stages, loading, getFullPipeline, updateStageData }) {
         socket.on(socketEvent.UPDATE_PIPELINE_DATA, (data) => {
             updateStageData(data)
         })
+        socket.on(socketEvent.TRIGGER_PIPELINE, (data) => {
+            toast.success(data)
+        })
 
         return () => {
             socket.disconnect()
             socket.off(socketEvent.UPDATE_PIPELINE_DATA)
+            socket.off(socketEvent.TRIGGER_PIPELINE)
         }
     }, [])
 

@@ -4,7 +4,11 @@ import { HttpStatusCode, socketEvent } from '~/utils/constants'
 const triggerPipeline = async (req, res) => {
     try {
         const { repository, branchName } = req.body
+        const { user_id } = req.firebaseDecode
+
         await PipeLineService.triggerPipeline(repository, branchName)
+
+        _io.to(repository).except(user_id).emit(socketEvent.TRIGGER_PIPELINE, user_id)
         res.status(HttpStatusCode.OK).json({ message: 'Trigger successfully!' })
     } catch (error) {
         res.status(error.statusCode()).json({
