@@ -9,7 +9,7 @@ const triggerPipeline = async (req, res) => {
 
         await PipeLineService.triggerPipeline(repository, branchName)
 
-        _io.to(repository).except(user_id).emit(socketEvent.TRIGGER_PIPELINE, userData)
+        _io.to(repository).emit(socketEvent.TRIGGER_PIPELINE, userData)
         res.status(HttpStatusCode.OK).json({ message: 'Trigger successfully!' })
     } catch (error) {
         res.status(error.statusCode()).json({
