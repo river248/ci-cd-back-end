@@ -28,7 +28,12 @@ const deployToProd = async (req, res) => {
 
         const result = await DeploymentService.deployToProd(repository, version, approve)
 
-        _io.to(repository).emit(socketEvent.DEPLOY_TO_PRODUCTION, { userData, stageData: result, approve })
+        _io.to(repository).emit(socketEvent.DEPLOY_TO_PRODUCTION, {
+            userData,
+            deployableVerions: result,
+            deployedVerion: version,
+            approve,
+        })
         res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
