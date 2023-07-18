@@ -7,8 +7,9 @@ import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import { useTheme } from '@mui/material/styles'
+import { toast } from 'react-toastify'
 
-import { useQueryHook } from '~/hooks'
+import { useAuth, useQueryHook } from '~/hooks'
 import Title from '~/components/Title'
 import routes from '~/configs/routes'
 import StageContainer from '~/containers/StageContainer'
@@ -16,21 +17,35 @@ import { handleFetchFullPipeline, handleUpdateStageData } from '~/redux/async-lo
 import { processName, socket, socketEvent } from '~/utils/constants'
 import Stage from '~/components/Stage'
 import ProceedToProdContainer from '~/containers/ProceedToProdContainer'
+import ImageToastify from '~/components/ImageToastify'
 
 function Pipeline({ stages, loading, getFullPipeline, updateStageData }) {
     const query = useQueryHook()
     const theme = useTheme()
     const navigate = useNavigate()
+    const { user } = useAuth()
 
     useEffect(() => {
         socket.connect()
         socket.on(socketEvent.UPDATE_PIPELINE_DATA, (data) => {
             updateStageData(data)
         })
+        socket.on(socketEvent.TRIGGER_PIPELINE, (userData) => {
+            if (userData.userId !== user.userId) {
+                toast.info(
+                    <ImageToastify
+                        image={userData.avatar}
+                        content={`<strong>${userData.name}</strong> has just triggered pipeline !`}
+                    />,
+                    { icon: false },
+                )
+            }
+        })
 
         return () => {
             socket.disconnect()
             socket.off(socketEvent.UPDATE_PIPELINE_DATA)
+            socket.off(socketEvent.TRIGGER_PIPELINE)
         }
     }, [])
 
