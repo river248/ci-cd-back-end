@@ -17,7 +17,7 @@ const findInstallableProdVersions = async (req, res) => {
 const findStageByRepoAndExecutionId = async (req, res) => {
     try {
         const { name, repository, executionId } = req.query
-        const result = await StageService.getStageData(repository, name, executionId)
+        const result = await StageService.getStageData(repository, name, executionId, true)
 
         res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
