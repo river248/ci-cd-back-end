@@ -46,8 +46,6 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
 
                 break
             }
-
-            console.log('deployment status: ', status)
         }
 
         return deploymentMessage

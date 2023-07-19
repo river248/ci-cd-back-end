@@ -41,3 +41,8 @@ export const resExceptionMessageHandler = (exception) => {
     }
     return 'Unhandled exception'
 }
+
+export const asyncTimeout = async (ms) => {
+    let timer = null
+    return new Promise((resolve) => (timer = setTimeout(resolve, ms))).finally(() => clearTimeout(timer))
+}

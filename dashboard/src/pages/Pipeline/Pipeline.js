@@ -19,7 +19,7 @@ import Stage from '~/components/Stage'
 import ProceedToProdContainer from '~/containers/ProceedToProdContainer'
 import ImageToastify from '~/components/ImageToastify'
 
-function Pipeline({ stages, loading, getFullPipeline, updateStageData }) {
+function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateStageData }) {
     const query = useQueryHook()
     const theme = useTheme()
     const navigate = useNavigate()
@@ -50,13 +50,15 @@ function Pipeline({ stages, loading, getFullPipeline, updateStageData }) {
     }, [])
 
     useEffect(() => {
-        getFullPipeline(query.get('repo'))
+        if (socketListenTime === 0) {
+            getFullPipeline(query.get('repo'))
+        }
         socket.emit(socketEvent.USING_PIPELINE, query.get('repo'))
 
         return () => {
             socket.off(socketEvent.USING_PIPELINE)
         }
-    }, [query.get('repo')])
+    }, [query.get('repo'), socketListenTime])
 
     return (
         <Box paddingX={2} paddingY={1}>
@@ -136,6 +138,7 @@ Pipeline.propTypes = {
         }),
     ),
     loading: PropTypes.bool,
+    socketListenTime: PropTypes.number,
     getFullPipeline: PropTypes.func,
     updateStageData: PropTypes.func,
 }
@@ -143,6 +146,7 @@ Pipeline.propTypes = {
 const mapStateToProps = (state) => ({
     loading: state.pipeline.loading,
     stages: state.pipeline.stages,
+    socketListenTime: state.pipeline.socketListenTime,
 })
 
 const mapDispatchToProps = (dispatch) => ({

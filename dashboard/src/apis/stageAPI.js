@@ -12,3 +12,14 @@ export const fetchInstallableProdVerions = async (repository) => {
         toast.error(resExceptionMessageHandler(error))
     }
 }
+
+export const fetchStageByRepoAndExecutionId = async (repository, name, executionId) => {
+    try {
+        const res = await axios.get(
+            `${API_ROOT}/v1/stage?name=${name}&repository=${repository}&executionId=${executionId}`,
+        )
+        return res.data
+    } catch (error) {
+        toast.error(resExceptionMessageHandler(error))
+    }
+}
