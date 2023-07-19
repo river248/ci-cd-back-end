@@ -1,11 +1,11 @@
 import Joi from 'joi'
 
-import { HttpStatusCode } from '~/utils/constants'
+import { HttpStatusCode, stageName } from '~/utils/constants'
 
 const deploymentCheck = async (req, res, next) => {
     const condition = Joi.object({
         repository: Joi.string().trim().min(4).max(50).required(),
-        stage: Joi.string().valid('test', 'production').required(),
+        stage: Joi.string().valid(stageName.TEST, stageName.PRODUCTION).required(),
         executionId: Joi.string().trim().required(),
         appMetricName: Joi.string().trim().min(4).max(20).required(),
         deploymentInfo: Joi.object({

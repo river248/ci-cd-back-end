@@ -1,6 +1,6 @@
 import Joi from 'joi'
 
-import { HttpStatusCode } from '~/utils/constants'
+import { HttpStatusCode, stageName } from '~/utils/constants'
 
 const createNew = async (req, res, next) => {
     const condition = Joi.object({
@@ -10,7 +10,9 @@ const createNew = async (req, res, next) => {
             .pattern(/^(.+)\/([^/]+)(.jpg|.png|.jpeg)$/i)
             .required(),
         members: Joi.array().items(Joi.string().trim().required()).required(),
-        stages: Joi.array().items(Joi.string().valid('build', 'test', 'production').required()).required(),
+        stages: Joi.array()
+            .items(Joi.string().valid(stageName.BUILD, stageName.TEST, stageName.PRODUCTION).required())
+            .required(),
     })
     try {
         await condition.validateAsync(req.body, { abortEarly: false })
@@ -29,7 +31,7 @@ const update = async (req, res, next) => {
             .pattern(/^(.+)\/([^/]+)(.jpg|.png|.jpeg)$/i)
             .trim(),
         members: Joi.array().items(Joi.string().trim()),
-        stages: Joi.array().items(Joi.string().valid('build', 'test', 'production')),
+        stages: Joi.array().items(Joi.string().valid(stageName.BUILD, stageName.TEST, stageName.PRODUCTION)),
     })
     try {
         await condition.validateAsync(req.body, { abortEarly: false })

@@ -40,6 +40,12 @@ export const stageMetrics = {
     PRODUCTION: ['Deployment Check'],
 }
 
+export const stageName = {
+    BUILD: 'build',
+    TEST: 'test',
+    PRODUCTION: 'production',
+}
+
 export const updateAction = {
     SET: 'set',
     PUSH: 'push',

@@ -1,7 +1,7 @@
 import Joi from 'joi'
 
 import { getDB } from '~/configs/mongodb'
-import { collection } from '~/utils/constants'
+import { collection, stageName } from '~/utils/constants'
 
 const repositoryCollectionSchema = Joi.object({
     name: Joi.string().trim().min(4).max(50).required(),
@@ -10,7 +10,9 @@ const repositoryCollectionSchema = Joi.object({
         .trim()
         .required(),
     members: Joi.array().items(Joi.string().trim().required()).required(),
-    stages: Joi.array().items(Joi.string().valid('build', 'test', 'production').required()).required(),
+    stages: Joi.array()
+        .items(Joi.string().valid(stageName.BUILD, stageName.TEST, stageName.PRODUCTION).required())
+        .required(),
 })
 
 const validateSchema = async (data) => {

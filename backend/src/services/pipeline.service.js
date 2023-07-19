@@ -2,7 +2,7 @@ import { isEmpty, isNil } from 'lodash'
 
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
-import { githubAPI, updateAction, workflowStatus } from '~/utils/constants'
+import { githubAPI, updateAction, workflowStatus, stageName } from '~/utils/constants'
 import { MetricService } from './metric.service'
 import { StageService } from './stage.services'
 import { toTitleCase } from '~/utils/helpers'
@@ -80,12 +80,11 @@ const triggerPipeline = async (repo, branchName) => {
 
 const generateVersion = async (repository) => {
     const DOT = '.'
-    const BUILD = 'build'
     const FIRST_VERION = '0.0.1'
     const ELEMENT_TO_GET_VERSION = 2
 
     try {
-        const stages = await StageService.findStages(repository, BUILD, {}, 1)
+        const stages = await StageService.findStages(repository, stageName.BUILD, {}, 1)
 
         if (isEmpty(stages)) {
             return FIRST_VERION
