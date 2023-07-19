@@ -24,6 +24,7 @@ function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateSt
     const theme = useTheme()
     const navigate = useNavigate()
     const { user } = useAuth()
+    const REPOSITORY = query.get('repo')
 
     useEffect(() => {
         socket.connect()
@@ -50,15 +51,16 @@ function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateSt
     }, [])
 
     useEffect(() => {
-        if (socketListenTime === 0) {
-            getFullPipeline(query.get('repo'))
-        }
-        socket.emit(socketEvent.USING_PIPELINE, query.get('repo'))
+        getFullPipeline(REPOSITORY)
+    }, [REPOSITORY])
+
+    useEffect(() => {
+        socket.emit(socketEvent.USING_PIPELINE, REPOSITORY)
 
         return () => {
             socket.off(socketEvent.USING_PIPELINE)
         }
-    }, [query.get('repo'), socketListenTime])
+    }, [REPOSITORY, socketListenTime])
 
     return (
         <Box paddingX={2} paddingY={1}>
@@ -66,7 +68,7 @@ function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateSt
                 <IconButton sx={{ marginRight: 1 }} onClick={() => navigate(routes.dashboard, { replace: true })}>
                     <ArrowBackIcon sx={{ color: theme.palette.common.white, fontSize: 30 }} />
                 </IconButton>
-                <Title content={query.get('repo')} />
+                <Title content={REPOSITORY} />
             </Stack>
 
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>

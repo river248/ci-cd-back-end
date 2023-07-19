@@ -10,4 +10,4 @@ import {
 export const loading = createAction(PIPELINE_LOADING)
 export const getFullPipeline = createAction(GET_FULL_PIPELINE)
 export const updateStageData = createAction(UPDATE_STAGE_DATA)
-export const reLisenSocketEvent = createAction(RELISTEN_SOCKET_EVENT)
+export const reListenSocketEvent = createAction(RELISTEN_SOCKET_EVENT)

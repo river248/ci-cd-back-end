@@ -1,6 +1,6 @@
 import { fetchFullPipeline } from '~/apis/pipelineAPI'
 import { fetchStageByRepoAndExecutionId } from '~/apis/stageAPI'
-import { getFullPipeline, loading, reLisenSocketEvent, updateStageData } from '~/redux/actions/pipelineAction'
+import { getFullPipeline, loading, reListenSocketEvent, updateStageData } from '~/redux/actions/pipelineAction'
 import { processName } from '~/utils/constants'
 import { asyncTimeout } from '~/utils/helper'
 
@@ -22,7 +22,7 @@ export const handleUpdateStageData = (data) => async (dispatch) => {
             dispatch(updateStageData(stageData))
 
             if (stateStatus !== processName.IN_PROGRESS) {
-                dispatch(reLisenSocketEvent())
+                dispatch(reListenSocketEvent())
                 break
             }
         }

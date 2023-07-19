@@ -27,7 +27,7 @@ const pipelineReducer = createReducer(initialState, (builder) => {
         }
     })
     builder.addCase(RELISTEN_SOCKET_EVENT, (state, _action) => {
-        state.socketListenTime++
+        state.socketListenTime = state.socketListenTime + 1
     })
 })
 
