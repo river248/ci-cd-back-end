@@ -1,8 +1,14 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { PIPELINE_LOADING, GET_FULL_PIPELINE, UPDATE_STAGE_DATA } from '~/redux/types/pipelineType'
+import {
+    PIPELINE_LOADING,
+    GET_FULL_PIPELINE,
+    UPDATE_STAGE_DATA,
+    RELISTEN_SOCKET_EVENT,
+} from '~/redux/types/pipelineType'
 
 const initialState = {
     loading: false,
+    socketListenTime: 0,
     stages: [],
 }
 
@@ -19,6 +25,9 @@ const pipelineReducer = createReducer(initialState, (builder) => {
         if (index >= 0) {
             state.stages[index] = action.payload
         }
+    })
+    builder.addCase(RELISTEN_SOCKET_EVENT, (state, _action) => {
+        state.socketListenTime++
     })
 })
 
