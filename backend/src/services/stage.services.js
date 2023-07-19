@@ -3,7 +3,7 @@ import { isEmpty, isNil } from 'lodash'
 import { MetricService } from './metric.service'
 import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
-import { socketEvent, stageMetrics, updateAction, workflowStatus } from '~/utils/constants'
+import { socketEvent, stageMetrics, updateAction, workflowStatus, stageName } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
 //========================================================================================+
 //                                 PRIVATE FUNCTIONS                                      |
@@ -220,7 +220,6 @@ const startStage = async (repository, stage, executionId, initialJob) => {
 
 const finishStage = async (repository, stage, executionId, codePipelineBranch, pipelineStatus, endDateTime) => {
     try {
-        const TEST_STAGE = 'test'
         const { metrics, isSuccess } = await handleFinishStage(repository, stage, executionId)
 
         const data = {
@@ -228,14 +227,14 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
             requireManualApproval:
                 isSuccess &&
                 pipelineStatus === workflowStatus.SUCCESS &&
-                stage === TEST_STAGE &&
+                stage === stageName.TEST &&
                 codePipelineBranch === 'master',
             endDateTime,
         }
 
         const stageData = await update(repository, stage, executionId, data)
 
-        if (stage === TEST_STAGE) {
+        if (stage === stageName.TEST) {
             const deployableVerions = await findInstallableProdVersions(repository)
             const mapToVersions = deployableVerions.map((deployableVerion) => deployableVerion.version)
 
@@ -263,13 +262,12 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
 }
 
 const findInstallableProdVersions = async (repository) => {
-    const STAGE = 'test'
     const CODE_PIPELINE_BRANCH = 'master'
 
     try {
         const stages = await findStages(
             repository,
-            STAGE,
+            stageName.TEST,
             { requireManualApproval: true, codePipelineBranch: CODE_PIPELINE_BRANCH },
             0,
         )

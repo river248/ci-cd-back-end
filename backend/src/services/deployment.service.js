@@ -4,7 +4,7 @@ import { last } from 'lodash'
 import InternalServer from '~/errors/internalServer.error'
 import { asyncTimeout } from '~/utils/helpers'
 import { MetricService } from './metric.service'
-import { githubAPI, workflowStatus } from '~/utils/constants'
+import { githubAPI, workflowStatus, stageName } from '~/utils/constants'
 import { env } from '~/configs/environment'
 import { StageService } from './stage.services'
 import BadRequest from '~/errors/badRequest.error'
@@ -34,6 +34,10 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
                     deploymentMessage = 'Deployment failed!'
                 }
 
+                if (stage === stageName.PRODUCTION) {
+                    await asyncTimeout(30000)
+                }
+
                 await MetricService.handlePushMetric(
                     repostory,
                     stage,
@@ -43,6 +47,7 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
                     `https://dashboard.render.com/web/${deploymentEnvId}/events`,
                     JSON.stringify({ total: 1, actual }),
                 )
+
                 break
             }
         }
@@ -54,8 +59,6 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
 }
 
 const deployToProd = async (repository, version, approve) => {
-    const STAGE = 'test'
-
     try {
         const stages = await StageService.findInstallableProdVersions(repository)
         const lastInstallableVerion = last(stages)
@@ -80,7 +83,7 @@ const deployToProd = async (repository, version, approve) => {
 
         const [deployableVerions, deployedVersion] = await Promise.all([
             StageService.findInstallableProdVersions(repository),
-            StageService.update(repository, STAGE, executionId, { requireManualApproval: false }),
+            StageService.update(repository, stageName.TEST, executionId, { requireManualApproval: false }),
         ])
 
         const res = deployableVerions
