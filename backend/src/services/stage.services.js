@@ -247,6 +247,7 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
             delete metric.executionId
         })
 
+        console.log('stage: ', stage, 'stageData: ', stageData)
         if (!isEmpty(stageData) && !isNil(stageData)) {
             return { ...stageData, metrics }
         }

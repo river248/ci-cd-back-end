@@ -34,10 +34,6 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
                     deploymentMessage = 'Deployment failed!'
                 }
 
-                if (stage === stageName.PRODUCTION) {
-                    await asyncTimeout(30000)
-                }
-
                 await MetricService.handlePushMetric(
                     repostory,
                     stage,
@@ -50,6 +46,8 @@ const deploymentCheck = async (repostory, stage, executionId, appMetricName, dep
 
                 break
             }
+
+            console.log('deployment status: ', status)
         }
 
         return deploymentMessage
