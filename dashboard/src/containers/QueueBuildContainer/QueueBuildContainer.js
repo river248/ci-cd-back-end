@@ -12,7 +12,7 @@ function QueueBuildContainer() {
     const query = useQueryHook()
     const REPOSITORY = query.get('repo')
     const [tagNames, setTagNames] = useState([])
-    const user = useAuth()
+    const { user } = useAuth()
 
     useEffect(() => {
         socket.on(socketEvent.UPDATE_QUEUE, (res) => {
