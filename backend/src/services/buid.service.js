@@ -1,4 +1,4 @@
-import { first, isEmpty } from 'lodash'
+import { first, isEmpty, last } from 'lodash'
 
 import NotFound from '~/errors/notfound.error'
 import { RepositoryService } from './repository.service'
@@ -7,6 +7,7 @@ import { githubAPI, stageName, workflowStatus } from '~/utils/constants'
 import { env } from '~/configs/environment'
 import { StageService } from './stage.services'
 import { QueueModel } from '~/models/queue.model'
+import BadRequest from '~/errors/badRequest.error'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -17,16 +18,31 @@ const generateVersion = async (repository) => {
     const ELEMENT_TO_GET_VERSION = 2
 
     try {
-        const stages = await StageService.findStages(repository, stageName.BUILD, {}, 1)
+        const [stages, waitingBuilds] = await Promise.all([
+            StageService.findStages(repository, stageName.BUILD, {}, 1),
+            QueueModel.findQueue(repository),
+        ])
 
-        if (isEmpty(stages)) {
+        if (isEmpty(stages) && isEmpty(waitingBuilds)) {
             return FIRST_VERION
         }
 
-        const stageData = stages[0]
+        if (!isEmpty(waitingBuilds)) {
+            if (waitingBuilds.length >= 10) {
+                throw new BadRequest('Queue is full. Please wait for some build is triggered!')
+            }
 
+            const latesVerion = last(waitingBuilds)
+
+            return `0.0.${latesVerion.tagName.split('@')[1] * 1 + 1}`
+        }
+
+        const stageData = stages[0]
         return `0.0.${stageData.version.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
     } catch (error) {
+        if (error instanceof BadRequest) {
+            throw new BadRequest(error.message)
+        }
         throw new InternalServer(error.message)
     }
 }
@@ -112,6 +128,10 @@ const manuallyTriggerBuild = async (repository, branchName) => {
     } catch (error) {
         if (error instanceof NotFound) {
             throw new NotFound(error.message)
+        }
+
+        if (error instanceof BadRequest) {
+            throw new BadRequest(error.message)
         }
 
         throw new InternalServer(error.message)

@@ -8,10 +8,10 @@ const manuallyTriggerBuild = async (req, res) => {
         const { user_id, name, picture } = req.firebaseDecode
         const userData = { userId: user_id, name, avatar: picture }
 
-        await BuildService.manuallyTriggerBuild(repository, branchName)
+        const result = await BuildService.manuallyTriggerBuild(repository, branchName)
 
         _io.to(repository).emit(socketEvent.TRIGGER_PIPELINE, userData)
-        res.status(HttpStatusCode.OK).json({ message: 'Trigger successfully!' })
+        res.status(HttpStatusCode.OK).json({ message: result })
     } catch (error) {
         res.status(error.statusCode()).json({
             error: error.message,

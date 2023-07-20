@@ -105,7 +105,7 @@ const handlePipelineData = async (payload) => {
             )
 
             if (stage === stageName.TEST) {
-                BuildService.triggerBuildInQueue(repository)
+                BuildService.triggerBuildInQueue(repo)
             }
 
             if (res) {
