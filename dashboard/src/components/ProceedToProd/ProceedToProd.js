@@ -7,8 +7,8 @@ import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 import { isEmpty } from 'lodash'
 
-import { StageName, StageWrapper } from '~/components/GlobalStyles/GlobalStyles.mui'
 import Button from '~/components/Button'
+import StageCard from '~/components/StageCard'
 
 function ProceedToProd({ version, disabled, onApproveOrReject }) {
     const theme = useTheme()
@@ -16,15 +16,11 @@ function ProceedToProd({ version, disabled, onApproveOrReject }) {
     const REJECT = theme.palette.error.main
 
     return (
-        <StageWrapper>
-            <StageName variant={'h6'} component={'div'} textTransform={'uppercase'}>
-                Deploy to production
-            </StageName>
-
+        <StageCard title={'Deploy to production'}>
             <Box marginTop={1}>
                 <Paper sx={{ padding: 1 }}>
                     {!isEmpty(version) ? (
-                        <Typography variant={'span'} component={'div'}>
+                        <Typography variant={'span'} component={'div'} fontSize={14}>
                             Install version{' '}
                             <Typography
                                 variant={'span'}
@@ -45,7 +41,7 @@ function ProceedToProd({ version, disabled, onApproveOrReject }) {
                             button.
                         </Typography>
                     ) : (
-                        <Typography variant={'span'} component={'div'}>
+                        <Typography variant={'span'} component={'div'} fontSize={14}>
                             There is no version which can proceed to production.
                         </Typography>
                     )}
@@ -81,7 +77,7 @@ function ProceedToProd({ version, disabled, onApproveOrReject }) {
                     Approve
                 </Button>
             </Stack>
-        </StageWrapper>
+        </StageCard>
     )
 }
 

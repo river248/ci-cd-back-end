@@ -18,6 +18,7 @@ import { processName, socket, socketEvent } from '~/utils/constants'
 import Stage from '~/components/Stage'
 import ProceedToProdContainer from '~/containers/ProceedToProdContainer'
 import ImageToastify from '~/components/ImageToastify'
+import QueueBuildContainer from '~/containers/QueueBuildContainer'
 
 function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateStageData }) {
     const query = useQueryHook()
@@ -80,6 +81,7 @@ function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateSt
                     </Fragment>
                 ) : (
                     <Fragment>
+                        <QueueBuildContainer />
                         {stages.map((stage) => (
                             <StageContainer key={stage.name} stage={stage} />
                         ))}
