@@ -15,9 +15,9 @@ router.post('/data', PipeLineController.getWorkflowDataFromGithub)
 router.post(
     '/trigger-pipeline',
     AuthMiddleware.isAuth,
-    PipelineValidation.triggerPipeline,
+    PipelineValidation.manuallyTriggerBuild,
     RoleMiddleware.isMember,
-    PipeLineController.triggerPipeline,
+    PipeLineController.manuallyTriggerBuild,
 )
 router.get('/:repository', AuthMiddleware.isAuth, PipeLineController.getFullPipeline)
 

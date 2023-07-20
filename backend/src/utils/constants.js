@@ -56,6 +56,7 @@ export const collection = {
     STAGE: 'stages',
     REPOSITORY: 'repositories',
     USER: 'users',
+    QUEUE: 'queue',
 }
 
 export const socketEvent = {

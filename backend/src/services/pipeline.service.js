@@ -2,12 +2,12 @@ import { isEmpty, isNil } from 'lodash'
 
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
-import { githubAPI, updateAction, workflowStatus, stageName } from '~/utils/constants'
+import { stageName, updateAction, workflowStatus } from '~/utils/constants'
 import { MetricService } from './metric.service'
 import { StageService } from './stage.services'
 import { toTitleCase } from '~/utils/helpers'
 import { RepositoryService } from './repository.service'
-import { env } from '~/configs/environment'
+import { BuildService } from './buid.service'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -50,53 +50,6 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
 //========================================================================================+
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
-
-const triggerPipeline = async (repo, branchName) => {
-    try {
-        const [validatedBranch, version] = await Promise.all([
-            RepositoryService.validateBranch(repo, branchName),
-            generateVersion(repo),
-        ])
-        const tagName = await RepositoryService.createTag(repo, validatedBranch, version)
-
-        await _octokit.request(githubAPI.WORKFLOW_DISPATCH_ROUTE, {
-            owner: env.GITHUB_OWNER,
-            repo,
-            workflow_id: 'build.yml',
-            ref: tagName,
-            inputs: {
-                name: 'Build',
-            },
-            headers: githubAPI.HEADERS,
-        })
-    } catch (error) {
-        if (error instanceof NotFound) {
-            throw new NotFound(error.message)
-        }
-
-        throw new InternalServer(error.message)
-    }
-}
-
-const generateVersion = async (repository) => {
-    const DOT = '.'
-    const FIRST_VERION = '0.0.1'
-    const ELEMENT_TO_GET_VERSION = 2
-
-    try {
-        const stages = await StageService.findStages(repository, stageName.BUILD, {}, 1)
-
-        if (isEmpty(stages)) {
-            return FIRST_VERION
-        }
-
-        const stageData = stages[0]
-
-        return `0.0.${stageData.version.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
 
 const handlePipelineData = async (payload) => {
     try {
@@ -150,6 +103,10 @@ const handlePipelineData = async (payload) => {
                 jobStatus,
                 endDateTime,
             )
+
+            if (stage === stageName.TEST) {
+                BuildService.triggerBuildInQueue(repository)
+            }
 
             if (res) {
                 return res
@@ -206,8 +163,6 @@ const getFullPipeline = async (repository) => {
 //========================================================================================+
 
 export const PipeLineService = {
-    triggerPipeline,
     handlePipelineData,
     getFullPipeline,
-    generateVersion,
 }
