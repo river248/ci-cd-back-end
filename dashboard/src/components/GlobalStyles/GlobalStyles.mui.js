@@ -1,6 +1,5 @@
 import { styled } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
-import Typography from '@mui/material/Typography'
 
 import Input from '~/components/Input'
 
@@ -25,17 +24,4 @@ export const NoImage = styled('div')(({ theme }) => ({
     width: '100%',
     height: 140,
     backgroundColor: theme.palette.grey[100],
-}))
-
-export const StageWrapper = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(1),
-    backgroundColor: theme.palette.grey[300],
-    width: 270,
-}))
-
-export const StageName = styled(Typography)(({ theme }) => ({
-    padding: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-    fontSize: 16,
-    textAlign: 'center',
 }))

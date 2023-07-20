@@ -5,6 +5,7 @@ import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
 import { socketEvent, stageMetrics, updateAction, workflowStatus, stageName } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
+import { BuildService } from './buid.service'
 //========================================================================================+
 //                                 PRIVATE FUNCTIONS                                      |
 //========================================================================================+
@@ -246,6 +247,10 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
             delete metric.stage
             delete metric.executionId
         })
+
+        if (stage === stageName.TEST) {
+            BuildService.triggerBuildInQueue(repository)
+        }
 
         if (!isEmpty(stageData) && !isNil(stageData)) {
             return { ...stageData, metrics }

@@ -15,10 +15,11 @@ router.post('/data', PipeLineController.getWorkflowDataFromGithub)
 router.post(
     '/trigger-pipeline',
     AuthMiddleware.isAuth,
-    PipelineValidation.triggerPipeline,
+    PipelineValidation.manuallyTriggerBuild,
     RoleMiddleware.isMember,
-    PipeLineController.triggerPipeline,
+    PipeLineController.manuallyTriggerBuild,
 )
+router.get('/queue/:repository', AuthMiddleware.isAuth, PipeLineController.getQueue)
 router.get('/:repository', AuthMiddleware.isAuth, PipeLineController.getFullPipeline)
 
 export const PipeLineRoute = router

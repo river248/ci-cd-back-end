@@ -1,16 +1,17 @@
+import { BuildService } from '~/services/buid.service'
 import { PipeLineService } from '~/services/pipeline.service'
 import { HttpStatusCode, socketEvent } from '~/utils/constants'
 
-const triggerPipeline = async (req, res) => {
+const manuallyTriggerBuild = async (req, res) => {
     try {
         const { repository, branchName } = req.body
         const { user_id, name, picture } = req.firebaseDecode
         const userData = { userId: user_id, name, avatar: picture }
 
-        await PipeLineService.triggerPipeline(repository, branchName)
+        const result = await BuildService.manuallyTriggerBuild(repository, branchName)
 
         _io.to(repository).emit(socketEvent.TRIGGER_PIPELINE, userData)
-        res.status(HttpStatusCode.OK).json({ message: 'Trigger successfully!' })
+        res.status(HttpStatusCode.OK).json({ message: result })
     } catch (error) {
         res.status(error.statusCode()).json({
             error: error.message,
@@ -47,8 +48,21 @@ const getFullPipeline = async (req, res) => {
     }
 }
 
+const getQueue = async (req, res) => {
+    try {
+        const result = await BuildService.getQueue(req.params.repository)
+
+        res.status(HttpStatusCode.OK).json(result)
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            error: error.message,
+        })
+    }
+}
+
 export const PipeLineController = {
-    triggerPipeline,
+    manuallyTriggerBuild,
     getWorkflowDataFromGithub,
     getFullPipeline,
+    getQueue,
 }

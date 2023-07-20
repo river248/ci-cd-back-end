@@ -2,7 +2,7 @@ import Joi from 'joi'
 
 import { HttpStatusCode } from '~/utils/constants'
 
-const triggerPipeline = async (req, res, next) => {
+const manuallyTriggerBuild = async (req, res, next) => {
     const condition = Joi.object({
         repository: Joi.string().trim().min(4).max(50).required(),
         branchName: Joi.string().trim().min(6).max(50).required(),
@@ -21,5 +21,5 @@ const triggerPipeline = async (req, res, next) => {
 }
 
 export const PipelineValidation = {
-    triggerPipeline,
+    manuallyTriggerBuild,
 }
