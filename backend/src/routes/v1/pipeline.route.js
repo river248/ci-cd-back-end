@@ -19,6 +19,7 @@ router.post(
     RoleMiddleware.isMember,
     PipeLineController.manuallyTriggerBuild,
 )
+router.get('/queue/:repository', AuthMiddleware.isAuth, PipeLineController.getQueue)
 router.get('/:repository', AuthMiddleware.isAuth, PipeLineController.getFullPipeline)
 
 export const PipeLineRoute = router

@@ -48,8 +48,21 @@ const getFullPipeline = async (req, res) => {
     }
 }
 
+const getQueue = async (req, res) => {
+    try {
+        const result = await BuildService.getQueue(req.params.repository)
+
+        res.status(HttpStatusCode.OK).json(result)
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            error: error.message,
+        })
+    }
+}
+
 export const PipeLineController = {
     manuallyTriggerBuild,
     getWorkflowDataFromGithub,
     getFullPipeline,
+    getQueue,
 }

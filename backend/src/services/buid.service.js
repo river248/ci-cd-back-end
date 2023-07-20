@@ -89,6 +89,7 @@ const autoTriggerBuild = async (repo, tagName) => {
         throw new InternalServer(error.message)
     }
 }
+
 //========================================================================================+
 //                                    PUBLIC FUNCTIONS                                    |
 //========================================================================================+
@@ -139,6 +140,27 @@ const manuallyTriggerBuild = async (repository, branchName) => {
     }
 }
 
+const getQueue = async (repository) => {
+    try {
+        const [queue, repo] = await Promise.all([
+            QueueModel.findQueue(repository),
+            RepositoryService.findRepository(repository),
+        ])
+
+        if (isEmpty(repo)) {
+            throw new NotFound(`Not found repo: ${repository}`)
+        }
+
+        return queue
+    } catch (error) {
+        if (error instanceof NotFound) {
+            throw new NotFound(error.message)
+        }
+
+        throw new InternalServer(error.message)
+    }
+}
+
 //========================================================================================+
 //                                 EXPORT PUBLIC FUNCTIONS                                |
 //========================================================================================+
@@ -146,4 +168,5 @@ const manuallyTriggerBuild = async (repository, branchName) => {
 export const BuildService = {
     manuallyTriggerBuild,
     triggerBuildInQueue,
+    getQueue,
 }
