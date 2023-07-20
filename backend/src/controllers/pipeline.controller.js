@@ -5,12 +5,9 @@ import { HttpStatusCode, socketEvent } from '~/utils/constants'
 const manuallyTriggerBuild = async (req, res) => {
     try {
         const { repository, branchName } = req.body
-        const { user_id, name, picture } = req.firebaseDecode
-        const userData = { userId: user_id, name, avatar: picture }
 
-        const result = await BuildService.manuallyTriggerBuild(repository, branchName)
+        const result = await BuildService.manuallyTriggerBuild(repository, branchName, req.firebaseDecode)
 
-        _io.to(repository).emit(socketEvent.TRIGGER_PIPELINE, userData)
         res.status(HttpStatusCode.OK).json({ message: result })
     } catch (error) {
         res.status(error.statusCode()).json({

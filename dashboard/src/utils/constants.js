@@ -10,6 +10,7 @@ export const socketEvent = {
     TRIGGER_PIPELINE: 'trigger-pipeline',
     DEPLOY_TO_PRODUCTION: 'deploy-to-production',
     UPDATE_DEPLOYABLED_PRODUCTION: 'update-deployable-production',
+    UPDATE_QUEUE: 'update-queue',
 }
 
 export const httpStatusCode = {

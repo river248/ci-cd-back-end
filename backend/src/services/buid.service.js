@@ -3,7 +3,7 @@ import { first, isEmpty, last } from 'lodash'
 import NotFound from '~/errors/notfound.error'
 import { RepositoryService } from './repository.service'
 import InternalServer from '~/errors/internalServer.error'
-import { githubAPI, stageName, workflowStatus } from '~/utils/constants'
+import { githubAPI, socketEvent, stageName, workflowStatus } from '~/utils/constants'
 import { env } from '~/configs/environment'
 import { StageService } from './stage.services'
 import { QueueModel } from '~/models/queue.model'
@@ -104,13 +104,17 @@ const triggerBuildInQueue = async (repository) => {
 
             QueueModel.removeFromQueue(repository, tagName)
             autoTriggerBuild(repository, tagName)
+
+            return tagName
         }
+
+        return null
     } catch (error) {
         throw new InternalServer(error.message)
     }
 }
 
-const manuallyTriggerBuild = async (repository, branchName) => {
+const manuallyTriggerBuild = async (repository, branchName, triggerUser) => {
     try {
         const [validatedBranch, version] = await Promise.all([
             RepositoryService.validateBranch(repository, branchName),
@@ -119,13 +123,17 @@ const manuallyTriggerBuild = async (repository, branchName) => {
 
         const tagName = await RepositoryService.createTag(repository, validatedBranch, version)
         const buildable = await checkBuildable(repository, tagName)
+        const { user_id, name, picture } = triggerUser
+        const userData = { userId: user_id, name, avatar: picture }
 
         if (buildable) {
             await autoTriggerBuild(repository, tagName)
+            _io.to(repository).emit(socketEvent.TRIGGER_PIPELINE, userData)
 
             return 'Trigger build successfully!'
         }
 
+        _io.to(repository).emit(socketEvent.UPDATE_QUEUE, { action: 'push', tagName, userData })
         return 'Push to queue successfully!'
     } catch (error) {
         if (error instanceof NotFound) {
