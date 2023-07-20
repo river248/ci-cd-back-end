@@ -32,9 +32,10 @@ const generateVersion = async (repository) => {
                 throw new BadRequest('Queue is full. Please wait for some build is triggered!')
             }
 
-            const latesVerion = last(waitingBuilds)
+            const latesQueue = last(waitingBuilds)
+            const latesVerion = latesQueue.tagName.split('@')[1]
 
-            return `0.0.${latesVerion.tagName.split('@')[1] * 1 + 1}`
+            return `0.0.${latesVerion.split(DOT)[ELEMENT_TO_GET_VERSION] * 1 + 1}`
         }
 
         const stageData = stages[0]
