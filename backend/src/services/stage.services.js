@@ -249,7 +249,11 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
         })
 
         if (stage === stageName.TEST) {
-            BuildService.triggerBuildInQueue(repository)
+            BuildService.triggerBuildInQueue(repository).then((tagName) => {
+                if (tagName) {
+                    _io.to(repository).emit(socketEvent.UPDATE_QUEUE, { action: 'pop', tagName })
+                }
+            })
         }
 
         if (!isEmpty(stageData) && !isNil(stageData)) {
