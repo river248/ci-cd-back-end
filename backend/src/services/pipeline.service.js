@@ -2,12 +2,11 @@ import { isEmpty, isNil } from 'lodash'
 
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
-import { stageName, updateAction, workflowStatus } from '~/utils/constants'
+import { updateAction, workflowStatus } from '~/utils/constants'
 import { MetricService } from './metric.service'
 import { StageService } from './stage.services'
 import { toTitleCase } from '~/utils/helpers'
 import { RepositoryService } from './repository.service'
-import { BuildService } from './buid.service'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -103,10 +102,6 @@ const handlePipelineData = async (payload) => {
                 jobStatus,
                 endDateTime,
             )
-
-            if (stage === stageName.TEST) {
-                BuildService.triggerBuildInQueue(repo)
-            }
 
             if (res) {
                 return res
