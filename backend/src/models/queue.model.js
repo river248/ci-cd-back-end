@@ -22,7 +22,7 @@ const pushToQueue = async (data) => {
             createdAt: Date.now(),
         }
 
-        await getDB().collection(collection.QUEUE).insertOne(valueValidated)
+        const res = await getDB().collection(collection.QUEUE).insertOne(valueValidated)
 
         return { ...value, _id: res.insertedId.toString() }
     } catch (error) {
