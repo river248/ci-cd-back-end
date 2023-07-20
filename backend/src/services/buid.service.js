@@ -96,10 +96,10 @@ const manuallyTriggerBuild = async (repository, branchName) => {
     try {
         const [validatedBranch, version] = await Promise.all([
             RepositoryService.validateBranch(repository, branchName),
-            generateVersion(repo),
+            generateVersion(repository),
         ])
 
-        const tagName = await RepositoryService.createTag(repo, validatedBranch, version)
+        const tagName = await RepositoryService.createTag(repository, validatedBranch, version)
         const buildable = await checkBuildable(repository, tagName)
 
         if (buildable) {
