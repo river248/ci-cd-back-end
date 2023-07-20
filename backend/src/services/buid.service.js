@@ -44,7 +44,7 @@ const checkBuildable = async (repository, tagName) => {
             return true
         }
 
-        await QueueModel.pushToQueue(repository, tagName)
+        await QueueModel.pushToQueue({ repository, tagName })
 
         return false
     } catch (error) {
