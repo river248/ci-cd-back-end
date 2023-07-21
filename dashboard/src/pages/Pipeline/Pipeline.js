@@ -19,6 +19,8 @@ import Stage from '~/components/Stage'
 import ProceedToProdContainer from '~/containers/ProceedToProdContainer'
 import ImageToastify from '~/components/ImageToastify'
 import QueueBuildContainer from '~/containers/QueueBuildContainer'
+import QueueBuild from '~/components/QueueBuild'
+import ProceedToProd from '~/components/ProceedToProd'
 
 function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateStageData }) {
     const query = useQueryHook()
@@ -75,9 +77,11 @@ function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateSt
             <Stack direction={'row'} alignItems={'flex-start'} spacing={2}>
                 {loading ? (
                     <Fragment>
+                        <QueueBuild tagNames={['1', '2', '3', '4', '5']} loading />
                         <Stage name={'build'} loading />
                         <Stage name={'test'} loading />
                         <Stage name={'prod'} loading />
+                        <ProceedToProd loading />
                     </Fragment>
                 ) : (
                     <Fragment>

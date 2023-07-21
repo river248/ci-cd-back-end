@@ -4,16 +4,34 @@ import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import Skeleton from '@mui/material/Skeleton'
 import { useTheme } from '@mui/material/styles'
 import { isEmpty } from 'lodash'
 
 import Button from '~/components/Button'
 import StageCard from '~/components/StageCard'
 
-function ProceedToProd({ version, disabled, onApproveOrReject }) {
+function ProceedToProd({ version, disabled, loading, onApproveOrReject }) {
     const theme = useTheme()
     const APPROVE = theme.palette.success.main
     const REJECT = theme.palette.error.main
+
+    if (loading) {
+        return (
+            <StageCard>
+                <Skeleton variant={'text'} width={160} sx={{ margin: '0 auto', fontSize: '1.8rem' }} />
+                <Paper sx={{ padding: 1, marginTop: 1 }}>
+                    <Skeleton variant={'text'} />
+                    <Skeleton variant={'text'} />
+                    <Skeleton variant={'text'} width={100} />
+                </Paper>
+                <Stack direction={'row'} spacing={1} marginTop={1}>
+                    <Skeleton variant={'rounded'} width={'50%'} height={40} />
+                    <Skeleton variant={'rounded'} width={'50%'} height={40} />
+                </Stack>
+            </StageCard>
+        )
+    }
 
     return (
         <StageCard title={'Deploy to production'}>
@@ -84,6 +102,7 @@ function ProceedToProd({ version, disabled, onApproveOrReject }) {
 ProceedToProd.propTypes = {
     version: PropTypes.string,
     disabled: PropTypes.bool,
+    loading: PropTypes.bool,
     onApproveOrReject: PropTypes.func,
 }
 

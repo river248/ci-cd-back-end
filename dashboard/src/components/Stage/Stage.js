@@ -41,7 +41,7 @@ function Stage({ name, status, loading }) {
         return (
             <StageCard>
                 <Skeleton variant={'text'} width={100} sx={{ margin: '0 auto', fontSize: '1.8rem' }} />
-                <Paper sx={{ padding: 1 }}>
+                <Paper sx={{ padding: 1, marginTop: 1 }}>
                     <Skeleton variant={'rounded'} height={40} />
                     <Stack marginTop={1} spacing={1} direction={'row'}>
                         <Skeleton variant={'rounded'} width={'50%'} height={40} />
