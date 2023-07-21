@@ -4,11 +4,27 @@ import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Tooltip from '@mui/material/Tooltip'
+import Skeleton from '@mui/material/Skeleton'
 import { isEmpty } from 'lodash'
 
 import StageCard from '~/components/StageCard'
 
-function QueueBuild({ tagNames }) {
+function QueueBuild({ tagNames, loading }) {
+    if (loading) {
+        return (
+            <StageCard>
+                <Skeleton variant={'text'} width={100} sx={{ margin: '0 auto', fontSize: '1.8rem' }} />
+                <Stack spacing={1} marginTop={1}>
+                    {tagNames.map((item) => (
+                        <Paper sx={{ padding: 1 }} key={item}>
+                            <Skeleton variant={'text'} />
+                        </Paper>
+                    ))}
+                </Stack>
+            </StageCard>
+        )
+    }
+
     return (
         <StageCard title={'queue'}>
             <Stack spacing={1}>
@@ -33,6 +49,7 @@ function QueueBuild({ tagNames }) {
 }
 
 QueueBuild.propTypes = {
+    loading: PropTypes.bool,
     tagNames: PropTypes.arrayOf(PropTypes.string.isRequired),
 }
 
