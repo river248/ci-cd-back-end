@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash'
 
 import BuildAction from '~/components/BuildAction'
 import { processName } from '~/utils/constants'
-import { triggerPipeline } from '~/apis/pipelineAPI'
+import { stopBuild, triggerPipeline } from '~/apis/pipelineAPI'
 import { useStage } from '~/hooks'
 
 function BuildActionContainer() {
@@ -12,7 +12,7 @@ function BuildActionContainer() {
     const [branch, setBranch] = useState('')
     const [loading, setLoading] = useState(false)
 
-    const { repository, status } = latestBuild
+    const { repository, executionId, status } = latestBuild
 
     const handleSetBranch = useCallback((event) => {
         setBranch(event.target.value)
@@ -31,8 +31,14 @@ function BuildActionContainer() {
     }, [branch, repository])
 
     const handleStop = useCallback(() => {
-        console.log('stop build')
-    }, [branch, repository])
+        const callApi = async () => {
+            setLoading(true)
+            await stopBuild(repository, executionId)
+            setLoading(false)
+        }
+
+        callApi()
+    }, [executionId, repository])
 
     if (isEmpty(latestBuild)) {
         return null
@@ -41,7 +47,7 @@ function BuildActionContainer() {
     return (
         <BuildAction
             disableTrigger={loading || isEmpty(branch)}
-            disableStop={status !== processName.IN_PROGRESS || loading || isEmpty(branch)}
+            disableStop={isEmpty(executionId) || status !== processName.IN_PROGRESS || loading}
             branch={branch}
             onSetBranch={handleSetBranch}
             onTrigger={handleTrigger}
