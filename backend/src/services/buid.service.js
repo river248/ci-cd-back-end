@@ -150,7 +150,7 @@ const manuallyTriggerBuild = async (repository, branchName, triggerer) => {
 
 const manuallyStopBuild = async (repository, executionId, stopper) => {
     try {
-        await octokit.request(githubAPI.CANCEL_WORKFLOW, {
+        await _octokit.request(githubAPI.CANCEL_WORKFLOW, {
             owner: env.GITHUB_OWNER,
             repo: repository,
             run_id: executionId,

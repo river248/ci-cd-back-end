@@ -19,7 +19,7 @@ function StageContainer({ stage }) {
 
     let latestBuild = {}
 
-    if (repository && name && executionId) {
+    if (repository && name && executionId && status) {
         latestBuild = {
             stage: name,
             repository,
@@ -29,6 +29,7 @@ function StageContainer({ stage }) {
             commitId,
             startDateTime,
             endDateTime,
+            status,
         }
     }
 
