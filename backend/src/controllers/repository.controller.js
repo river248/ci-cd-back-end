@@ -4,7 +4,7 @@ import { HttpStatusCode } from '~/utils/constants'
 const createNew = async (req, res) => {
     try {
         const result = await RepositoryService.createNew(req.body)
-        res.status(HttpStatusCode.OK).json(result)
+        res.status(HttpStatusCode.CREATED).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
             error: error.message,

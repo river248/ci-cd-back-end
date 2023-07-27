@@ -1,6 +1,7 @@
 export const HttpStatusCode = {
     OK: 200,
     CREATED: 201,
+    ACCEPTED: 202,
     BAD_REQUEST: 400,
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
@@ -17,6 +18,7 @@ export const githubAPI = {
     GET_BRANCHES_ROUTE: 'GET /repos/{owner}/{repo}/branches',
     WORKFLOW_DISPATCH_ROUTE: 'POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches',
     GET_REPOSITORY: 'GET /repos/{owner}/{repo}',
+    CANCEL_WORKFLOW: 'POST /repos/{owner}/{repo}/actions/runs/{run_id}/cancel',
 }
 
 export const workflowStatus = {
@@ -66,6 +68,7 @@ export const socketEvent = {
     DEPLOY_TO_PRODUCTION: 'deploy-to-production',
     UPDATE_DEPLOYABLED_PRODUCTION: 'update-deployable-production',
     UPDATE_QUEUE: 'update-queue',
+    STOP_BUILD: 'stop-build',
 }
 
 export const clientHost = [
