@@ -19,6 +19,13 @@ router.post(
     RoleMiddleware.isMember,
     PipeLineController.manuallyTriggerBuild,
 )
+router.post(
+    '/stop-build',
+    AuthMiddleware.isAuth,
+    PipelineValidation.manuallyStopBuild,
+    RoleMiddleware.isMember,
+    PipeLineController.manuallyStopBuild,
+)
 router.get('/queue/:repository', AuthMiddleware.isAuth, PipeLineController.getQueue)
 router.get('/:repository', AuthMiddleware.isAuth, PipeLineController.getFullPipeline)
 

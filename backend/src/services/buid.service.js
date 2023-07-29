@@ -114,7 +114,7 @@ const triggerBuildInQueue = async (repository) => {
     }
 }
 
-const manuallyTriggerBuild = async (repository, branchName, triggerUser) => {
+const manuallyTriggerBuild = async (repository, branchName, triggerer) => {
     try {
         const [validatedBranch, version] = await Promise.all([
             RepositoryService.validateBranch(repository, branchName),
@@ -123,7 +123,7 @@ const manuallyTriggerBuild = async (repository, branchName, triggerUser) => {
 
         const tagName = await RepositoryService.createTag(repository, validatedBranch, version)
         const buildable = await checkBuildable(repository, tagName)
-        const { user_id, name, picture } = triggerUser
+        const { user_id, name, picture } = triggerer
         const userData = { userId: user_id, name, avatar: picture }
 
         if (buildable) {
@@ -144,6 +144,25 @@ const manuallyTriggerBuild = async (repository, branchName, triggerUser) => {
             throw new BadRequest(error.message)
         }
 
+        throw new InternalServer(error.message)
+    }
+}
+
+const manuallyStopBuild = async (repository, executionId, stopper) => {
+    try {
+        await _octokit.request(githubAPI.CANCEL_WORKFLOW, {
+            owner: env.GITHUB_OWNER,
+            repo: repository,
+            run_id: executionId,
+            headers: githubAPI.HEADERS,
+        })
+
+        const { user_id, name, picture } = stopper
+        const userData = { userId: user_id, name, avatar: picture }
+        _io.to(repository).emit(socketEvent.STOP_BUILD, userData)
+
+        return 'Stop build successfully!'
+    } catch (error) {
         throw new InternalServer(error.message)
     }
 }
@@ -177,4 +196,5 @@ export const BuildService = {
     manuallyTriggerBuild,
     triggerBuildInQueue,
     getQueue,
+    manuallyStopBuild,
 }

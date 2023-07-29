@@ -26,6 +26,19 @@ export const triggerPipeline = async (repository, branchName) => {
     }
 }
 
+export const stopBuild = async (repository, executionId) => {
+    try {
+        const res = await axios.post(`${API_ROOT}/v1/pipeline/stop-build`, {
+            repository,
+            executionId,
+        })
+
+        toast.success(res.data.message)
+    } catch (error) {
+        toast.error(resExceptionMessageHandler(error))
+    }
+}
+
 export const fetchQueue = async (repository) => {
     try {
         const res = await axios.get(`${API_ROOT}/v1/pipeline/queue/${repository}`)

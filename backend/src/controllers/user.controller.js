@@ -17,7 +17,7 @@ const update = async (req, res) => {
     try {
         const result = await UserService.update(req.body)
 
-        res.status(HttpStatusCode.CREATED).json(result)
+        res.status(HttpStatusCode.OK).json(result)
     } catch (error) {
         res.status(error.statusCode()).json({
             error: error.message,

@@ -20,6 +20,22 @@ const manuallyTriggerBuild = async (req, res, next) => {
     }
 }
 
+const manuallyStopBuild = async (req, res, next) => {
+    const condition = Joi.object({
+        repository: Joi.string().trim().min(4).max(50).required(),
+        executionId: Joi.string().trim().required(),
+    })
+    try {
+        await condition.validateAsync(req.body, { abortEarly: false })
+        next()
+    } catch (error) {
+        res.status(HttpStatusCode.BAD_REQUEST).json({
+            error: error.message,
+        })
+    }
+}
+
 export const PipelineValidation = {
     manuallyTriggerBuild,
+    manuallyStopBuild,
 }

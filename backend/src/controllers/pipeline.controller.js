@@ -16,6 +16,20 @@ const manuallyTriggerBuild = async (req, res) => {
     }
 }
 
+const manuallyStopBuild = async (req, res) => {
+    try {
+        const { repository, executionId } = req.body
+
+        const result = await BuildService.manuallyStopBuild(repository, executionId, req.firebaseDecode)
+
+        res.status(HttpStatusCode.ACCEPTED).json({ message: result })
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            error: error.message,
+        })
+    }
+}
+
 const getWorkflowDataFromGithub = async (req, res) => {
     try {
         const result = await PipeLineService.handlePipelineData(req.body)
@@ -62,4 +76,5 @@ export const PipeLineController = {
     getWorkflowDataFromGithub,
     getFullPipeline,
     getQueue,
+    manuallyStopBuild,
 }
