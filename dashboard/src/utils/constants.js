@@ -11,6 +11,7 @@ export const socketEvent = {
     DEPLOY_TO_PRODUCTION: 'deploy-to-production',
     UPDATE_DEPLOYABLED_PRODUCTION: 'update-deployable-production',
     UPDATE_QUEUE: 'update-queue',
+    STOP_BUILD: 'stop-build',
 }
 
 export const httpStatusCode = {

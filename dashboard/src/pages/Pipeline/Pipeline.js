@@ -45,11 +45,22 @@ function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateSt
                 )
             }
         })
-
+        socket.on(socketEvent.STOP_BUILD, (userData) => {
+            if (userData.userId !== user.userId) {
+                toast.info(
+                    <ImageToastify
+                        image={userData.avatar}
+                        content={`<strong>${userData.name}</strong> has just stopped build !`}
+                    />,
+                    { icon: false },
+                )
+            }
+        })
         return () => {
             socket.disconnect()
             socket.off(socketEvent.UPDATE_PIPELINE_DATA)
             socket.off(socketEvent.TRIGGER_PIPELINE)
+            socket.off(socketEvent.STOP_BUILD)
         }
     }, [])
 
