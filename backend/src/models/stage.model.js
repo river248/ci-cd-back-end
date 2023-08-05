@@ -116,9 +116,24 @@ const findStages = async (repository, name, condition, limit) => {
     }
 }
 
+const findExecutionsByDate = async (startDateTime, endDateTime) => {
+    try {
+        const res = await getDB()
+            .collection(collection.STAGE)
+            .find({ buildStartTime: { $gte: startDateTime }, endDateTime: { $lte: endDateTime } })
+            .sort({ buildStartTime: -1 })
+            .toArray()
+
+        return res
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 export const StageModel = {
     createNew,
     update,
     findStage,
     findStages,
+    findExecutionsByDate,
 }

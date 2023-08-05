@@ -287,6 +287,22 @@ const findInstallableProdVersions = async (repository) => {
     }
 }
 
+const findExecutionsByDate = async (startDateTime, endDateTime) => {
+    try {
+        const fromDate = new Date(startDateTime)
+        let toDate = new Date(endDateTime)
+
+        toDate = toDate.toISOString().split('T')[0]
+        toDate = new Date(`${toDate}T23:59:59.999Z`)
+
+        const res = await StageModel.findExecutionsByDate(fromDate, toDate)
+
+        return res
+    } catch (error) {
+        throw new InternalServer(error.message)
+    }
+}
+
 //========================================================================================+
 //                                 EXPORT PUBLIC FUNCTIONS                                |
 //========================================================================================+
@@ -299,4 +315,5 @@ export const StageService = {
     startStage,
     finishStage,
     findInstallableProdVersions,
+    findExecutionsByDate,
 }
