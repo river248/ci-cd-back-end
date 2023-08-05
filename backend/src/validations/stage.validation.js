@@ -13,10 +13,7 @@ const findExecutionsByDate = async (req, res, next) => {
         const fromDate = new Date(startDateTime)
         const toDate = new Date(endDateTime)
 
-        fromDate.toISOString()
-        toDate.toISOString()
-
-        if (fromDate > toDate) {
+        if (fromDate.getTime() > toDate.getTime()) {
             throw new Error('startDateTime must be less than or equal endDateTime !')
         }
 
