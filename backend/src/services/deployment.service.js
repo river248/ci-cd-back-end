@@ -6,7 +6,7 @@ import { asyncTimeout } from '~/utils/helpers'
 import { MetricService } from './metric.service'
 import { githubAPI, workflowStatus, stageName } from '~/utils/constants'
 import { env } from '~/configs/environment'
-import { StageService } from './stage.services'
+import { StageService } from './stage.service'
 import BadRequest from '~/errors/badRequest.error'
 
 const deploymentCheck = async (repostory, stage, executionId, appMetricName, deploymentInfo) => {

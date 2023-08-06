@@ -4,7 +4,7 @@ import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { updateAction, workflowStatus } from '~/utils/constants'
 import { MetricService } from './metric.service'
-import { StageService } from './stage.services'
+import { StageService } from './stage.service'
 import { toTitleCase } from '~/utils/helpers'
 import { RepositoryService } from './repository.service'
 //========================================================================================+

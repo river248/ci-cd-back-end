@@ -4,7 +4,7 @@ import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { MetricModel } from '~/models/metric.model'
 import { updateAction } from '~/utils/constants'
-import { StageService } from './stage.services'
+import { StageService } from './stage.service'
 
 //========================================================================================+
 //                                    PRIVATE FUNCTIONS                                   |

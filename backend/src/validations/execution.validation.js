@@ -4,6 +4,7 @@ import { HttpStatusCode } from '~/utils/constants'
 
 const findExecutionsByDate = async (req, res, next) => {
     const condition = Joi.object({
+        repository: Joi.string().trim().min(4).max(50).required(),
         startDateTime: Joi.string().trim().required().length(10),
         endDateTime: Joi.string().trim().required().length(10),
     })
@@ -25,4 +26,4 @@ const findExecutionsByDate = async (req, res, next) => {
     }
 }
 
-export const StageValidation = { findExecutionsByDate }
+export const ExecutionValidation = { findExecutionsByDate }
