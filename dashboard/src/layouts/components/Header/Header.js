@@ -10,9 +10,21 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 import { isEmpty } from 'lodash'
-import { Dropdown, DropdownItem, Search, Wrapper } from './Header.styles.js'
 
-function Header({ avatar, popperPlacement, popperAnchor, openPopper, popperMenu = [], onTogglePopper, onSelectItem }) {
+import { Dropdown, DropdownItem, Search, Wrapper } from './Header.styles'
+import Button from '~/components/Button'
+
+function Header({
+    avatar,
+    popperPlacement,
+    popperAnchor,
+    openPopper,
+    popperMenu = [],
+    navigation,
+    onTogglePopper,
+    onSelectItem,
+    onNavigate,
+}) {
     const theme = useTheme()
 
     return (
@@ -31,6 +43,16 @@ function Header({ avatar, popperPlacement, popperAnchor, openPopper, popperMenu 
                     >
                         CI/CD
                     </Typography>
+                    <Button
+                        variant={'contained'}
+                        size={'small'}
+                        defaultText={false}
+                        uppercase={false}
+                        sx={{ marginLeft: theme.spacing(3) }}
+                        onClick={onNavigate}
+                    >
+                        {navigation}
+                    </Button>
                 </Stack>
                 <Search placeholder={'Search...'} />
                 <ClickAwayListener onClickAway={() => onTogglePopper('bottom-end', null)}>
@@ -81,8 +103,10 @@ Header.propTypes = {
             name: PropTypes.string.isRequired,
         }),
     ),
+    navigation: PropTypes.string.isRequired,
     onTogglePopper: PropTypes.func,
     onSelectItem: PropTypes.func,
+    onNavigate: PropTypes.func,
 }
 
 export default React.memo(Header)
