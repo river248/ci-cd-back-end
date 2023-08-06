@@ -1,4 +1,4 @@
-import { StageService } from '~/services/stage.services'
+import { StageService } from '~/services/stage.service'
 import { HttpStatusCode } from '~/utils/constants'
 
 const findInstallableProdVersions = async (req, res) => {
@@ -27,21 +27,7 @@ const findStageByRepoAndExecutionId = async (req, res) => {
     }
 }
 
-const findExecutionsByDate = async (req, res) => {
-    try {
-        const { startDateTime, endDateTime } = req.query
-        const result = await StageService.findExecutionsByDate(startDateTime, endDateTime)
-
-        res.status(HttpStatusCode.OK).json(result)
-    } catch (error) {
-        res.status(error.statusCode()).json({
-            error: error.message,
-        })
-    }
-}
-
 export const StageController = {
     findInstallableProdVersions,
     findStageByRepoAndExecutionId,
-    findExecutionsByDate,
 }

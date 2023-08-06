@@ -5,7 +5,7 @@ import { RepositoryService } from './repository.service'
 import InternalServer from '~/errors/internalServer.error'
 import { githubAPI, socketEvent, stageName, workflowStatus } from '~/utils/constants'
 import { env } from '~/configs/environment'
-import { StageService } from './stage.services'
+import { StageService } from './stage.service'
 import { QueueModel } from '~/models/queue.model'
 import BadRequest from '~/errors/badRequest.error'
 //========================================================================================+

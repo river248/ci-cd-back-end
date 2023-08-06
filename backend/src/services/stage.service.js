@@ -1,4 +1,4 @@
-import { isEmpty, isNil } from 'lodash'
+import { cloneDeep, isEmpty, isNil } from 'lodash'
 
 import { MetricService } from './metric.service'
 import InternalServer from '~/errors/internalServer.error'
@@ -111,7 +111,13 @@ const update = async (repository, name, executionId, data) => {
 
 const findStages = async (repository, name, condition, limit) => {
     try {
-        const stageData = await StageModel.findStages(repository, name, condition, limit)
+        let newCondition = cloneDeep(condition)
+
+        if (!isEmpty(name)) {
+            newCondition = { ...newCondition, name }
+        }
+
+        const stageData = await StageModel.findStages(repository, newCondition, limit)
 
         return stageData
     } catch (error) {
@@ -287,22 +293,6 @@ const findInstallableProdVersions = async (repository) => {
     }
 }
 
-const findExecutionsByDate = async (startDateTime, endDateTime) => {
-    try {
-        const fromDate = new Date(startDateTime)
-        let toDate = new Date(endDateTime)
-
-        toDate = toDate.toISOString().split('T')[0]
-        toDate = new Date(`${toDate}T23:59:59.999Z`)
-
-        const res = await StageModel.findExecutionsByDate(fromDate, toDate)
-
-        return res
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
-
 //========================================================================================+
 //                                 EXPORT PUBLIC FUNCTIONS                                |
 //========================================================================================+
@@ -315,5 +305,4 @@ export const StageService = {
     startStage,
     finishStage,
     findInstallableProdVersions,
-    findExecutionsByDate,
 }

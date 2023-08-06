@@ -102,28 +102,14 @@ const findStage = async (repository, name, executionId) => {
  * @param {string} name
  * @param {object} condition
  */
-const findStages = async (repository, name, condition, limit) => {
+const findStages = async (repository, condition, limit) => {
     try {
         const res = await getDB()
             .collection(collection.STAGE)
-            .find({ repository, name, ...condition })
+            .find({ repository, ...condition })
             .sort({ buildStartTime: -1 })
             .limit(limit)
             .toArray()
-        return res
-    } catch (error) {
-        throw new Error(error)
-    }
-}
-
-const findExecutionsByDate = async (startDateTime, endDateTime) => {
-    try {
-        const res = await getDB()
-            .collection(collection.STAGE)
-            .find({ buildStartTime: { $gte: startDateTime }, endDateTime: { $lte: endDateTime } })
-            .sort({ buildStartTime: -1 })
-            .toArray()
-
         return res
     } catch (error) {
         throw new Error(error)
@@ -135,5 +121,4 @@ export const StageModel = {
     update,
     findStage,
     findStages,
-    findExecutionsByDate,
 }
