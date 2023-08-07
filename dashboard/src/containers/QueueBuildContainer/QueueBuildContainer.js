@@ -6,7 +6,7 @@ import QueueBuild from '~/components/QueueBuild'
 import { useAuth, useQueryHook } from '~/hooks'
 import { socket, socketEvent } from '~/utils/constants'
 import { fetchQueue } from '~/apis/pipelineAPI'
-import ImageToastify from '~/components/ImageToastify/ImageToastify'
+import ImageToastify from '~/components/ImageToastify'
 
 function QueueBuildContainer() {
     const query = useQueryHook()
