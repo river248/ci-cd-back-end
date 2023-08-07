@@ -14,6 +14,7 @@ import Header from '~/components/Title'
 import { handleGetExecutionsByDate } from '~/redux/async-logics/executionLogic'
 import ExecutionChartContainer from '~/containers/ExecutionChartContainer'
 import { processName } from '~/utils/constants'
+import { EXECUTION } from '~/utils/apiPropTypes'
 
 function Executions({ loading, executions, getExecutionsByDate }) {
     const theme = useTheme()
@@ -99,23 +100,7 @@ function Executions({ loading, executions, getExecutionsByDate }) {
 ExecutionTableContainer.propTypes = {
     loading: PropTypes.bool,
     getExecutionsByDate: PropTypes.func,
-    executions: PropTypes.arrayOf(
-        PropTypes.shape({
-            _id: PropTypes.string.isRequired,
-            executionId: PropTypes.string.isRequired,
-            name: PropTypes.oneOf(['build', 'test', 'production']).isRequired,
-            repository: PropTypes.string.isRequired,
-            codePipelineBranch: PropTypes.string,
-            commitId: PropTypes.string,
-            status: PropTypes.oneOf([processName.SUCCESS, processName.FAILURE]),
-            version: PropTypes.string.isRequired,
-            buildStartTime: PropTypes.string.isRequired,
-            requireManualApproval: PropTypes.bool,
-            deploymentId: PropTypes.string,
-            startDateTime: PropTypes.string.isRequired,
-            endDateTime: PropTypes.string.isRequired,
-        }),
-    ),
+    executions: PropTypes.arrayOf(EXECUTION),
 }
 
 const mapStateToProps = (state) => ({

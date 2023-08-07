@@ -15,7 +15,7 @@ import { countBy, groupBy } from 'lodash'
 import { getDate } from 'date-fns'
 import { useTheme } from '@mui/material/styles'
 
-import { processName } from '~/utils/constants'
+import { EXECUTION } from '~/utils/apiPropTypes'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -92,23 +92,7 @@ function ExecutionChartContainer({ chartName, executions }) {
 
 ExecutionChartContainer.propTypes = {
     chartName: PropTypes.string.isRequired,
-    executions: PropTypes.arrayOf(
-        PropTypes.shape({
-            _id: PropTypes.string.isRequired,
-            executionId: PropTypes.string.isRequired,
-            name: PropTypes.oneOf(['build', 'test', 'production']).isRequired,
-            repository: PropTypes.string.isRequired,
-            codePipelineBranch: PropTypes.string,
-            commitId: PropTypes.string,
-            status: PropTypes.oneOf([processName.SUCCESS, processName.FAILURE]),
-            version: PropTypes.string.isRequired,
-            buildStartTime: PropTypes.string.isRequired,
-            requireManualApproval: PropTypes.bool,
-            deploymentId: PropTypes.string,
-            startDateTime: PropTypes.string.isRequired,
-            endDateTime: PropTypes.string.isRequired,
-        }),
-    ),
+    executions: PropTypes.arrayOf(EXECUTION),
 }
 
 export default React.memo(ExecutionChartContainer)

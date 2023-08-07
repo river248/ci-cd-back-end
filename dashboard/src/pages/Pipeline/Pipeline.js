@@ -14,13 +14,14 @@ import Title from '~/components/Title'
 import routes from '~/configs/routes'
 import StageContainer from '~/containers/StageContainer'
 import { handleFetchFullPipeline, handleUpdateStageData } from '~/redux/async-logics/pipelineLogic'
-import { processName, socket, socketEvent } from '~/utils/constants'
+import { socket, socketEvent } from '~/utils/constants'
 import Stage from '~/components/Stage'
 import ProceedToProdContainer from '~/containers/ProceedToProdContainer'
 import ImageToastify from '~/components/ImageToastify'
 import QueueBuildContainer from '~/containers/QueueBuildContainer'
 import QueueBuild from '~/components/QueueBuild'
 import ProceedToProd from '~/components/ProceedToProd'
+import { STAGE } from '~/utils/apiPropTypes'
 
 function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateStageData }) {
     const query = useQueryHook()
@@ -109,53 +110,7 @@ function Pipeline({ stages, loading, socketListenTime, getFullPipeline, updateSt
 }
 
 Pipeline.propTypes = {
-    stages: PropTypes.arrayOf(
-        PropTypes.shape({
-            _id: PropTypes.string,
-            repository: PropTypes.string,
-            name: PropTypes.string,
-            executionId: PropTypes.string,
-            version: PropTypes.string,
-            status: PropTypes.oneOf([
-                processName.QUEUED,
-                processName.IN_PROGRESS,
-                processName.SUCCESS,
-                processName.FAILURE,
-            ]),
-            codePipelineBranch: PropTypes.string,
-            metrics: PropTypes.arrayOf(
-                PropTypes.shape({
-                    _id: PropTypes.string,
-                    name: PropTypes.string,
-                    rank: PropTypes.number,
-                    actual: PropTypes.number,
-                    total: PropTypes.number,
-                    status: PropTypes.oneOf([
-                        processName.QUEUED,
-                        processName.IN_PROGRESS,
-                        processName.SUCCESS,
-                        processName.FAILURE,
-                    ]),
-                    appMetrics: PropTypes.arrayOf(
-                        PropTypes.shape({
-                            name: PropTypes.string,
-                            actual: PropTypes.number,
-                            total: PropTypes.number,
-                            reportUrl: PropTypes.string,
-                        }),
-                    ),
-                    completedAt: PropTypes.string,
-                    executionId: PropTypes.string,
-                    startedAt: PropTypes.string,
-                }),
-            ),
-            commitId: PropTypes.string,
-            deploymentId: PropTypes.string,
-            buildStartTime: PropTypes.string,
-            endDateTime: PropTypes.string,
-            startDateTime: PropTypes.string,
-        }),
-    ),
+    stages: PropTypes.arrayOf(STAGE),
     loading: PropTypes.bool,
     socketListenTime: PropTypes.number,
     getFullPipeline: PropTypes.func,

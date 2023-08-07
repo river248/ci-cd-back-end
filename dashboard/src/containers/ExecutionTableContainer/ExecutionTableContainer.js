@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import { DataGrid } from '@mui/x-data-grid/DataGrid'
 import { format } from 'date-fns'
 
-import { processName } from '~/utils/constants'
 import { differenceInTime } from '~/utils/helper'
 import StatusIcon from '~/components/StatusIcon'
+import { EXECUTION } from '~/utils/apiPropTypes'
 
 function ExecutionTableContainer({ executions }) {
     const columns = useMemo(
@@ -60,23 +60,7 @@ function ExecutionTableContainer({ executions }) {
 }
 
 ExecutionTableContainer.propTypes = {
-    executions: PropTypes.arrayOf(
-        PropTypes.shape({
-            _id: PropTypes.string.isRequired,
-            executionId: PropTypes.string.isRequired,
-            name: PropTypes.oneOf(['build', 'test', 'production']).isRequired,
-            repository: PropTypes.string.isRequired,
-            codePipelineBranch: PropTypes.string.isRequired,
-            commitId: PropTypes.string,
-            status: PropTypes.oneOf([processName.SUCCESS, processName.FAILURE]).isRequired,
-            version: PropTypes.string.isRequired,
-            buildStartTime: PropTypes.string.isRequired,
-            requireManualApproval: PropTypes.bool,
-            deploymentId: PropTypes.string,
-            startDateTime: PropTypes.string.isRequired,
-            endDateTime: PropTypes.string.isRequired,
-        }),
-    ),
+    executions: PropTypes.arrayOf(EXECUTION),
 }
 
 export default React.memo(ExecutionTableContainer)
