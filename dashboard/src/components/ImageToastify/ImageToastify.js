@@ -5,7 +5,7 @@ import Avatar from '@mui/material/Avatar'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-function ImageToastify({ closeToast, image, content }) {
+function ImageToastify({ image, content, closeToast }) {
     return (
         <Stack direction={'row'} alignItems={'center'} onClick={closeToast}>
             <Avatar alt={'Avatar'} src={image} sx={{ width: 40, height: 40, marginRight: 1 }} />

@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import ExecutionFilter from '~/components/ExecutionFilter'
 import { handleGetExecutionsByDate } from '~/redux/async-logics/executionLogic'
 import { handleFetchAllRepositories } from '~/redux/async-logics/repositoryLogic'
+import { REPOSITORY } from '~/utils/apiPropTypes'
 
 function ExecutionFilterContainer({ loading, repositories, getExecutionsByDate, getAllRepositories }) {
     const [startDate, setStartDate] = useState('')
@@ -53,7 +54,7 @@ function ExecutionFilterContainer({ loading, repositories, getExecutionsByDate, 
 
 ExecutionFilterContainer.propTypes = {
     loading: PropTypes.bool,
-    repositories: PropTypes.array,
+    repositories: PropTypes.arrayOf(REPOSITORY),
     getExecutionsByDate: PropTypes.func,
     getAllRepositories: PropTypes.func,
 }

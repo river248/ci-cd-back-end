@@ -2,6 +2,14 @@ import PropTypes from 'prop-types'
 
 import { processName } from './constants'
 
+export const REPOSITORY = PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    stages: PropTypes.arrayOf(['build', 'test', 'production']),
+    thumbnail: PropTypes.string.isRequired,
+    members: PropTypes.arrayOf(PropTypes.string),
+})
+
 export const EXECUTION = PropTypes.shape({
     _id: PropTypes.string.isRequired,
     executionId: PropTypes.string.isRequired,

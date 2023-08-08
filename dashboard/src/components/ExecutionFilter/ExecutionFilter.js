@@ -41,7 +41,7 @@ function ExecutionFilter({ options, selectedOption, disabled, onSelect, onDatePi
 }
 
 ExecutionFilter.propTypes = {
-    repositories: PropTypes.arrayOf(PropTypes.string),
+    options: PropTypes.arrayOf(PropTypes.string),
     selectedOption: PropTypes.string,
     disabled: PropTypes.bool,
     onSelect: PropTypes.func,
