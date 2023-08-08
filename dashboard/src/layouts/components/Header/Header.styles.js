@@ -2,7 +2,7 @@ import { styled } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
 
 import Button from '~/components/Button'
-import Input from '~/components/Input'
+import { MuiInput } from '~/components/GlobalStyles/GlobalStyles.mui'
 
 export const Wrapper = styled(Paper)(({ theme }) => ({
     borderRadius: 0,
@@ -15,8 +15,12 @@ export const Wrapper = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.secondary.dark,
 }))
 
-export const Search = styled(Input)(({ theme }) => ({
+export const Search = styled(MuiInput)(({ theme }) => ({
     width: 250,
+
+    ' .MuiOutlinedInput-notchedOutline': {
+        border: 0,
+    },
 
     [theme.breakpoints.down('sm')]: {
         width: 200,

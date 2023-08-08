@@ -2,24 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Paper from '@mui/material/Paper'
 import Stack from '@mui/material/Stack'
-import TextField from '@mui/material/TextField'
 import { useTheme } from '@mui/material/styles'
 
 import Button from '~/components/Button'
+import { MuiInput } from '~/components/GlobalStyles/GlobalStyles.mui'
 
 function BuildAction({ disableTrigger, disableStop, branch, onSetBranch, onTrigger, onStop }) {
     const theme = useTheme()
 
     return (
         <Paper sx={{ padding: theme.spacing(1) }}>
-            <TextField
-                size={'small'}
-                placeholder={'branch-name'}
-                sx={{ background: theme.palette.common.white }}
-                fullWidth
-                value={branch}
-                onChange={onSetBranch}
-            />
+            <MuiInput placeholder={'branch-name'} fullWidth value={branch} onChange={onSetBranch} />
             <Stack marginTop={1} direction={'row'} spacing={1}>
                 <Button
                     disabled={disableTrigger}

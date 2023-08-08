@@ -1,7 +1,23 @@
 import { styled } from '@mui/material/styles'
 import Paper from '@mui/material/Paper'
+import TextField from '@mui/material/TextField'
+import Select from '@mui/material/Select'
 
-import Input from '~/components/Input'
+export const textFieldStyles = (theme) => ({
+    borderRadius: theme.shape.borderRadius,
+    background: theme.palette.common.white,
+
+    ' .MuiInputBase-input': {
+        color: theme.palette.common.black,
+        padding: theme.spacing(1.0625, 1.75),
+    },
+
+    ' .MuiOutlinedInput-notchedOutline': {
+        borderWidth: 2,
+        borderStyle: 'solid',
+        borderColor: theme.palette.text.secondary,
+    },
+})
 
 export const ModalWrapper = styled(Paper)(({ theme }) => ({
     position: 'absolute',
@@ -12,12 +28,12 @@ export const ModalWrapper = styled(Paper)(({ theme }) => ({
     width: 320,
 }))
 
-export const MuiInput = styled(Input)(({ theme }) => ({
-    ' .MuiOutlinedInput-notchedOutline': {
-        borderWidth: 2,
-        borderStyle: 'solid',
-        borderColor: theme.palette.text.secondary,
-    },
+export const MuiInput = styled(TextField)(({ theme }) => ({
+    ...textFieldStyles(theme),
+}))
+
+export const MuiSelect = styled(Select)(({ theme }) => ({
+    ...textFieldStyles(theme),
 }))
 
 export const NoImage = styled('div')(({ theme }) => ({
