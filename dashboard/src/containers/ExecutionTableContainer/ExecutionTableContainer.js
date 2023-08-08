@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { DataGrid } from '@mui/x-data-grid/DataGrid'
 import { format } from 'date-fns'
+import { connect } from 'react-redux'
 
 import { differenceInTime } from '~/utils/helper'
 import StatusIcon from '~/components/StatusIcon'
@@ -63,4 +64,8 @@ ExecutionTableContainer.propTypes = {
     executions: PropTypes.arrayOf(EXECUTION),
 }
 
-export default React.memo(ExecutionTableContainer)
+const mapStateToProps = (state) => ({
+    executions: state.execution.executions,
+})
+
+export default connect(mapStateToProps, null)(React.memo(ExecutionTableContainer))

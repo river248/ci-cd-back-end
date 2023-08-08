@@ -9,7 +9,7 @@ function DateTimePicker({ ...passProps }) {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={['DatePicker']}>
-                <MuiDatePicker {...passProps} />
+                <MuiDatePicker {...passProps} format={'DD/MM/YYYY'} />
             </DemoContainer>
         </LocalizationProvider>
     )
