@@ -116,24 +116,24 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
-            - name: Run unit test
+            - name: Run unit test for backend
               working-directory: ./backend
               run: |
                   npm ci
                   npm run test
-            - name: Get report unit tests
+            - name: Get report unit tests for backend
               if: ${{ always() }}
-              id: unit_test_report
+              id: unit_test_backend_report
               run: |
                   echo "report=$(cat ./backend/junit.json)" >> "$GITHUB_OUTPUT"
             - name: Push metric
               if: ${{ always() }}
               run: |
-                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data": "{\"numPassedTests\": ${{ fromJSON(steps.unit_test_report.outputs.report).numPassedTests }}, \"numTotalTests\": ${{ fromJSON(steps.unit_test_report.outputs.report).numTotalTests }}}"}' \
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Tests","appMetricName":"backend","data": "{\"numPassedTests\": ${{ fromJSON(steps.unit_test_backend_report.outputs.report).numPassedTests }}, \"numTotalTests\": ${{ fromJSON(steps.unit_test_backend_report.outputs.report).numTotalTests }}}"}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
     unit_test_coverage:
-        needs: unit_tests
+        needs: start_stage
         runs-on: ubuntu-latest
         steps:
             - name: Slit ref to array.
@@ -150,9 +150,23 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 18
+            - name: Run unit test coverage for backend
+              working-directory: ./backend
+              run: |
+                  npm ci
+                  npm run test
+            - name: Get coverage report for backend
+              if: ${{ always() }}
+              id: coverage_backend_report
+              run: |
+                  {
+                    echo 'report<<EOF'
+                    cat ./backend/coverage-summary.json
+                    echo EOF
+                  } >> "$GITHUB_OUTPUT"
             - name: Push metric
               run: |
-                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"backend","data": "{\"actual\": 0, \"total\": 0}"}' \
+                  curl -d '{"repository":"ci-cd-github-actions","stage":"build","executionId":"${{ github.run_id }}","metricName":"Unit Test Coverage","appMetricName":"backend","data": "{\"actual\": ${{ fromJSON(steps.coverage_backend_report.outputs.report).total.lines.covered }}, \"total\": ${{ fromJSON(steps.coverage_backend_report.outputs.report).total.lines.total }}}"}' \
                     -H "Content-Type: application/json" \
                     -X POST https://ci-cd-github-actions.onrender.com/v1/metric/push-metric
     finish_stage:
