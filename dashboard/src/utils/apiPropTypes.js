@@ -5,7 +5,7 @@ import { processName } from './constants'
 export const REPOSITORY = PropTypes.shape({
     _id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    stages: PropTypes.arrayOf(['build', 'test', 'production']),
+    stages: PropTypes.arrayOf(PropTypes.string),
     thumbnail: PropTypes.string.isRequired,
     members: PropTypes.arrayOf(PropTypes.string),
 })

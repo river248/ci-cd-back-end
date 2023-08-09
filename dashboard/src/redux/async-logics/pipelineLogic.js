@@ -7,7 +7,7 @@ import { asyncTimeout } from '~/utils/helper'
 export const handleFetchFullPipeline = (repo) => async (dispatch) => {
     dispatch(loading(true))
     const res = await fetchFullPipeline(repo)
-    dispatch(getFullPipeline(res))
+    dispatch(getFullPipeline(res ?? []))
     dispatch(loading(false))
 }
 

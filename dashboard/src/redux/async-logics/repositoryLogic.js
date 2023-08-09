@@ -4,7 +4,7 @@ import { addNewRepository, getAllRepositories, loading, removeRepository } from 
 export const handleFetchAllRepositories = () => async (dispatch) => {
     dispatch(loading(true))
     const res = await fetchAllRepositories()
-    dispatch(getAllRepositories(res))
+    dispatch(getAllRepositories(res ?? []))
     dispatch(loading(false))
 }
 

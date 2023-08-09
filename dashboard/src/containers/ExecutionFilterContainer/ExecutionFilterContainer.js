@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { format } from 'date-fns'
 import { isEmpty } from 'lodash'
@@ -14,15 +14,16 @@ function ExecutionFilterContainer({ loading, repositories, getExecutionsByDate, 
     const [endDate, setEndDate] = useState('')
     const [repository, setRepository] = useState('')
 
-    const options = useMemo(() => {
-        getAllRepositories()
-        return repositories.map((repository) => repository.name)
-    }, [JSON.stringify(repositories)])
+    const options = useMemo(() => repositories.map((repository) => repository.name), [JSON.stringify(repositories)])
 
     const disabled = useMemo(
         () => isEmpty(startDate) || isEmpty(endDate) || isEmpty(repository),
         [startDate, endDate, repository],
     )
+
+    useEffect(() => {
+        getAllRepositories()
+    }, [])
 
     const handleDatePicker = useCallback((type, value) => {
         if (type === 'start') {
