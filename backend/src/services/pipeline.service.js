@@ -24,7 +24,9 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
         }
 
         const { total, actual } = metrics[0]
-        const isFailed = isNil(total) || isNil(actual) || actual !== total || jobStatus === workflowStatus.FAILURE
+        const failedMetric =
+            metricName === 'Unit Test Coverage' ? ((actual / total) * 100).toFixed(2) * 1 < 80 : actual !== total
+        const isFailed = isNil(total) || isNil(actual) || failedMetric || jobStatus === workflowStatus.FAILURE
         const status = isFailed ? workflowStatus.FAILURE : workflowStatus.SUCCESS
 
         const res = await MetricService.update(
