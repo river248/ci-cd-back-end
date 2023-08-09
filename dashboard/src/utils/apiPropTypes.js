@@ -2,13 +2,21 @@ import PropTypes from 'prop-types'
 
 import { processName } from './constants'
 
+export const REPOSITORY = PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    stages: PropTypes.arrayOf(PropTypes.string),
+    thumbnail: PropTypes.string.isRequired,
+    members: PropTypes.arrayOf(PropTypes.string),
+})
+
 export const EXECUTION = PropTypes.shape({
     _id: PropTypes.string.isRequired,
     executionId: PropTypes.string.isRequired,
     name: PropTypes.oneOf(['build', 'test', 'production']).isRequired,
     repository: PropTypes.string.isRequired,
-    codePipelineBranch: PropTypes.string,
-    commitId: PropTypes.string,
+    codePipelineBranch: PropTypes.string.isRequired,
+    commitId: PropTypes.string.isRequired,
     status: PropTypes.oneOf([processName.SUCCESS, processName.FAILURE]),
     version: PropTypes.string.isRequired,
     buildStartTime: PropTypes.string.isRequired,

@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState, useCallback } from 'react'
+import PropTypes from 'prop-types'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Modal from '@mui/material/Modal'
@@ -10,6 +11,7 @@ import Title from '~/components/Title'
 import { handleFetchAllRepositories } from '~/redux/async-logics/repositoryLogic'
 import AddNewRepositoryContainer from '~/containers/AddNewRepositoryContainer'
 import RemoveRepositoryContainer from '~/containers/RemoveRepositoryContainer'
+import { REPOSITORY } from '~/utils/apiPropTypes'
 
 function Dashboard({ loading, repositories, getAllRepositories }) {
     const fakeRepositories = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
@@ -68,6 +70,12 @@ function Dashboard({ loading, repositories, getAllRepositories }) {
             </Modal>
         </Box>
     )
+}
+
+Dashboard.propTypes = {
+    loading: PropTypes.bool,
+    repositories: PropTypes.arrayOf(REPOSITORY),
+    getAllRepositories: PropTypes.func,
 }
 
 const mapStateToProps = (state) => ({
