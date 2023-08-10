@@ -7,7 +7,12 @@
 .pnp.js
 
 # testing
-/coverage
+/backend/coverage
+/backend/jest-html-reporters-attach
+/backend/jest_html_reporters.html
+/backend/coverage-summary.json
+/backend/junit.json
+/backend/junit.xml
 
 # production
 /dashboard/build
