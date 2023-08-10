@@ -59,11 +59,7 @@ const checkBuildable = async (repository) => {
             0,
         )
 
-        if (isEmpty(queueOrInProgress)) {
-            return true
-        }
-
-        return false
+        return isEmpty(queueOrInProgress)
     } catch (error) {
         throw new InternalServer(error.message)
     }
