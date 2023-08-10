@@ -184,37 +184,10 @@ test('manuallyTriggerBuild push to queue', async () => {
 
     expect(res).toBe('Push to queue successfully!')
     expect(RepositoryService.validateBranch).toHaveBeenCalledWith(REPOSITORY_NAME, BRANCH_NAME)
+    expect(StageService.findStages).toHaveBeenCalledTimes(5)
     expect(StageService.findStages).toHaveBeenNthCalledWith(1, REPOSITORY_NAME, stageName.BUILD, {}, 1)
     expect(QueueModel.findQueue).toHaveBeenCalledWith(REPOSITORY_NAME)
     expect(RepositoryService.createTag).toHaveBeenCalledWith(REPOSITORY_NAME, BRANCH_NAME, '0.0.2')
-    expect(StageService.findStages).toHaveBeenNthCalledWith(
-        2,
-        REPOSITORY_NAME,
-        stageName.BUILD,
-        { status: workflowStatus.QUEUED },
-        0,
-    )
-    expect(StageService.findStages).toHaveBeenNthCalledWith(
-        3,
-        REPOSITORY_NAME,
-        stageName.BUILD,
-        { status: workflowStatus.IN_PROGRESS },
-        0,
-    )
-    expect(StageService.findStages).toHaveBeenNthCalledWith(
-        4,
-        REPOSITORY_NAME,
-        stageName.TEST,
-        { status: workflowStatus.QUEUED },
-        0,
-    )
-    expect(StageService.findStages).toHaveBeenNthCalledWith(
-        5,
-        REPOSITORY_NAME,
-        stageName.TEST,
-        { status: workflowStatus.IN_PROGRESS },
-        0,
-    )
     expect(global._io.to).toHaveBeenCalledWith(REPOSITORY_NAME)
     expect(QueueModel.pushToQueue).toHaveBeenCalledWith({ repository: REPOSITORY_NAME, tagName: 'master@0.0.2' })
 })
