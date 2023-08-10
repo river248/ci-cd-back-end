@@ -1,6 +1,6 @@
 import InternalServer from '~/errors/internalServer.error'
-import { StageService } from './stage.service'
 import { workflowStatus } from '~/utils/constants'
+import { StageModel } from '~/models/stage.model'
 
 const findExecutionsByDate = async (repository, startDateTime, endDateTime) => {
     try {
@@ -16,7 +16,7 @@ const findExecutionsByDate = async (repository, startDateTime, endDateTime) => {
             status: { $nin: [workflowStatus.QUEUED, workflowStatus.IN_PROGRESS] },
         }
 
-        const res = await StageService.findStages(repository, null, condition, 0)
+        const res = await StageModel.findStages(repository, condition, 0)
 
         return res
     } catch (error) {

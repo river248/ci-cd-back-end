@@ -1,13 +1,13 @@
 import { first, isEmpty, last } from 'lodash'
 
-import NotFound from '~/errors/notfound.error'
 import { RepositoryService } from './repository.service'
+import NotFound from '~/errors/notfound.error'
 import InternalServer from '~/errors/internalServer.error'
 import { githubAPI, socketEvent, stageName, workflowStatus } from '~/utils/constants'
 import { env } from '~/configs/environment'
-import { StageService } from './stage.service'
 import { QueueModel } from '~/models/queue.model'
 import BadRequest from '~/errors/badRequest.error'
+import { StageModel } from '~/models/stage.model'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -19,7 +19,7 @@ const generateVersion = async (repository) => {
 
     try {
         const [stages, waitingBuilds] = await Promise.all([
-            StageService.findStages(repository, stageName.BUILD, {}, 1),
+            StageModel.findStages(repository, { name: stageName.BUILD }, 1),
             QueueModel.findQueue(repository),
         ])
 
@@ -48,20 +48,20 @@ const generateVersion = async (repository) => {
     }
 }
 
-const checkBuildable = async (repository, tagName) => {
+const checkBuildable = async (repository) => {
     try {
-        const [queuedBuild, inProgressBuild, queuedTest, inProgressTest] = await Promise.all([
-            StageService.findStages(repository, stageName.BUILD, { status: workflowStatus.QUEUED }, 0),
-            StageService.findStages(repository, stageName.BUILD, { status: workflowStatus.IN_PROGRESS }, 0),
-            StageService.findStages(repository, stageName.TEST, { status: workflowStatus.QUEUED }, 0),
-            StageService.findStages(repository, stageName.TEST, { status: workflowStatus.IN_PROGRESS }, 0),
-        ])
+        const queueOrInProgress = await StageModel.findStages(
+            repository,
+            {
+                name: { $ne: stageName.PRODUCTION },
+                status: { $in: [workflowStatus.QUEUED, workflowStatus.IN_PROGRESS] },
+            },
+            0,
+        )
 
-        if (isEmpty(queuedBuild) && isEmpty(inProgressBuild) && isEmpty(queuedTest) && isEmpty(inProgressTest)) {
+        if (isEmpty(queueOrInProgress)) {
             return true
         }
-
-        await QueueModel.pushToQueue({ repository, tagName })
 
         return false
     } catch (error) {
@@ -96,6 +96,12 @@ const autoTriggerBuild = async (repo, tagName) => {
 
 const triggerBuildInQueue = async (repository) => {
     try {
+        const buildable = await checkBuildable(repository)
+
+        if (!buildable) {
+            return null
+        }
+
         const waitingBuilds = await QueueModel.findQueue(repository)
         const buildableBranch = first(waitingBuilds)
 
@@ -120,9 +126,10 @@ const manuallyTriggerBuild = async (repository, branchName, triggerer) => {
             RepositoryService.validateBranch(repository, branchName),
             generateVersion(repository),
         ])
-
-        const tagName = await RepositoryService.createTag(repository, validatedBranch, version)
-        const buildable = await checkBuildable(repository, tagName)
+        const [tagName, buildable] = await Promise.all([
+            RepositoryService.createTag(repository, validatedBranch, version),
+            checkBuildable(repository),
+        ])
         const { user_id, name, picture } = triggerer
         const userData = { userId: user_id, name, avatar: picture }
 
@@ -133,7 +140,9 @@ const manuallyTriggerBuild = async (repository, branchName, triggerer) => {
             return 'Trigger build successfully!'
         }
 
+        await QueueModel.pushToQueue({ repository, tagName })
         _io.to(repository).emit(socketEvent.UPDATE_QUEUE, { action: 'push', tagName, userData })
+
         return 'Push to queue successfully!'
     } catch (error) {
         if (error instanceof NotFound) {
