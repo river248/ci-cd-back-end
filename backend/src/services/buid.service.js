@@ -1,6 +1,7 @@
 import { first, isEmpty, last } from 'lodash'
 
 import { RepositoryService } from './repository.service'
+import { ExecutionService } from './execution.service'
 import NotFound from '~/errors/notfound.error'
 import InternalServer from '~/errors/internalServer.error'
 import { githubAPI, socketEvent, stageName, workflowStatus } from '~/utils/constants'
@@ -155,12 +156,7 @@ const manuallyTriggerBuild = async (repository, branchName, triggerer) => {
 
 const manuallyStopBuild = async (repository, executionId, stopper) => {
     try {
-        await _octokit.request(githubAPI.CANCEL_WORKFLOW, {
-            owner: env.GITHUB_OWNER,
-            repo: repository,
-            run_id: executionId,
-            headers: githubAPI.HEADERS,
-        })
+        await ExecutionService.stopExecution(repository, executionId)
 
         const { user_id, name, picture } = stopper
         const userData = { userId: user_id, name, avatar: picture }
