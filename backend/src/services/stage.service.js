@@ -1,17 +1,18 @@
-import { cloneDeep, isEmpty, isNil } from 'lodash'
+import { isEmpty, isNil } from 'lodash'
 
 import { MetricService } from './metric.service'
+import { BuildService } from './buid.service'
 import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
 import { socketEvent, stageMetrics, updateAction, workflowStatus, stageName } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
-import { BuildService } from './buid.service'
+import { MetricModel } from '~/models/metric.model'
 //========================================================================================+
 //                                 PRIVATE FUNCTIONS                                      |
 //========================================================================================+
 const handleFinishStage = async (repository, stage, executionId) => {
     try {
-        let metrics = await MetricService.findMetrics(repository, stage, { executionId })
+        let metrics = await MetricModel.findMetrics(repository, stage, { executionId })
         const inProgressMetrics = []
         const completedMetrics = []
         let isSuccess = true
@@ -105,22 +106,6 @@ const update = async (repository, name, executionId, data) => {
             throw new NotFound(error.message)
         }
 
-        throw new InternalServer(error.message)
-    }
-}
-
-const findStages = async (repository, name, condition, limit) => {
-    try {
-        let newCondition = cloneDeep(condition)
-
-        if (!isEmpty(name)) {
-            newCondition = { ...newCondition, name }
-        }
-
-        const stageData = await StageModel.findStages(repository, newCondition, limit)
-
-        return stageData
-    } catch (error) {
         throw new InternalServer(error.message)
     }
 }
@@ -254,7 +239,7 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
             delete metric.executionId
         })
 
-        if (stage === stageName.TEST) {
+        if (stage !== stageName.PRODUCTION) {
             BuildService.triggerBuildInQueue(repository).then((tagName) => {
                 if (tagName) {
                     _io.to(repository).emit(socketEvent.UPDATE_QUEUE, { action: 'pop', tagName })
@@ -280,10 +265,9 @@ const findInstallableProdVersions = async (repository) => {
     const CODE_PIPELINE_BRANCH = 'master'
 
     try {
-        const stages = await findStages(
+        const stages = await StageModel.findStages(
             repository,
-            stageName.TEST,
-            { requireManualApproval: true, codePipelineBranch: CODE_PIPELINE_BRANCH },
+            { name: stageName.TEST, requireManualApproval: true, codePipelineBranch: CODE_PIPELINE_BRANCH },
             0,
         )
 
@@ -300,7 +284,6 @@ const findInstallableProdVersions = async (repository) => {
 export const StageService = {
     createNew,
     update,
-    findStages,
     getStageData,
     startStage,
     finishStage,
