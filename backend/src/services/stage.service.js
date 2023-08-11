@@ -7,66 +7,6 @@ import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
 import { socketEvent, stageMetrics, updateAction, workflowStatus, stageName, mainBranch } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
-//========================================================================================+
-//                                 PRIVATE FUNCTIONS                                       |
-//========================================================================================+
-const handleCompletedFinishStage = async ({
-    repository,
-    stage,
-    executionId,
-    codePipelineBranch,
-    successExecution,
-    pipelineStatus,
-    endDateTime,
-    metrics,
-}) => {
-    try {
-        const data = {
-            status: successExecution ? pipelineStatus : workflowStatus.FAILURE,
-            requireManualApproval:
-                successExecution &&
-                pipelineStatus === workflowStatus.SUCCESS &&
-                stage === stageName.TEST &&
-                codePipelineBranch === mainBranch.MASTER,
-            endDateTime,
-        }
-
-        const stageData = await update(repository, stage, executionId, data)
-
-        if (stage === stageName.TEST) {
-            const deployableVerions = await findInstallableProdVersions(repository)
-            const mapToVersions = deployableVerions.map((deployableVerion) => deployableVerion.version)
-
-            _io.to(repository).emit(socketEvent.UPDATE_DEPLOYABLED_PRODUCTION, mapToVersions)
-        }
-
-        metrics.forEach((metric) => {
-            delete metric.repository
-            delete metric.stage
-            delete metric.executionId
-        })
-
-        if (stage !== stageName.PRODUCTION) {
-            BuildService.triggerBuildInQueue(repository).then((tagName) => {
-                if (tagName) {
-                    _io.to(repository).emit(socketEvent.UPDATE_QUEUE, { action: 'pop', tagName })
-                }
-            })
-        }
-
-        if (!isEmpty(stageData) && !isNil(stageData)) {
-            return { ...stageData, metrics }
-        }
-
-        return null
-    } catch (error) {
-        if (error instanceof NotFound) {
-            throw new NotFound(error.message)
-        }
-
-        throw new InternalServer(error.message)
-    }
-}
 
 //========================================================================================+
 //                                 PUBLIC FUNCTIONS                                       |
@@ -214,35 +154,45 @@ const startStage = async (repository, stage, executionId, initialJob) => {
     }
 }
 
-const finishStage = async ({
-    repository,
-    stage,
-    executionId,
-    codePipelineBranch,
-    pipelineStatus,
-    jobStatus,
-    endDateTime,
-}) => {
+const finishStage = async (repository, stage, executionId, codePipelineBranch, pipelineStatus, endDateTime) => {
     try {
         const { metrics, isSuccess } = await ExecutionService.checkExecutionStatus(repository, stage, executionId)
 
-        if (pipelineStatus === workflowStatus.QUEUED && codePipelineBranch === mainBranch.MASTER && !isSuccess) {
-            await ExecutionService.stopExecution(repository, executionId)
+        const data = {
+            status: isSuccess ? pipelineStatus : workflowStatus.FAILURE,
+            requireManualApproval:
+                isSuccess &&
+                pipelineStatus === workflowStatus.SUCCESS &&
+                stage === stageName.TEST &&
+                codePipelineBranch === mainBranch.MASTER,
+            endDateTime,
         }
 
-        if (pipelineStatus === workflowStatus.COMPLETED) {
-            const res = await handleCompletedFinishStage({
-                repository,
-                stage,
-                executionId,
-                codePipelineBranch,
-                successExecution: isSuccess,
-                pipelineStatus: jobStatus,
-                endDateTime,
-                metrics,
-            })
+        const stageData = await update(repository, stage, executionId, data)
 
-            return res
+        if (stage === stageName.TEST) {
+            const deployableVerions = await findInstallableProdVersions(repository)
+            const mapToVersions = deployableVerions.map((deployableVerion) => deployableVerion.version)
+
+            _io.to(repository).emit(socketEvent.UPDATE_DEPLOYABLED_PRODUCTION, mapToVersions)
+        }
+
+        metrics.forEach((metric) => {
+            delete metric.repository
+            delete metric.stage
+            delete metric.executionId
+        })
+
+        if (stage !== stageName.PRODUCTION) {
+            BuildService.triggerBuildInQueue(repository).then((tagName) => {
+                if (tagName) {
+                    _io.to(repository).emit(socketEvent.UPDATE_QUEUE, { action: 'pop', tagName })
+                }
+            })
+        }
+
+        if (!isEmpty(stageData) && !isNil(stageData)) {
+            return { ...stageData, metrics }
         }
 
         return null

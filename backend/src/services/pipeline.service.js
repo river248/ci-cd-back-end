@@ -94,16 +94,15 @@ const handlePipelineData = async (payload) => {
          * This block create update stage and metric
          */
 
-        if (isFinishStage && pipelineStatus != workflowStatus.IN_PROGRESS) {
-            const res = await StageService.finishStage({
-                repository: repo,
+        if (isFinishStage && pipelineStatus === workflowStatus.COMPLETED) {
+            const res = await StageService.finishStage(
+                repo,
                 stage,
                 executionId,
                 codePipelineBranch,
-                pipelineStatus,
                 jobStatus,
                 endDateTime,
-            })
+            )
 
             if (res) {
                 return res
