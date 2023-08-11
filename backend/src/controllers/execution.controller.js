@@ -14,6 +14,20 @@ const findExecutionsByDate = async (req, res) => {
     }
 }
 
+const checkExecutionStatus = async (req, res) => {
+    try {
+        const { repository, stage, executionId } = req.body
+        const result = await ExecutionService.checkExecutionStatus(repository, stage, executionId)
+
+        res.status(HttpStatusCode.OK).json(result)
+    } catch (error) {
+        res.status(error.statusCode()).json({
+            error: error.message,
+        })
+    }
+}
+
 export const ExecutionController = {
     findExecutionsByDate,
+    checkExecutionStatus,
 }
