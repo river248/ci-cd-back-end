@@ -1,3 +1,5 @@
+import { isEmpty } from 'lodash'
+
 import { MetricService } from './metric.service'
 import InternalServer from '~/errors/internalServer.error'
 import { githubAPI, updateAction, workflowStatus } from '~/utils/constants'
