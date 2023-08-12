@@ -1,68 +1,13 @@
-import { cloneDeep, isEmpty, isNil } from 'lodash'
+import { isEmpty, isNil } from 'lodash'
 
 import { MetricService } from './metric.service'
+import { BuildService } from './buid.service'
+import { ExecutionService } from './execution.service'
 import InternalServer from '~/errors/internalServer.error'
 import { StageModel } from '~/models/stage.model'
-import { socketEvent, stageMetrics, updateAction, workflowStatus, stageName } from '~/utils/constants'
+import { socketEvent, stageMetrics, updateAction, workflowStatus, stageName, mainBranch } from '~/utils/constants'
 import NotFound from '~/errors/notfound.error'
-import { BuildService } from './buid.service'
-//========================================================================================+
-//                                 PRIVATE FUNCTIONS                                      |
-//========================================================================================+
-const handleFinishStage = async (repository, stage, executionId) => {
-    try {
-        let metrics = await MetricService.findMetrics(repository, stage, { executionId })
-        const inProgressMetrics = []
-        const completedMetrics = []
-        let isSuccess = true
 
-        metrics.forEach((metric) => {
-            if (metric.status === workflowStatus.IN_PROGRESS) {
-                inProgressMetrics.push(metric)
-            } else {
-                completedMetrics.push(metric)
-            }
-        })
-
-        if (!isEmpty(inProgressMetrics)) {
-            await Promise.all(
-                inProgressMetrics.map(
-                    async (inProgressMetric) =>
-                        await MetricService.update(
-                            inProgressMetric.repository,
-                            inProgressMetric.stage,
-                            inProgressMetric.executionId,
-                            inProgressMetric.name,
-                            { status: workflowStatus.FAILURE },
-                            updateAction.SET,
-                        ),
-                ),
-            )
-
-            isSuccess = false
-            metrics = [
-                ...completedMetrics,
-                ...inProgressMetrics.map((inProgressMetric) => ({
-                    ...inProgressMetric,
-                    status: workflowStatus.FAILURE,
-                })),
-            ]
-        } else {
-            const hasError = metrics.find((metric) => metric.status !== workflowStatus.SUCCESS)
-
-            if (hasError) {
-                isSuccess = false
-            }
-        }
-
-        return {
-            isSuccess,
-            metrics,
-        }
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
 //========================================================================================+
 //                                 PUBLIC FUNCTIONS                                       |
 //========================================================================================+
@@ -105,22 +50,6 @@ const update = async (repository, name, executionId, data) => {
             throw new NotFound(error.message)
         }
 
-        throw new InternalServer(error.message)
-    }
-}
-
-const findStages = async (repository, name, condition, limit) => {
-    try {
-        let newCondition = cloneDeep(condition)
-
-        if (!isEmpty(name)) {
-            newCondition = { ...newCondition, name }
-        }
-
-        const stageData = await StageModel.findStages(repository, newCondition, limit)
-
-        return stageData
-    } catch (error) {
         throw new InternalServer(error.message)
     }
 }
@@ -227,7 +156,7 @@ const startStage = async (repository, stage, executionId, initialJob) => {
 
 const finishStage = async (repository, stage, executionId, codePipelineBranch, pipelineStatus, endDateTime) => {
     try {
-        const { metrics, isSuccess } = await handleFinishStage(repository, stage, executionId)
+        const { metrics, isSuccess } = await ExecutionService.checkExecutionStatus(repository, stage, executionId)
 
         const data = {
             status: isSuccess ? pipelineStatus : workflowStatus.FAILURE,
@@ -235,7 +164,7 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
                 isSuccess &&
                 pipelineStatus === workflowStatus.SUCCESS &&
                 stage === stageName.TEST &&
-                codePipelineBranch === 'master',
+                codePipelineBranch === mainBranch.MASTER,
             endDateTime,
         }
 
@@ -254,7 +183,7 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
             delete metric.executionId
         })
 
-        if (stage === stageName.TEST) {
+        if (stage !== stageName.PRODUCTION) {
             BuildService.triggerBuildInQueue(repository).then((tagName) => {
                 if (tagName) {
                     _io.to(repository).emit(socketEvent.UPDATE_QUEUE, { action: 'pop', tagName })
@@ -277,13 +206,10 @@ const finishStage = async (repository, stage, executionId, codePipelineBranch, p
 }
 
 const findInstallableProdVersions = async (repository) => {
-    const CODE_PIPELINE_BRANCH = 'master'
-
     try {
-        const stages = await findStages(
+        const stages = await StageModel.findStages(
             repository,
-            stageName.TEST,
-            { requireManualApproval: true, codePipelineBranch: CODE_PIPELINE_BRANCH },
+            { name: stageName.TEST, requireManualApproval: true, codePipelineBranch: mainBranch.MASTER },
             0,
         )
 
@@ -300,7 +226,6 @@ const findInstallableProdVersions = async (repository) => {
 export const StageService = {
     createNew,
     update,
-    findStages,
     getStageData,
     startStage,
     finishStage,

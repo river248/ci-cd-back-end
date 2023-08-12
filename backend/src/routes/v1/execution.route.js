@@ -6,6 +6,12 @@ import { ExecutionValidation } from '~/validations/execution.validation'
 
 const router = express.Router()
 
+router.post(
+    '/check-execution-status',
+    AuthMiddleware.isAuthForExecution,
+    ExecutionValidation.checkExecutionStatus,
+    ExecutionController.checkExecutionStatus,
+)
 router.get(
     '/',
     AuthMiddleware.isAuth,

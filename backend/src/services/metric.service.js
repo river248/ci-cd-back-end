@@ -1,10 +1,10 @@
 import { cloneDeep, isEmpty, isNil } from 'lodash'
 
+import { StageService } from './stage.service'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { MetricModel } from '~/models/metric.model'
-import { updateAction } from '~/utils/constants'
-import { StageService } from './stage.service'
+import { metricEnum, updateAction } from '~/utils/constants'
 
 //========================================================================================+
 //                                    PRIVATE FUNCTIONS                                   |
@@ -22,7 +22,7 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
             },
         }
 
-        if (metricName === 'Code Quality') {
+        if (metricName === metricEnum.CODE_QUALITY) {
             const qualityGates = dataFromJSON.projectStatus.conditions
             const sonarOkQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'OK').length
             const sonarErrorQualityGates = qualityGates.filter((qualityGate) => qualityGate.status === 'ERROR').length
@@ -31,14 +31,14 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
             appMetricData.appMetrics.total = sonarOkQualityGates + sonarErrorQualityGates
         }
 
-        if (metricName === 'Unit Tests') {
+        if (metricName === metricEnum.UNIT_TESTS) {
             const { numPassedTests, numTotalTests } = dataFromJSON
 
             appMetricData.appMetrics.actual = numPassedTests
             appMetricData.appMetrics.total = numTotalTests
         }
 
-        if (metricName === 'Unit Test Coverage' || metricName === 'Deployment Check') {
+        if (metricName === metricEnum.UNIT_TEST_COVERAGE || metricName === metricEnum.DEPLOYMENT_CHECK) {
             const { total, actual } = dataFromJSON
 
             appMetricData.appMetrics.actual = actual
@@ -62,7 +62,7 @@ const pushMetric = async (repository, stage, executionId, metricName, appMetricN
 
 const calculateMetric = async (repository, stage, executionId, metricName, newAppMetric) => {
     try {
-        const metrics = await findMetrics(repository, stage, { executionId, name: metricName })
+        const metrics = await MetricModel.findMetrics(repository, stage, { executionId, name: metricName })
 
         if (isEmpty(metrics)) {
             throw new NotFound(
@@ -164,16 +164,6 @@ const handlePushMetric = async (repository, stage, executionId, metricName, appM
     }
 }
 
-const findMetrics = async (repository, stage, conditions) => {
-    try {
-        const res = await MetricModel.findMetrics(repository, stage, conditions)
-
-        return res
-    } catch (error) {
-        throw new InternalServer(error.message)
-    }
-}
-
 //========================================================================================+
 //                                 EXPORT PUBLIC FUNCTIONS                                |
 //========================================================================================+
@@ -182,5 +172,4 @@ export const MetricService = {
     createNew,
     update,
     handlePushMetric,
-    findMetrics,
 }

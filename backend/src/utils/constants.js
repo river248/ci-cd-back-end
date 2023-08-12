@@ -36,10 +36,17 @@ export const workflowStatus = {
     STALE: 'stale',
 }
 
+export const metricEnum = {
+    CODE_QUALITY: 'Code Quality',
+    UNIT_TESTS: 'Unit Tests',
+    UNIT_TEST_COVERAGE: 'Unit Test Coverage',
+    DEPLOYMENT_CHECK: 'Deployment Check',
+}
+
 export const stageMetrics = {
-    BUILD: ['Code Quality', 'Unit Tests', 'Unit Test Coverage'],
-    TEST: ['Deployment Check'],
-    PRODUCTION: ['Deployment Check'],
+    BUILD: [metricEnum.CODE_QUALITY, metricEnum.UNIT_TESTS, metricEnum.UNIT_TEST_COVERAGE],
+    TEST: [metricEnum.DEPLOYMENT_CHECK],
+    PRODUCTION: [metricEnum.DEPLOYMENT_CHECK],
 }
 
 export const stageName = {
@@ -47,6 +54,8 @@ export const stageName = {
     TEST: 'test',
     PRODUCTION: 'production',
 }
+
+export const mainBranch = { MASTER: 'master' }
 
 export const updateAction = {
     SET: 'set',

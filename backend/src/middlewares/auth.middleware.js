@@ -24,6 +24,18 @@ const isAuth = async (req, res, next) => {
     }
 }
 
+const isAuthForExecution = async (req, res, next) => {
+    const tokenFromClient = req.headers['authorization']
+
+    if (tokenFromClient === env.GITHUB_AUTH) {
+        next()
+    } else {
+        return res.status(HttpStatusCode.FORBIDDEN).json({
+            error: 'No token provided.',
+        })
+    }
+}
+
 const isAuthForDeployment = async (req, res, next) => {
     const tokenFromClient = req.headers['authorization']
 
@@ -36,4 +48,4 @@ const isAuthForDeployment = async (req, res, next) => {
     }
 }
 
-export const AuthMiddleware = { isAuth, isAuthForDeployment }
+export const AuthMiddleware = { isAuth, isAuthForDeployment, isAuthForExecution }

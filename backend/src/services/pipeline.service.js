@@ -1,12 +1,13 @@
 import { isEmpty, isNil } from 'lodash'
 
+import { MetricService } from './metric.service'
+import { StageService } from './stage.service'
+import { RepositoryService } from './repository.service'
 import InternalServer from '~/errors/internalServer.error'
 import NotFound from '~/errors/notfound.error'
 import { updateAction, workflowStatus } from '~/utils/constants'
-import { MetricService } from './metric.service'
-import { StageService } from './stage.service'
 import { toTitleCase } from '~/utils/helpers'
-import { RepositoryService } from './repository.service'
+import { MetricModel } from '~/models/metric.model'
 //========================================================================================+
 //                                   PRIVATE FUNCTIONS                                    |
 //========================================================================================+
@@ -16,7 +17,7 @@ const handleCompletedJob = async (repository, stage, executionId, metricKey, dat
         const { jobStatus, startDateTime, endDateTime } = data
         const metricName = toTitleCase(metricKey.replaceAll('_', ' '))
 
-        const metrics = await MetricService.findMetrics(repository, stage, { executionId, name: metricName })
+        const metrics = await MetricModel.findMetrics(repository, stage, { executionId, name: metricName })
         if (isEmpty(metrics)) {
             throw new NotFound(
                 `Not found metric ${metricName} with executionId ${executionId} for stage ${stage} at repo ${repository}`,
